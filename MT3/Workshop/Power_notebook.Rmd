@@ -215,3 +215,9 @@ pwr.t.test(d = .46, power = .8, sig.level = .05, type = c("two.sample"))
 Okay, so we will need a sample of n = 150 (i.e., 75 in each group) to replicate the original effect size with 80% power.
 
 Either approach is fine, but my recommendation is that for large effect sizes, use the lower bound confidence interval estimate to calculate sample size. For small and moderate effects, use the original study effect size estimate.
+
+
+
+***
+
+--Some of this content comes from: Robert I. Kabacoff, Ph.D
