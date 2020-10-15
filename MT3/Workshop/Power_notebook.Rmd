@@ -168,9 +168,9 @@ The design was a classic two-group design, with participants randomized into a c
 Participants in the “cheating” condition claimed to
 have obtained significantly more heads for money (M  5.49, SD  1.25) than did those in the “cheater” condition (M  4.88, SD = 1.38), t(77) = 2.06, p = .04, Cohen's d = 0.46. This was a difference in favor of the authors' hypotheses, but note here the high p value. Definitely one to check out.
 
-#### Original study power
+#### Original study power (post-priori power)
 
-The original effect size for the twp-sample t-test that tested the primary prediction was Cohen’s d = .46. The authors do not provide a confidence interval for this effect size but we can estimate it using the ci.smd() function from the MBESS package. It has the form:
+The original effect size for the two-sample t-test that tested the primary prediction was Cohen’s d = .46. The authors do not provide a confidence interval for this effect size but we can estimate it using the ci.smd() function from the MBESS package. It has the form:
 
 ci.smd(ncp=, n.1=, n.2=, conf.level=0.95)
 
@@ -182,7 +182,7 @@ Let's do this for the Bryan example:
 ci.smd(ncp=2.06, n.1=40, n.2=39, conf.level=0.95)
 ```
 
-Oof, we have a really low  lower limit there of .02. This effect is already looking shakey!
+Oof, we have a really low  lower limit there of .02. This effect is already looking shaky!
 
 Anyway, let's first see what sample size would have been needed to detect the original effect.
 
@@ -196,9 +196,9 @@ As is clear from these analyses the original study was not sufficiently powered 
 pwr.t2n.test(n1 = 40, n2= 39, d = .46, sig.level =.05) # for uneven samples like this use pwr.t2n.test where n1 and n2 are the sample sizes (all other commands the same)
 ```
 
-The original study only had a post-hoc power of .52 or 52%. Hmmmmmm. Very good grounds to replicate this.
+The original study only had a post-priori power of .52 or 52%. Hmmmmmm. Very good grounds to replicate this.
 
-#### Replication study power
+#### Replication study power (a-priori power)
 
 To achieve high power I will need a large number of participants because the original effect size is only moderate. This is especially so based the calculation of the lower confidence interval bound of the effect size (0.02). Best practice would be to take the smallest plausible effect size (i.e., .02) and with 80% power calculate our replication sample size. Let's do that now:
 
