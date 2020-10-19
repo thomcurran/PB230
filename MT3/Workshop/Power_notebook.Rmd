@@ -77,7 +77,7 @@ You see, the larger the effect size, the smaller the sample needed to reliabilit
 Now you have a go. What is the sample size needed for a paired-sample t-test to obtain a power of 0.80, when the effect size is large (0.50) and a significance level of 0.05 is employed. Write the code needed to find the n.
 
 ```{r}
-
+pwr.t.test(d = .50, power = .8, sig.level = .05, type = c("paired"))
 ```
 
 ## ANOVA
@@ -86,9 +86,9 @@ For a one-way analysis of variance use:
 
 pwr.anova.test(k = , n = , f = , sig.level = , power = )
 
-where k is the number of groups, n is the common sample size in each group, and f is the F value from ANOVA.
+where k is the number of groups, n is the common sample size in each group, and f is the Cohens F. Cohen's F can be calcuated from eta2 (or the PRE) of the overall ANOVA model using this website: https://www.escal.site/. It converts common effect size metrics for ANOVA to Cohen's F. 
 
-Cohen suggests that f values of 0.1, 0.25, and 0.4 represent small, medium, and large effect sizes respectively.
+Cohen suggests that F values of 0.1, 0.25, and 0.4 represent small, medium, and large effect sizes respectively.
 
 ### For example
 
@@ -103,7 +103,7 @@ pwr.anova.test(k=3,f=.25,sig.level=.05,power=.8)
 Now you have a go. What is the sample size needed for a 4 group one-way ANVOA to obtain a power of 0.80, when the effect size is large (0.40) and a significance level of 0.05 is employed. Write the code needed to find the n for each group.
 
 ```{r}
-
+pwr.anova.test(k=4,f=.25,sig.level=.05,power=.8)
 ```
 
 ## Correlations and regression
@@ -120,9 +120,9 @@ For linear models (e.g., multiple regression) use
 
 pwr.f2.test(u =, v = , f2 = , sig.level = , power = )
 
-where u and v are the numerator (number of predictors) and denominator (n-number of predictors) degrees of freedom. We use F from the ANOVA as the effect size measure.
+where u and v are the numerator (number of predictors) and denominator (n-number of predictors) degrees of freedom. We use Cohen's F2 as the effect size measure. Like ANOVA, we can calcuate F2 from the multiR2 of the overall model at: https://www.escal.site/. Just add the multiR2 in the R-squared box, find Cohens F and then square it for F2.
 
-Cohen suggests F values of 0.02, 0.15, and 0.35 represent small, medium, and large effect sizes in regression.
+Cohen suggests F2 values of 0.02, 0.15, and 0.35 represent small, medium, and large effect sizes in regression.
 
 ### For example
 
@@ -144,7 +144,7 @@ Now you have a go. What is the sample size needed for a correlation to obtain a 
 
 
 ```{r}
-
+pwr.r.test(r = .50, sig.level = .05, power =.80)
 ```
 
 ## Applied replication example
@@ -165,8 +165,7 @@ I am going to run a practice power analysis on experiment 2 from this study, whi
 
 The design was a classic two-group design, with participants randomized into a cheater or cheating group. The authors do not list the randomization split but the original sample was 79 college students. We will assume it was 40/39.
 
-Participants in the “cheating” condition claimed to
-have obtained significantly more heads for money (M  5.49, SD  1.25) than did those in the “cheater” condition (M  4.88, SD = 1.38), t(77) = 2.06, p = .04, Cohen's d = 0.46. This was a difference in favor of the authors' hypotheses, but note here the high p value. Definitely one to check out.
+Participants in the “cheating” condition claimed to have obtained significantly more heads for money (M  5.49, SD  1.25) than did those in the “cheater” condition (M  4.88, SD = 1.38), t(77) = 2.06, p = .04, Cohen's d = 0.46. This was a difference in favor of the authors' hypotheses: asking someone not to be a cheater appears to stop them cheating. But note here the high p value. Definitely one to check out.
 
 #### Original study power (post-priori power)
 
