@@ -7,8 +7,10 @@ Preliminaries
 
 ```{r}
 install.packages("pwr")
+install.packages("pwr2")
 install.packages("MBESS")
 library(pwr)
+library(pwr2)
 library(MBESS)
 ```
 
@@ -80,7 +82,7 @@ Now you have a go. What is the sample size needed for a paired-sample t-test to 
 pwr.t.test(d = .50, power = .8, sig.level = .05, type = c("paired"))
 ```
 
-## ANOVA
+## One-way ANOVA
 
 For a one-way analysis of variance use:
 
@@ -103,7 +105,7 @@ pwr.anova.test(k=3,f=.25,sig.level=.05,power=.8)
 Now you have a go. What is the sample size needed for a 4 group one-way ANVOA to obtain a power of 0.80, when the effect size is large (0.40) and a significance level of 0.05 is employed. Write the code needed to find the n for each group.
 
 ```{r}
-pwr.anova.test(k=4,f=.25,sig.level=.05,power=.8)
+
 ```
 
 ## Correlations and regression
@@ -145,6 +147,34 @@ Now you have a go. What is the sample size needed for a correlation to obtain a 
 
 ```{r}
 pwr.r.test(r = .50, sig.level = .05, power =.80)
+```
+
+## Two-way ANOVA
+
+For a two-way analysis of variance use pwr2 (cannot do it with pwr):
+
+ss.2way(a = , b = , f.A = , f.B = alpha = , beta = , B=100)
+
+where a is the number of groups in Factor A, b is the number of groups in Factor B, f.A is the Cohens F of Factor A, f.B is the Cohen's F of Factor B, alpha is the significance level (0.05), and beta is the inverse power (i.e., 1-power so for 80% power we have a beta of .20 or 1-80). B=100 is just the number of iteration runs for the calculation.
+
+Cohen's F can be calcuated from eta2 (or the PRE) of each main effect in the ANOVA model using this website: https://www.escal.site/. It converts common effect size metrics for ANOVA to Cohen's F. 
+
+Cohen suggests that F values of 0.1, 0.25, and 0.4 represent small, medium, and large effect sizes respectively.
+
+### For example
+
+For a two-way ANOVA, each factor of 2 groups (i.e., 2 x 2 design), let's calculate the sample size needed in each group to obtain a power of 0.80, when the effect size is moderate (0.25) for each main effect, and a significance level of 0.05 is employed.
+
+```{r}
+ss.2way(a=2, b=2, f.A=0.25, f.B=0.25, alpha=0.05, beta=0.2, B=100)
+```
+
+### Exercise
+
+Now you have a go. What is the sample size needed for a 2 x 3 two-way ANVOA to obtain a power of 0.80, when the effect size is large (0.40) for main effect A and moderate for main effect B (0.25), with a significance level of 0.05 employed. Write the code needed to find the n for each group:
+
+```{r}
+
 ```
 
 ## Applied replication example
@@ -215,6 +245,24 @@ Okay, so we will need a sample of n = 150 (i.e., 75 in each group) to replicate 
 
 Either approach is fine, but my recommendation is that for large effect sizes, use the lower bound confidence interval estimate to calculate sample size. For small and moderate effects, use the original study effect size estimate.
 
+## Post-script: Quick run through of post-priori power for two-way ANOVA
+
+The logic of post-priori power for two-way ANOVA is slightly different to the other tests listed here because the function used is different. For post-priori two-way ANOVA power we use pwr.2way() from the pwr2 package:
+
+pwr.2way(a=, b=, alpha=, size.A=, size.B=, f.A=, f.B=)
+
+where a is the number of groups in Factor A, b is the number of groups in Factor B, f.A is the Cohens F of Factor A, f.B is the Cohen's F of Factor B, alpha is the significance level (0.05), size.A is the sample size of each group in Factor A and size.B is the sample size of each group in Factor B. B=100 is just the number of iteration runs for the calculation.
+
+### For example
+
+For a two-way ANOVA, with each factor of 2 groups (i.e., 2 x 2 design) containing 50 participants, let's calculate the post-priori power, when the effect size is moderate (0.25) for main effect A and large (.50) for main effect B, a significance level of 0.05 is employed.
+
+
+```{r}
+pwr.2way(a=2, b=2, alpha=.05, size.A=50, size.B=50, f.A=.25, f.B=.50)
+```
+
+Power for main effect A is 94% for main effect B is 1.00%. Use lowest power.
 
 
 ***
