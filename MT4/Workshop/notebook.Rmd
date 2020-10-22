@@ -1,0 +1,579 @@
+---
+title: "MT4: Cleaning up your act"
+output: html_notebook
+---
+
+In this session, we are going to apply the data screening and cleaning strategies intorduced in the lecture.
+
+## Learning Outcomes
+
+By the end of this workshop, you should be able to:
+
+1. Test for data entry accuracy
+
+2. Check for amount of missing data and missing data patterns
+
+3. Conduct within-scale imputation
+
+4. Identify and remove univariate and multivariate outliers
+
+5. Conduct multiple imputation
+
+## Install required packages
+
+```{r}
+install.packages("psych")
+install.packages("naniar")
+install.packages("sjlabelled")
+install.packages("tidyverse")
+install.packages("mice")
+install.packages("VIM")
+install.packages("MissMech")
+install.packages("mice")
+install.packages("MoEClust")
+install.packages("miceadds")
+```
+
+## Load required packages
+
+The required packages are the same as the installed packages. As last year, we write the code needed to load the required packages in the below R chunk.
+
+```{r}
+library(psych)
+library(naniar)
+library(sjlabelled)
+library(tidyverse)
+library(mice)
+library(VIM)
+library(MissMech)
+library(mice)
+library(MoEClust)
+library(miceadds)
+```
+
+## The data
+
+To practice data cleaning, we are going to use data from some research I did a number of years ago now investigating the predictors of engagement among 260 sports participants. The focus of this research was to better understand how and why young people engage in their sport with an emphasis on two motivational orientations: task (playing sport for learning, development, and growth) and ego (playing sport for cups and medals).
+
+This work surveyed young people aged 12-18 on these variables, measured usig two psychological tools:
+
+*Instrument 1 – Task and Ego Goal Orientation in Sport Questionnaire (TEGOSQ; Duda & Nicholls, 1992)*
+
+In response to the stem: “I feel successful in sport when…”, participants indicated the extent to which they agreed or disagreed with each of the 13 items on a 5-point Likert-type scale ranging from 1 (strongly disagree) to 5 (strongly agree). The task subscale consists of 7 items which focus on success defined through task mastery, learning and effort (e.g., “I learn a new skill and it makes me want to practice more”). The ego orientation subscale contains 6 items which reflect success defined through outperforming others and the demonstration of superior ability (e.g., “I’m the only one who can do the play or skill”).
+
+*Instrument 2 – Athlete Engagement Questionnaire (AEQ; Lonsdale, Hodge, & Jackson, 2007)*
+
+This measure consists of 4 subscales, each with 4 items, that assess confidence (e.g., “I believe I am capable of accomplishing my goals in sport”), dedication (e.g., “I am determined to achieve my goals in sport”), enthusiasm (e.g., “I feel excited about my sport”) and vigor (e.g., “I feel really alive when I participate in my sport”). Participants respond on a 5-point likert scale ranging from 1 (almost never) to 5 (almost always).
+
+## Load data
+
+First, lets load this data into our R environment. Go to the MT4 folder, and then to the workshop folder, and find the “data.csv” file. Click on it and then select “import dataset”. In the new window that appears, click “update” and then when the dataframe shows, click import. If you want, you can try running the code below and it might do the same thing (if not put your hand up).
+
+```{r}
+data <- read_csv("C:/Users/CURRANT/Dropbox/Work/LSE/PB230/MT4/Workshop/data.csv")
+```
+
+We are going to clean this datset up and then use multiple regression to test the following research question and null hypothesis:
+
+Research Question - Do task and ego orientations predict levels of youth sports engagement among 12-18 year old youth sports participants?
+
+Null Hypothesis 1 - The effect of task orientation on engagement will be zero.
+
+Null Hypothesis 2 - The effect of ego orientation on engagement will be ze
+
+## Checking data accuracy
+
+The first step in data cleaning is to check that the data are entered correctly. If possible the data should be proofread against the original data (on the questionnaires, etc) to check that item has been entered correctly. Preferably someone other than the person who entered the data should do this (but not essential). We don't have access to the questionnaires here any data entry errors will need to be coded as misssing. 
+
+Let's check that the data conform to the appropriate range (i.e., 1-5).
+
+```{r}
+describe(data)
+```
+
+We can see that there is an anomaly in the range of ded3 and task4. Both have upper limits beyond the scale of 55 and 33 respectively. As such, these data entry errors must be replaced with missing or "NA". 
+
+Let's do that now using the replace_with_na function.
+
+```{r}
+data <-
+  data %>%
+  replace_with_na(replace = list(ded3 = 6:55, task4 = 6:33)) # replace any value between 6:55 and 6:33 with na
+describe(data)
+```
+
+Great, the ranges no are in line with the scale limits for all variables.
+
+## Amount and pattern of missing data 
+
+To display the amount of missing data and the missing data patterns, we can use the mice or VIM package. We start with the mice package. This package contains the md.pattern function that produces the missing data pattern. I'm just going to select out the items for now so the dataset contains only the variables of interest (data_var).
+
+```{r}
+data_var <-
+  data %>%
+  select(6:34) # select out only the items
+md.pattern(data_var) # run the missing data pattern function
+```
+
+Because there are so many items in our dataset, the output is a little hard to read. But don't worry, the main information is interpretable.
+
+The first row contains the variable names. Each other row represents a missing data pattern. The 1’s in each row indicate that the variable is complete and the 0’s indicate that the variable in that pattern contains missing values. The first column on the left (without a column name) shows the number of cases with a specific pattern and the column on the right shows the number of variables that is incomplete in that pattern. The last row shows the total number of missing values for each variable.
+
+To obtain a visual impression of the missing data patterns in R the VIM and nanair packages can be used. The VIM package contains the function aggr that produces the univariate proportion of missing data together with two graphs. The nanair package provides a specific visualiation of the amount of missing data, showing in black the location of missing values, and also providing information on the overall percentage of missing values overall (in the legend), and in each variable (top x axis).
+
+```{r}
+aggr(data_var, col=c('white','red'), numbers=TRUE, sortVars=TRUE, cex.axis=.7, gap=3, ylab=c("Percentage of missing data","Missing Data Pattern"))
+vis_miss(data_var)
+```
+
+The variable names are shown at the bottom of the figures. The red cells in the Missing data patterns figure indicate that those variables contain missing values. We see that 95% of the participants do not contain missing values in any of the variables (211 of 260) and, as a whole, the data set only contains 1% missing values (else 99% is complete). That's pretty good! 
+
+But there is a proportion of this sample with missing data and we need to figure out a way of retaining it if we possibly can. Recall from the lecture that removing all the cases with missing data is a pretty terrible idea. It reduces our power to detect effects and, if there is a mechanism to the missingness, it can also significantly bias estimates. Lets look how we determine the mechanism of missing data.
+
+## Missing data mechanisms
+
+By evaluating the missing data patterns, we get insight in the location of the missing values. With respect to the missing data mechanism we are interested in the underlying reasons for the missing values and the relationships between variables with and without missing data. In 1976, Donald Rubin introduced a typology for missing data that distinguishes between random and non-random missing data situations, which are called Missing Completely At Random, Missing At Random and Missing Not At Random and abbreviated as MCAR, MAR and MNAR respectively (Rubin, 1976).
+
+The key idea behind Rubin’s missing data mechanisms is that the probability of missing data in a variable may or may not be related to the values of other measured variables in the dataset. With probability, we loosely mean the likelihood of a missing value to occur, i.e. if a variable has a lot of missing data, the probability of missing data in that variable is high. This probability can be related to other measured or not-measured variables. For example, when mostly older people have missing values, the probability for missing data is related to age. Moreover, the missing data mechanisms also assume a certain relationship (or correlation) between observed variables and variables with missing values in the dataset.
+
+## Missing completely at random (MCAR)
+
+Data are Missing Completely At Random (MCAR) when the probability that a value is missing is unrelated to the value of other observed (or unobserved) variables and unrelated to values of the missing data variable itself. An MCAR example could be that low back pain patients had to come to a research center to determine their level of disability by performing some physical tests and some of these patients were unable to leave their home, due to the flu. There is no assumed relationship between having the flu and scores on the disability variable, which makes that this data is MCAR.
+
+## Missing At Random (MAR)
+
+Data are Missing At Random (MAR) when the probability that a value for a variable is missing is related to other observed values in the dataset, but not to the variable itself. It is not possible to test the MAR assumption, because for that you need information of the missing values and in real-life, that is not possible. In general, excluding MAR data leads to biased regression coefficient estimates and incorrect study results. A missing data method that works well with MAR data is Multiple Imputation (we'll work with MI in the second half of this workshop).
+
+## Missing not at random (MNAR)
+
+The data are MNAR when the probability of missing data in a variable is related to the scores of that variable itself, e.g. mostly high or low scores are missing. As with MAR data, MNAR data cannot be verified because information about the missing values is needed. The missing data problem cannot be handled fully by  Multiple Imputation, but it is the best option. 
+
+## Missing data evaluation
+
+The performance of missing data methods depends on the underlying missing data mechanism. As previously described, the difference between the MCAR and not-MCAR mechanisms depend on the relationship between the probability for missing data and the observed variables. If this relationship cannot be detected (and there are no specific reasons why data is missing) we assume that the data is MCAR. If there is some kind of relationship, the missing data may be MAR or MNAR. In practice we study and measure outcomes and independent variables that are related to each other. This makes the MAR assumption mostly an accepted “working” missing data assumption in practice.
+
+It is important to think about the most plausible reasons for the data being missing. For example, when cognitive scores are assessed during data collection and these are mostly not filled out by people that have decreased cognitive functions, the missing data can be assumed to be MNAR. Statistical tests can also be used to get an idea about the missing data mechanism. 
+
+In these statistical tests, the non-responders (i.e., participants with missing observations), can be compared to the responders on several characteristics. By doing this, we can test whether the missing data mechanism is likely to be MCAR or not-MCAR. There are several possibilities to compare the non-responders with the responders groups, for example using t-tests or Chi-square tests, logistic regressions with the missing data indicator as the outcome, or the MCAR test (Little, 1988; Jamshidian et al., 2014). The most widely used method is the MCAR test, and that is what we will do here.
+
+## Little’s MCAR test in R
+
+Jamshidian et al's (2014) MCAR test is available in the MissMech package as the TestMCARNormality function. The MCAR test is a chi-square test which tests the null hypothesis of equality of covariances between missing and non-missing data groups. That is to say the the correlations between the variables in the cases with missing data are the same (equality) as the correlations between the variables in cases with no missing data. To apply the test, we select only the continuous variables (data_var). 
+
+```{r}
+out.MCAR.ws <- TestMCARNormality(data_var, del.lesscases = 1)
+summary(out.MCAR.ws)
+```
+
+The p-value for the non-parametric test of homoscedasticity (equality of covariances) is larger than .05 so we accept the null hypothesis that the covariances are equal. This indicates that the data are missing completely at random (MCAR): there is no evidence of systematic patterning of the missing data across groupings. Essentially, we have a random scatter of missing values in our dataset. This is quite typical for correlational studies like these and it also means we can be a little more flexible in how we replace missing values.
+
+## Removing cases listwise with > 10% missing
+
+As the data appear to be MCAR, we can feel (relatively) safe (i.e., it won’t bias the sample) deleting subjects with missing values (i.e., listwise) provided the number of cases with missing data is small (i.e., < 5%) and those who we remove have large amounts of missing data (i.e., > 10%). 
+
+Our sample is 260. We know that the number of complete cases is 211 and the number with missing data is 49 (i.e., 260-211). As such, in this example, there are 5% of data missing (i.e., 260/49). We can then proceed to remove any cases with more than 10% missing data, which is 3 items (i.e., 29 items so 10% of 29 = 3 items).
+
+To remove cases with > 3 missing items, lets first create a new variable (na_count) in our data_var dataset that contains the NA counts for each case.
+
+```{r}
+data_var$na_count <- apply(is.na(data_var), 1, sum)
+data_var
+```
+
+Then we can filter the data to remove cases with an na_count above 3 (or retain everything 3 or below as per the coding logic).
+
+```{r}
+data_var <- 
+data_var %>% 
+filter(na_count <= "3")
+data_var
+```
+
+So we are now left with a dataset in which missing caes have < 10% missing data.
+
+## Replacing missing values 
+
+Given the data are missing MCAR, the number of cases with missing is small (i.e., < 5%), and amount of missing data per case with missign data is also small (i.e., 10%), we have some flexibility in the way in which we impute the missing data. As we saw in the lecture, four options are available to us:
+
+*Option 1:  Replace missing values with the scale mean (i.e., the mean of the non-missing items in a scale).*  The idea is that as the items forming a scale are (conceptually) highly correlated, it is reasonable to assume the missing values would closely resemble the other values in the scale it is derived from. So we impute the mean of the available missing items. Use this technique when there is evidence of MCAR and the number of missing values per case is small (i.e., < 10%). Any cases with a large amount of missing data (i.e., > 10%) can be safely deleted (because it assumes MCAR). A number of statisticians advocate this approach in such circumstances (e.g., Cole, 2008; Graham, Van Horn, & Taylor, 2012).
+
+*Option 2:  Using regression to replace the missing values.* Similar to option 1 but R provides this imputation as a specific function. In it, other chosen variables act as IVs predicting the variable with the missing values (which acts as the DV). This method only works if there is significant prediction of the variable with the missing values and, as with any prediction using multiple regression, it overfits the data – leading to inflated relationships between variables and underestimations of SEs. It also assumes that the data conform to monotone missingness (an impractical assumption for most data sets; see Little & Rubin, 2002). This technique is appropriate when there is evidence of MCAR or MAR and, unlike scale mean imputation, is fairly robust to cases with large amounts of missing data (i.e., > 10%). Nonetheless, given its manifold limitations, it is only advocated in a number of very specific situations. We won't be using it here.
+
+*Option 3: Use Expectation Maximization (EM) algorithm to replace missing values.* EM employs an iterative process of regression imputation, but is better than standard regression imputation because it makes no prior assumption as to which variables should be used as the predictors. The first step of EM simply calculates the mean vector (observed values) and correlation matrix (parameter estimates) of all variables from cases with non-missing data. Expectations are then made about the missing data on the basis of a series of regressions using values from the non-missing mean vector and correlation matrix (plus a bit of error). 
+
+The second step involves maximum likelihood (ML) estimation (sometimes referred to as Full Information ML) whereby the mean vector and correlation matrix is recalculated as though the missing data had been filled in from regression equations in step 1. This process is repeated until the difference between the non-missing mean vector and correlation matrix, and the filled in mean vector and correlation matrix, are trivial (i.e., they converge). In this way, the intent of EM is not to divine what an individual would have reported but to preserve the underlying parameters (i.e., means, variances, covariances, etc) and distributions. 
+
+R can be used to create an EM imputed data set by running the multiple imputation procedure with 1 imputation but this process underestimates SEs and must assume MCAR (see below). SEM programs (e.g., lavaan, which we will cover in LT) can also be used to perform EM-based imputation but with the advantage of maximizing the covariance matrix only for the model to be analyzed (thus yielding better SEs). This technique is well suited to SEM analysis when the data is MCAR or MAR (but also performs reasonably under MNAR) irrespective of the quantity of missing data. On the other hand, it is only appropriate for non-SEM analyses when there is evidence of MCAR and when the quantity of missing data is small (i.e., < 10%). Otherwise, Multiple Imputation should be preferred.
+
+*Option 4: Use Multiple Imputation (MI) to replace missing values.* MI can be conducted in R using mice package as a dedicated function and has 3 steps. First missing data are replaced using regression imputation augmented by a Bayesian procedure (conditional posterior distribution – you don’t need to know what this means, even I struggle with it!), which yields multiple imputed data sets.
+
+The second step involves analyzing each of the yielded data sets separately with standard statistics (e.g., linear regression). 
+
+The third step involves aggregating results from each separate data set and calculating standard errors for significance testing on the basis of both within- and between-data set variance. Researchers argue that a small number of MI data sets (m =5) will be adequate for most situations. 
+
+The main advantage of MI is that by yielding multiple data sets, researchers can calculate the ‘true’ uncertainty (accounting for both within- and between-imputation variance) associated with analyses using missing data, and therefore it overcomes the problem of underestimated SEs using single data sets produced by EM. Another advantage of MI is that is performs well under MCAR, MAR, and MNAR, and is robust to large amounts of missing data (i.e., > 10%). 
+
+An obvious drawback, however, is that MI provides for a cumbersome analysis with more than one data set to consider. It also provides different estimates with every execution meaning the results are not determinate. R makes this easier for us, however, by doing the multiple calculations for us. And this technique is well suited to analyses when there is a substantial proportion of missing data due to some systematic reason(s).  
+
+For this workshop, we are going to see how to impute with scale mean and multiple imputation because it is most commonly applied in psychological research using scales. 
+
+Let's start with scale mean imputation for the data_var dataset we are working with.
+
+## Scale mean imputation 
+
+To replace missing values with the mean of the available items in a scale, we first we need to calculate the scales means for each variable in the dataset. I'm going to use an.rm = TRUE so the calculation is made with available information (i.e., if 1 item is missing then the mean is calculated from the remaining non-missing items).
+
+```{r}
+data_var <-
+  data_var %>%
+  rowwise()%>%
+  mutate(meanego = mean(c(ego1,ego2,ego3,ego4,ego5,ego6), na.rm = TRUE)) %>%
+  mutate(meantask = mean(c(task1,task2,task3,task4,task5,task6,task7), na.rm = TRUE)) %>%
+  mutate(meanconf = mean(c(conf1,conf2,conf3,conf4), na.rm = TRUE)) %>% 
+  mutate(meanded = mean(c(ded1,ded2,ded3,ded4), na.rm = TRUE)) %>%
+  mutate(meanvig = mean(c(vig1,vig2,vig3,vig4), na.rm = TRUE)) %>%
+  mutate(meanent = mean(c(ent1,ent2,ent3,ent4), na.rm = TRUE))
+data_var
+```
+
+Then we are going to impute the mean scale score in the place of any missing scale item for each person. Remember that the missing data patterns told us that there are no missing items for ego6, task7, conf2, ded2, and conf3 so we don't need to impute those. All esle we do though.
+
+```{r}
+# Task
+
+data_var <- within(data_var, task1 <- ifelse(is.na(task1), meantask, task1)) # if (ifelse) task1 is missing (is.na) then replace with meantask, else use task1
+data_var <- within(data_var, task2 <- ifelse(is.na(task2), meantask, task2))
+data_var <- within(data_var, task3 <- ifelse(is.na(task3), meantask, task3))
+data_var <- within(data_var, task4 <- ifelse(is.na(task4), meantask, task4))
+data_var <- within(data_var, task5 <- ifelse(is.na(task5), meantask, task5))
+data_var <- within(data_var, task6 <- ifelse(is.na(task6), meantask, task6))
+
+# Ego
+
+data_var <- within(data_var, ego1 <- ifelse(is.na(ego1), meantask, ego1))
+data_var <- within(data_var, ego2 <- ifelse(is.na(ego2), meantask, ego2))
+data_var <- within(data_var, ego3 <- ifelse(is.na(ego3), meantask, ego3))
+data_var <- within(data_var, ego4 <- ifelse(is.na(ego4), meantask, ego4))
+data_var <- within(data_var, ego5 <- ifelse(is.na(ego5), meantask, ego5))
+
+# Confidence
+
+data_var <- within(data_var, conf1 <- ifelse(is.na(conf1), meantask, conf1))
+data_var <- within(data_var, conf4 <- ifelse(is.na(conf4), meantask, conf4))
+
+# Dedication
+
+data_var <- within(data_var, ded1 <- ifelse(is.na(ded1), meantask, ded1))
+data_var <- within(data_var, ded3 <- ifelse(is.na(ded3), meantask, ded3))
+data_var <- within(data_var, ded4 <- ifelse(is.na(ded4), meantask, ded4))
+
+# Vigor
+
+data_var <- within(data_var, vig1 <- ifelse(is.na(vig1), meantask, vig1))
+data_var <- within(data_var, vig2 <- ifelse(is.na(vig2), meantask, vig2))
+data_var <- within(data_var, vig3 <- ifelse(is.na(vig3), meantask, vig3))
+data_var <- within(data_var, vig4 <- ifelse(is.na(vig4), meantask, vig4))
+
+# Enthusiasm
+
+data_var <- within(data_var, ent1 <- ifelse(is.na(ent1), meantask, ent1))
+data_var <- within(data_var, ent2 <- ifelse(is.na(ent2), meantask, ent2))
+data_var <- within(data_var, ent3 <- ifelse(is.na(ent3), meantask, ent3))
+data_var <- within(data_var, ent4 <- ifelse(is.na(ent4), meantask, ent4))
+
+data_var
+```
+
+Et viola! We have successfully conducted scale mean imputation for our dataset. 
+
+We can do a check on this scale mean imputation by running the missing data patterns for the data_vars dataset..
+
+```{r}
+md.pattern(data_var)
+```
+
+And we can see that the dataset is now complete. Or completely observed, as mice call it.
+
+Let's calcuate the means now for each scale with those newly imputed values before we move onto looking at outliers. While we're at it, we should also create an engagement variable (meaneng) from the mean of the engagement subscales (i.e., confidence, dedication, enthusiasm, and vigor).
+
+```{r}
+data_var <-
+  data_var %>%
+  rowwise()%>%
+  mutate(meanego = mean(c(ego1,ego2,ego3,ego4,ego5,ego6))) %>%
+  mutate(meantask = mean(c(task1,task2,task3,task4,task5,task6,task7))) %>%
+  mutate(meanconf = mean(c(conf1,conf2,conf3,conf4))) %>% 
+  mutate(meanded = mean(c(ded1,ded2,ded3,ded4))) %>%
+  mutate(meanvig = mean(c(vig1,vig2,vig3,vig4))) %>%
+  mutate(meanent = mean(c(ent1,ent2,ent3,ent4))) %>%
+  mutate(meaneng = mean(c(meanded,meanvig,meanent,meanconf))) # create mean enagaement variable "meaneng"
+data_var
+```
+
+## Outliers
+
+Now we have successfully imputed the missing values with mean scale imputation, we can move to an inspection of outliers. These are case scores that are extreme and are therefore the main culprits of non-normality and/or deviations of a sample distribution from the population distribution. 
+
+As we saw in the lecture, these extreme outliers can have a large impact on the outcome of any statistical analysis and therefore need to be dealt with prior to any inferential testing. 
+
+Three basic reasons you’d get an outlier:
+
+1. There was a mistake in data entry (a 6 was entered as 66, etc.), hopefully step 1 above would have caught all of these.
+
+2. The outlier is not part of the population from which you intended to sample (you wanted a sample of 10 year olds and the outlier is a 12 year old). 
+
+3.	The outlier is part of the population you wanted but in the sample distribution it is as an extreme case.  In this case you must delete the extreme case(s) because of the skewing influence they have on the sample distribution.
+
+So, in order to avoid erroneous analyses and biased results the dataset must be checked for both univariate (outliers on one variable alone) and multivariate (outliers on a combination of variables) outliers BEFORE ANY ANALYSIS.
+
+## Univariate outliers
+
+Univariate outliers (i.e., outliers on one variable) are those with very large standardized scores (i.e., z scores greater than 3.29). To detect univariate outliers, we just standardise our variables and remove any cases with z scores of > 3.29, which are significant at the p = .001 level (i.e., would be randomly sampled less than one time in a thousand; Tabachnick & Fidell, 2013). Lets do that now.
+
+```{r}
+# Standardize variables
+
+data_var$zego <- scale(data_var$meanego)
+data_var$ztask <- scale(data_var$meantask)
+data_var$zeng <- scale(data_var$meaneng)
+
+# Remove ego outliers
+
+data_var <- 
+  data_var %>%
+  filter(zego >= -3.30 & zego <= 3.30)
+data_var
+
+# Remove task outliers
+
+data_var <- 
+  data_var %>%
+  filter(ztask >= -3.30 & ztask <= 3.30)
+data_var
+
+# Remove engagement outliers
+
+data_var <- 
+  data_var %>%
+  filter(zeng >= -3.30 & zeng <= 3.30)
+data_var
+  
+```
+
+Three cases were extreme outliers and have therefore been removed from the dataset.
+
+## Multivariate outliers
+
+Multivariate outliers are outliers on two or more variables. They are located by first computing a Mahalanobis distance for each case, and once that is done, the Mahalanobis scores are screened in the same manner that univariate outliers are screened. 
+
+To compute Mahalanobis distance in R we must use linear model and the MoE_mahala function.  Use any variable other than the focal variables (i.e., task, ego, and engagement) as the DV in this linear model and use all focal variables that need to be screened as the IVs. There should be a new variable containing saved Mahalanobis distances in your data set if you follow this logic. 
+
+Let's go ahead and run the linear model for our imputed data.
+
+```{r}
+linear.model <- lm(task1 ~ meantask + meanego + meaneng, data=data_var) # build linear model with focial variables as predictors
+data_var$res  <- data_var$task1 - predict(linear.model) # save residuals
+data_var$mahal <- MoE_mahala(linear.model, data_var$res)
+data_var # calculate mahalanobis distances from the residuals and save them in the dataset as new variable mahal
+summary(linear.model)
+```
+
+Now use the table below  to find the critical value of chi square for the numerator (model) degrees of freedom (for this example it is 3) in the linear model at p = .001. 
+
+![](https://i.stack.imgur.com/PbEqv.jpg)   
+
+With 3 degrees of freedom, the critical chi-square value is 16.27 at the p = .001 level. Simply remove the cases with Mahalanobis Distances exceeding this critical value.
+
+Let's go ahead and filter for those values.
+
+```{r}
+# Remove multivariate outliers
+
+data_var <- 
+  data_var %>%
+  filter(mahal <= 16.28)
+data_var
+```
+
+As you can see, no cases had multivariate outliers and so no cases were removed. We are done! 
+
+Lets just recap on the distributional properties of our study variables.
+
+```{r}
+describe(data_var)
+```
+
+We can calculate the average skew and kurtosis for our  cleaned dataset to make a check on the success of removing outliers. For skewness, we have values of .29 (ego), -.14 (task), and -.20 (engagement), which are averaged to .21. For kurtosis, we have values of -.74 (ego), -.06 (task), and -.56 (engagement), which are averaged to .45. Small values, which attest to the normality of our variables having dealt with outliers.
+
+## Doing the analysis
+
+Now we have imputed teh missing data and removed the outliers, we can now move to our analysis with the newly cleaned dataset. Let's run the liner model on it.
+
+```{r}
+main.model <- lm(meaneng ~ meantask + meanego, data=data_var)
+summary(main.model)
+```
+
+It seems both task and ego goals positively predict engagement. We have an answer to our research question!
+
+## How it is written
+
+"Prior to running the primary analysis, the data were screened for missing values. There were 211 complete cases and 49 cases with incomplete data. The probability of the pattern of missing values diverging from randomness was greater than .05 (p = .11), thus data missing completely at random (MCAR) was inferred. Consequently, participants with more than 10% missing data were removed from the dataset and each missing item was replaced using the mean of the each participant’s available non-missing items from the relevant subscale. This method of imputation is considered an appropriate strategy when the amount of missing data are low and items are highly correlated (Cole, 2008). This process resulted in the removal of 1 participant.
+
+Standardized z-scores larger than 3.29 (p < .001) and Mahalanobis distances greater than χ2 (3) = 16.27 (p < .001) were used to identify participants as univariate and multivariate outliers (Tabachnick & Fidell, 2007). Three participants were removed on this basis (3 univariate and 0 multivariate outliers). This yielded a final sample of 256 participants. These data were approximately univariate normal (average absolute skew = .21; average absolute kurtosis = .45)."
+
+## Multiple Imputation
+
+Although mean scale imputation is preferred for our dataset, I want to show you how to do imputation and anlysis using Multiple Imputation becuase there may be times where you will need to use it (i.e., non-MCAR data or data with large amounts of missingness).
+
+With MI, each missing value is replaced by several different values and consequently several different completed datasets are generated. The concept of MI can be made clear by the following figure:
+
+![](https://bookdown.org/mwheymans/bookmi/images/fig4.1.png)
+
+In the first step, the dataset with missing values (i.e. the incomplete dataset) is copied several times. Then in the next step, the missing values are replaced with imputed values in each copy of the dataset. In each copy, slightly different values are imputed due to random variation. This results in mulitple imputed datasets. In the third step, the imputed datasets are each analyzed and the study results are then pooled into the final study result. 
+
+In this part of the workshop, we'll cover the first phase in multiple imputation: the imputation step. Later, we'll cover the analysis and pooling phases are discussed.
+
+### Calculating variables and MCAR testing for MI
+
+In R, multiple imputation can be performed with the mice function from the mice package. As an example dataset to show how to apply MI in R we use the same dataset that we performed within-scale imputation on above (data). 
+
+The variables items are incomplete so lets calculate the mean scores first for the variables of interest, ignoring for the moment the existence of missing values (na.rm = FALSE).
+
+```{r}
+data_MI <-
+  data %>%
+  rowwise()%>%
+  mutate(meanego = mean(c(ego1,ego2,ego3,ego4,ego5,ego6), na.rm = FALSE)) %>%
+  mutate(meantask = mean(c(task1,task2,task3,task4,task5,task6,task7), na.rm = FALSE)) %>%
+  mutate(meanconf = mean(c(conf1,conf2,conf3,conf4), na.rm = FALSE)) %>% 
+  mutate(meanded = mean(c(ded1,ded2,ded3,ded4), na.rm = FALSE)) %>%
+  mutate(meanvig = mean(c(vig1,vig2,vig3,vig4), na.rm = FALSE)) %>%
+  mutate(meanent = mean(c(ent1,ent2,ent3,ent4), na.rm = FALSE)) %>%
+   mutate(meaneng = mean(c(meanded,meanconf,meanvig,meanent), na.rm = FALSE))
+data_MI
+```
+
+Then we are going to select out of that dataset just the variables were are using for analyses (i.e., task, ego, and engagement)
+
+```{r}
+data_MI <-
+  data_MI %>%
+  select(meaneng,meantask,meanego) 
+data_MI
+```
+
+Then finally lets do a check on the missing data patterns.
+
+```{r}
+md.pattern(data_MI)
+aggr(data_MI, col=c('white','red'), numbers=TRUE, sortVars=TRUE, cex.axis=.7, gap=3, ylab=c("Percentage of missing data","Missing Data Pattern"))
+```
+
+As you can see, there is a bit more missingness here given we have dramatically reduced the pool of variables and aggregated the items. 10% of engagement is missing, 7% of task and 4% of ego. The good news, though, is that there is no case with zero data on any of the variables so all cases can be retained (otherwise cases with no data at all should be removed). 
+
+If we test for the pattern of missingness, we get a sense of whether the data are MCAR.
+
+```{r}
+out <- TestMCARNormality(data_MI, del.lesscases = 1)
+summary(out)
+```
+
+The data are MCAR (i.e., p > .05), but given there are some cases with a large amount of missing data (i.e., > 66% or more than 1 item) MI should be employed.
+
+### Multiple Imputation in R
+
+Now lets use MI to imputate the missing data. The following default settings are used in the mice function to start MI:
+
+m=5 to generate 5 imputed datasets
+
+maxit=10 to use 10 iterations for each imputed dataset
+
+method=”pmm” to use predictive mean matching. For an elobate explanation of all options withing the mice function,type ?mice into the console.
+
+
+```{r}
+imp <- mice(data_MI, m=5, maxit=10, method="pmm")
+```
+
+By default, the mice fucntion returns information about the iteration and imputation steps of the imputed variables under the columns named “iter”, “imp” and “variable” respectively. This information can be turned off by setting the mice function parameter printFlag = FALSE, which results in silent computation of the missing values. A summary of the imputation results can be obtained by calling the imp object.
+
+```{r}
+imp
+```
+
+This imp object returns information about the number of imputed datasets, the imputation methods for each variable, and information of the PredictorMatrix (not that informative tbh).
+
+The imputed datasets can be extracted by using the complete function. The settings action = ”long” and include = TRUE returns a dataframe where the imputed datasets are stacked under each other and the original dataset (with missing values) included on top.
+
+```{r}
+complete(imp, action = "long", include = TRUE)
+```
+
+In the imputed datasets, two variables are added: an .id variable and an .imp variable to distinguish cases and the imputed datasets. To extract the first imputed dataset only, the setting action = 1 is needed in the complete function (see ?complete for more possibilities to extract the imputed datasets). 
+
+The imputed datasets can further be used in mice to conduct pooled analyses or to store them for further use. Let's now go ahead and use these imputed datasets to test our original research question.
+
+### Data analysis after Multiple Imputation
+
+After Multiple Imputation has been performed, the next steps are to apply statistical tests in each imputed dataset and to pool the results to obtain summary estimates. Don;t worry, R does this for us! 
+
+In R, these steps are mostly part of the same analysis step. Many pooling procedures are available as part of the mice package but we need the correlation, ANOVA, and linear regression ones for our research question. 
+
+### Pooling Correlation Coefficients in R
+
+You can use the micombine.cor function in the miceadds package to obtain pooled correlation coefficients.
+
+```{r}
+res.mi.cor <- micombine.cor(mi.res=imp, variables = c(1:3) )
+res.mi.cor
+```
+
+The ouput of the micombine.cor function shows in the columns: 
+
+r: Pooled Pearsons correlation coefficient. 
+rse: Standard error of pooled correlation. 
+fisher_r : Transformed pooled r 
+fisher_rse: Standard error of transformed pooled 
+r fmi: Fraction of missing information. 
+t: T-value. 
+p: P-value. 
+lower95 and upper95: 95% lower and upper confidence intervals. 
+
+You interpret the correlation coefficient and confidence interval in the same way you would do in typical correlation analyses.
+
+### Pooling Linear regression models in R
+
+A pooled linear regression analysis can be produced by using the with and pool functions in the mice package.
+
+```{r}
+fit <- with(data=imp,exp=lm(meaneng ~ meantask + meanego)) # fit the linear model with the imputed dataset
+lin.pool <- pool(fit) # pool the estimates across the multiple imputations
+summary(lin.pool) # output
+```
+The pooled procedure shows: 
+
+est: Pooled regression coefficient. 
+se: Standard error of pooled regression coefficient. 
+statistic: T-value. 
+df: Degrees of freedom. 
+Pr(>|t|): P-value. 
+
+Like the correlations, we interpret the beta estimates and t-values in exactly the same way as we would any other regression.
+
+### Pooling the ANOVA model in R
+
+To get the overall fit we need the ANOVA output. The easiest way to obtain a p-value for the ANOVA is by using the mi.anova function in the miceadds package.
+
+```{r}
+mi.anova(mi.res=imp, formula="meaneng ~ meantask + meanego")
+```
+
+In this multiple regression model we have a pooled multiple R2 of .46, F values, and eta2 associated with each predictor of engagement.
+
+And that's how its done! We will mainly be using mean scale imputation because this satisfies most of the assumptions commonly met in correlational research (i.e., MCAR and low relative missingness). But I also wanted to give you an overview of what to do if your data are not MCAR or the amount of missingness is large.
+
+## Activity
+
+
+--Some of this content comes from: Heymans and Eekhout (2019)
