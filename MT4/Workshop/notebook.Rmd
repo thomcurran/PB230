@@ -28,7 +28,7 @@ install.packages("sjlabelled")
 install.packages("tidyverse")
 install.packages("mice")
 install.packages("VIM")
-install.packages("MissMech")
+#install.packages("MissMech") # MissMech not available on CRAN so needs a manual install
 install.packages("mice")
 install.packages("MoEClust")
 install.packages("miceadds")
@@ -483,7 +483,7 @@ The data are MCAR (i.e., p > .05), but given there are some cases with a large a
 
 ### Multiple Imputation in R
 
-Now lets use MI to imputate the missing data. The following default settings are used in the mice function to start MI:
+Now lets use MI to impute the missing data. The following default settings are used in the mice function to start MI:
 
 m=5 to generate 5 imputed datasets
 
