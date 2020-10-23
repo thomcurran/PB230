@@ -3,7 +3,7 @@ title: "MT4: Cleaning up your act"
 output: html_notebook
 ---
 
-In this session, we are going to apply the data screening and cleaning strategies intorduced in the lecture.
+In this session, we are going to apply the data screening and cleaning strategies introduced in the lecture.
 
 ## Learning Outcomes
 
@@ -551,6 +551,7 @@ fit <- with(data=imp,exp=lm(meaneng ~ meantask + meanego)) # fit the linear mode
 lin.pool <- pool(fit) # pool the estimates across the multiple imputations
 summary(lin.pool) # output
 ```
+
 The pooled procedure shows: 
 
 est: Pooled regression coefficient. 
@@ -574,6 +575,32 @@ In this multiple regression model we have a pooled multiple R2 of .46, F values,
 And that's how its done! We will mainly be using mean scale imputation because this satisfies most of the assumptions commonly met in correlational research (i.e., MCAR and low relative missingness). But I also wanted to give you an overview of what to do if your data are not MCAR or the amount of missingness is large.
 
 ## Activity
+
+For this activity, I want you to screen clean and run a multiple regression for the "activity.csv" dataset. In this dataset are 14 variables from 272 participants. It is real data from a study looking at relationships between manager autonomy support (5 items; AutSup), manager control (4 items; CON), and exhaustion (5 items; EX) among call center workers.
+
+The research question was:
+
+Is employee exhaustion predicted by manager autonomy support and manager control?
+
+This is just a multiple regression with exhaustion as the outcome and manager autonomy support and manager control as the predictor variables.
+
+Before we get to the model, though, we need to screen and clean this dataset for errors, missing data, and outliers. Using the knowledge from this weeks lecture and the programming above, I would like you to check the data, examine the missingness, impute values, and detect and delete outliers before running the linear model.
+
+## Step 1: Load data
+
+## Step 2: Check data for errors
+
+## Step 3: Check amount and pattern of missing data and remove any caes with > 10% missing
+
+## Step 4: Imputate values using scale mean
+
+## Step 5: Create variables using mean scores
+
+## Step 6: Detect and remove univariate outliers
+
+## Step 7: Detect and remove multivariate outliers
+
+## Step 8: Run linear model and report results
 
 
 --Some of this content comes from: Heymans and Eekhout (2019)
