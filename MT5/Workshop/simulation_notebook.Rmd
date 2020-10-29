@@ -1,0 +1,274 @@
+---
+title: "Data Simulation"
+output: html_notebook
+---
+
+In this lab, we'll learn how to simulate data with R using the normal distribution (rnorm). There are 
+
+1. Learn how to simulate data for t-test (one-sample, repeated, and independent)
+
+2. Learn how to simulate data for one-way ANOVA
+
+3. Learn how to simulate data for multiple regression
+
+## Simulating a one-sample t-test
+
+The purpose of a one-sample t-test is to determine whether the mean of a sample is statistically different from a population mean. Simulating the data simply involves taking some number of samples from a distribution, and then running a t-test to determine if the mean of the sample if different to some other mean. 
+
+Consider simulating the scores from the preregistration example I provided on Moodle for Prescribed Optimism: Is it Right to Be Wrong About the Future? by David A. Armor, Cade Massey & Aaron M. Sackett (2008, Psychological Science). 
+
+Participants were asked to provide prescriptions to indicate whether it would be best to be overly pessimistic, accurate, or overly optimistic about each of eight vignettes (e.g., decisions about a financial investment, an academic-award application, a surgical procedure, and a dinner party). Responses were made on a a 8 point Likert scale from -4 (extremely pessimistic) through 0 (accurate) to +4 (extremely optimistic). 
+
+The question to ask of these scores is whether they are on average different from 0 (i.e., the score for accurate). If all of the participants lean toward accurate predictions, the mean of all of the prescriptions should be not be statistically different from 0. If the participants lean toward being optimistic then  the prescriptions should be significantly above 0. If we assume that the prescription scores are distributed normally, then it is possible to simulate 48 responses (the sample size calcuated from the power analysis) using the rnorm function in R (which samples from the normal distribution).
+
+Let’s create a sample that replicates the sample in the original study. This sample will have 48 prescriptions, with a mean of 1.15 and a standard deviation of 0.11. 
+
+```{r}
+prescription <- rnorm(10, mean = 1.15, sd = 0.11)
+```
+
+The above line of code will sample 48 numbers from the normal distribution. However, there is a potential problem that needs to be addressed. It is possible for the rnorm function to sample numbers larger than +/-4. These would be values beyond the range of the scale. To address this problem, we can use logical operators in R to find and replace any numbers larger than +4 with the value +4, and any number smaller than -4 with the value -4.
+
+```{r}
+prescription[prescription > 4] <- 4
+prescription[prescription < -4] <- -4
+```
+
+Now the variable onesample.t.test will only contain numbers between the range +4 and -4.
+
+One next question once this is complete is to determine the mean of sample. Use the mean function.
+
+```{r}
+mean(prescription)
+```
+
+Similar but not precisely the same as the original study. This is fine: there will always be sample-to-sample variation.
+
+### Save as dataframe (.csv)
+
+To save the newly simulated data, we just simply ask R to write the variables as a new .csv file with the write.csv function. 
+
+```{r}
+write.csv(prescription, "C:/Users/CURRANT/Dropbox/Work/LSE/PB230/MT5/Workshop/onesamplet.csv") # Remember to insert the correct file location for your compendium
+```
+
+And thats it!
+
+## Simulating a paired samples t-test (two conditions, within-subjects)
+
+A paired samples t-test is used for comparing data from two conditions in a within-subjects design (the same subjects contribute data to both of the conditions).
+
+I haven't used any example for a paired design for replication. So let's imagine a learning experiment where a power analysis suggested 20 participants were needed. In the experiment, students were asked to learn to type on a new computer keyboard with all of the keys re-arranged. They spend 1 hour practicing on day 1, and then 1 hour practicing on day 2. The prediction is that typing speeds will become faster with practice. 
+
+So the mean typing speeds should be slower on day 1 than day 2. One measure of typing speed is words per minute. Skilled typists can type on average 65 WPM and up to over 100-200 WPM. The participants in this experiment will be starting from scratch, so let’s assume the mean WPM on day 1 was 20 (sd = 5), and that they will make modest improvements to around 30 WPM (sd = 5) on day 2. 
+
+To simulate this data, we create two samples of 20 scores reflecting these predictions using rnorm.
+
+```{r}
+day1<-rnorm(20, mean = 20, sd = 5)
+day2<-rnorm(20, mean = 30, sd = 5)
+```
+
+These scores both have a lower limit of 0, so let’s ensure that all negative numbers are set to 0.
+
+```{r}
+day1[day1<0]<-0
+day2[day2<0]<-0
+```
+
+Next, look at the means.
+
+```{r}
+mean(day1)
+mean(day2)
+```
+
+Now lets create the dataframe that combines these two conditions using the data.frame function. Always a good idea to add an ID to the participant ID.
+
+```{r}
+pairedt <- data.frame(ID=1:20, day1 = day1, day2 = day2)
+pairedt
+```
+
+### Save as dataframe (.csv)
+
+Just like above, to save the newly simulated data, we just simply ask R to write the variables to a new .csv file with the write.csv function. 
+
+```{r}
+write.csv(pairedt, "C:/Users/CURRANT/Dropbox/Work/LSE/PB230/MT5/Workshop/pairedt.csv") # Remember to insert the correct file location for your compendium 
+```
+
+And thats it!
+
+## Simulating an independent samples t-test (two groups, between-subjects)
+
+The independent samples t-test is used to compare the differences between two groups of scores, specifically for between-subjects designs.
+
+Consider simulating the scores from the workshop example I provided in MT3 for When Cheating Would Make You a Cheater: Implicating the Self Prevents Unethical Behavior by Christopher, J. Bryan, Gabrielle S. Adams & Benoit Monin (2013, Journal of Experimental Psychology). 
+
+In their experiment 2, participants were told they should find a coin and flip it 10 times, while trying to influence the outcome of each toss with their minds, making the coin land heads as often as possible. They were told that to ensure that they were “properly motivated,” they would receive $1 for every toss landing heads. To forestall any perception of experimental demand to cheat, the instructions signaled that the present experimenters were skeptical that psychokinesis is real.
+
+Participants were randomly assigned to either the “cheater” or the “cheating” condition. The manipulation was embedded in the instructions that followed:
+
+NOTE: Please don’t [cheat/be a cheater] and report that one or more of your coin flips landed heads when it really landed tails! Even a small [amount of cheating/number of cheaters] would undermine the study, making it appear that psychokinesis is real.
+
+The instructions acknowledged that the laws of probability dictate that people would, on average, make 5 dollars, although some would “make as much as 10 dollars just by chance” and others would “make as little as 0 dollars.” 
+
+The manipulation was also embedded in the instructions on the next page, where participants logged the outcomes of their 10 coin flips. At the top of the page, in large, red, capital letters, was the message, “PLEASE DON’T [CHEAT/BE A CHEATER].” 
+
+The researchers used the mean number of heads participants claimed to have obtained to estimate cheating rates.
+
+The prediction ware that mean number of heads should be lower for the "cheater" group than the "control group "cheating" (i.e., framing cheating as part of the self would reduce cheating behaviour).
+
+Our power analyses revealed that we will need a sample of n = 150 (i.e., 75 in each group) to replicate the original effect size with 80% power. Therefore, to simulate the data we need to create two samples of 75 mean number of heads, one for the cheater group and one for the cheating group. 
+
+When creating the samples for each group it is important to set the means and standard deviations of the sample distribution in line with those reported in the origional study. In this case, the particular numbers for the cheater group are: M = 4.88 (SD = 1.38) and for the cheating group are: M = 5.49 (SD = 1.25). We will again use the rnorm function to create simulated mean number of heads.
+
+```{r}
+cheater <- rnorm(75, mean = 4.88, sd = 1.38)
+cheating <- rnorm(75, mean = 5.49, sd = 1.25)
+```
+
+Mean number of heads have a lower limit of 0 and an upper limit of 10. So, it is important to ensure that none of the numbers in each of the samples go beyond these limits.
+
+```{r}
+cheater[cheater > 10] <- 10
+cheater[cheater < 0] <- 0
+cheating[cheating > 10] <- 10
+cheating[cheating < 0] <- 0
+```
+
+Check means
+
+```{r}
+mean(cheater)
+mean(cheating)
+```
+
+Now lets create the dataframe that combines these two conditions using the data.frame function. Because the data need to be stacked horizontally (between-subjects so each row is a new case), we are also going to use the gather function in tidyverse to create a condition factor and the heads outcome variable. This way, we can easily run the independent t-test in a data format that is familiar to you.
+
+```{r}
+library(tidyverse)
+indt <- data.frame(ID=1:75, cheater=cheater, cheating=cheating)
+indt <- gather(indt, key=condition, value=heads, cheater, cheating)
+indt
+```
+
+### Save as dataframe (.csv)
+
+Just like above, to save the newly simulated data, we just simply ask R to write the variables to a new .csv file with the write.csv function. 
+
+```{r}
+write.csv(indt, "C:/Users/CURRANT/Dropbox/Work/LSE/PB230/MT5/Workshop/indt.csv") # Remember to insert the correct file location for your compendium 
+```
+
+And thats it!
+
+## Simulating data for a one-way between subjects design with 3 levels
+
+Like the paired t-test, we do not have a replication example for the one-way ANOVA. But I am aware that many of the designs you are working with conform to this design. So lets consider the following example between-subjects one-way ANOVA design with 3 levels for which power analysis tells us we need 30 subjects per condition:
+
+The task is a memory experiment. Participants in the encoding phase read a list of 20 words, and are given a later test to recall as many words from the list as possible. The IV is the amount of time between the encoding phase and the test phase, and is termed delay. 
+Group 1 is given the memory test immediately after reading the word list (mean = 17, sd = 3). Group 2 is given the memory test 1 hour after reading the word list (mean=15, sd = 3). Group 3 is given the memory test 2 hours after reading the word list (mean =12, sd = 3). 
+
+Each group is composed of 20 different subjects as per the power analysis. The prediction is that memory recall performance should decrease with longer delays. Group 1 should perform better than Group 2. And Group 2 should perform better than Group 3.
+
+The DV is the number of words recalled, this number would range between 0 and 20. There are 20 subjects and 3 conditions, so the DV should have 60 observations. The variables for the DV, and the ID and Delay factors can be constructed in a similar manner to the previous example. The major difference being that there are now 3 not two levels of the IV. 
+
+We will again use the rnorm function to create simulated words recalled for each condition.
+
+```{r}
+grp1 <- rnorm(20,mean=17,sd=3)
+grp2 <- rnorm(20,mean=15,sd=3)
+grp3 <- rnorm(20,mean=12, sd=3)
+```
+
+Recalled words have a lower limit of 0 and an upper limit of 20. So, it is important to ensure that none of the numbers in each of the samples go beyond these limits.
+
+```{r}
+grp1[grp1 > 20] <- 20
+grp1[grp1 < 0] <- 0
+grp2[grp2 > 20] <- 20
+grp2[grp2 < 0] <- 0
+grp3[grp3 > 20] <- 20
+grp3[grp3 < 0] <- 0
+```
+
+Check means
+
+```{r}
+mean(grp1)
+mean(grp2)
+mean(grp3)
+```
+
+Now lets create the dataframe that combines these three conditions using the data.frame function. Because the data need to be stacked horizontally (between-subjects so each row is a new case), we are again going to use the gather function in tidyverse to create a condition factor and the words outcome variable. This way, we can easily run the one-way in a data format that is familiar to you.
+
+```{r}
+anova <- data.frame(ID=1:60, grp1=grp1, grp2=grp2, grp3=grp3)
+anova <- gather(anova, key=condition, value=words, grp1, grp2, grp3)
+anova
+```
+
+### Save as dataframe (.csv)
+
+Just like above, to save the newly simulated data, we just simply ask R to write the variables to a new .csv file with the write.csv function. 
+
+```{r}
+write.csv(anova, "C:/Users/CURRANT/Dropbox/Work/LSE/PB230/MT5/Workshop/anova.csv") # Remember to insert the correct file location for your compendium 
+```
+
+
+And thats it! The logic of this coding can be easily extended to a 4, 5,6 condition ANOVA.
+
+## Simulating a multiple regression 
+
+Some students will have regression based studies to simulate data for. So the final example I am giving here is how to simulate data for this model.
+
+The data I am going to simulate is for one of my own studies for a while back now (WTF 2015!!). It was a piece of work published using the goals data we worked with last week. I collected perceptions of goal promoted by coaches (mastery and performance) and looked at the extent to which they could predict confidence in youth sports participants. The citation for the work is:
+
+Curran, T., Hill, A. P., Hall, H. K., & Jowett, G. E. (2015). Relationships between the coach-created motivational climate and athlete engagement in youth sport. Journal of sport and exercise psychology, 37(2), 193-198.
+
+I had two predictor variables (mastery and performance) and one outcome (confidence). i use multiple regression to test the relationships.
+
+Simulating data for this sort of study is a little more involved because there are relationships to consider. A package called simglm helps us to do this with (relative) ease. 
+
+For this example our outcome of interest is continuous (confidence measured on a 1-5 scale) and that the data is not clustered (don't worry for now why this matters, we will look at clustering next semester). In this example, our model would look like: Y = Xa + Xb1 + Xb2 + ej. In this equation, Y represents the continuous outcome, Xa represents the intercept, Xb1 represents mastery and Xb2 represents performance. Let’s generate some simulated data using the simglm package and the simulate_fixed function for my study using the intercept coefficient and b values for mastery and performance. I will request the original sample size (26) becuase my study was sufficiently powered.
+
+```{r}
+library(simglm)
+sim <- list(
+  formula = conf ~ 1 + mastery + performance,
+  fixed = list(mastery = list(var_type = 'ordinal', levels = 1:5), performance = list(var_type = 'ordinal', levels = 1:5)), # two predictor variable that are ordinal and limited between 1 and 5 (Likert scale)
+  sample_size = 260,
+  reg_weights = c(1.15, .69, .18)) # insert intercept value, beta1, and beta2
+
+reg <- simulate_fixed(data = NULL, sim) %>%
+  generate_response(sim) # generates outcome variable
+reg
+```
+
+This code takes the linear model form: conf ~ 1 + mastery + performance and simulates 2 ordinal variables (mastery and performance) that have betas of .69 and .18 respectively. The intercept in the linear model was 1.15. I've also added generate_response here so that R  also simulates the outcome variable (confidence).
+
+### Creating dataframe
+
+Alongside the variables of interest, this code also spits out other information like fixed_outcome (same as reposne variable) and random_effects. These are important for other operations with simglm but are redundant for our purposes.
+
+So lets create a new dataframe called reg with just the variables needed for our analysis.
+
+```{r}
+reg <- data.frame(ID=1:260, mastery=reg$mastery, peformance=reg$performance, conf=reg$conf) # save only variables of interest in new dataframe
+reg
+```
+
+And then lets save it as a .csv file.
+
+### Save as dataframe (.csv)
+
+Just like above, to save the newly simulated data, we just simply ask R to write the variables to a new .csv file with the write.csv function. 
+
+```{r}
+write.csv(reg, "C:/Users/CURRANT/Dropbox/Work/LSE/PB230/MT5/Workshop/reg.csv") # Remember to insert the correct file location for your compendium
+```
+
+And thats it! You can extend the above code to create any number of additional predictor variables.
