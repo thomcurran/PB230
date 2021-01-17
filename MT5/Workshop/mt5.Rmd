@@ -231,32 +231,33 @@ Curran, T., Hill, A. P., Hall, H. K., & Jowett, G. E. (2015). Relationships betw
 
 I had two predictor variables (mastery and performance) and one outcome (confidence). i use multiple regression to test the relationships.
 
-Simulating data for this sort of study is a little more involved because there are relationships to consider. But we can still achieve it fairly comfortabyl using rnorm. 
+Simulating data for this sort of study is a little more involved because there are relationships to consider. A package called simglm helps us to do this with (relative) ease. 
 
-For this example our outcome of interest is continuous (confidence measured on a 1-5 scale) and that the data is not clustered (don't worry for now why this matters, we will look at clustering next semester). In this example, our model would look like: Y = b0 + Xb1 + Xb2 + ej. In this equation, Y represents the continuous outcome, b0 represents the intercept, Xb1 represents mastery and Xb2 represents performance. Let’s generate some simulated data using rnorm using the means and SD from the paper. I will request the original sample size (260) because my study was sufficiently powered.
+For this example our outcome of interest is continuous (confidence measured on a 1-5 scale) and that the data is not clustered (don't worry for now why this matters, we will look at clustering next semester). In this example, our model would look like: Y = Xa + Xb1 + Xb2 + ej. In this equation, Y represents the continuous outcome, Xa represents the intercept, Xb1 represents mastery and Xb2 represents performance. Let’s generate some simulated data using the simglm package and the simulate_fixed function for my study using the intercept coefficient and b values for mastery and performance. I will request the original sample size (26) becuase my study was sufficiently powered.
 
 ```{r}
-ID <- 1:260
-mastery <- rnorm(260,mean =3.99, sd = 0.67)
-performance <- rnorm(260, mean = 2.36, sd= 0.55)
+library(simglm)
+sim <- list(
+  formula = conf ~ 1 + mastery + performance,
+  fixed = list(mastery = list(var_type = 'ordinal', levels = 1:5), performance = list(var_type = 'ordinal', levels = 1:5)), # two predictor variable that are ordinal and limited between 1 and 5 (Likert scale)
+  sample_size = 260,
+  reg_weights = c(1.15, .69, .18)) # insert intercept value, beta1, and beta2
 
-b0 <- 1.15 
-b1 <- .69
-b2 <- .18
-sigma <- 1.4 # this is for the random error in the model
-
-eps <- rnorm(ID,0,sigma)
-confidence <- b0 + b1*mastery  + b2*performance + eps # this is the linear model equation with the study beta values multiplied by the simulated data to give the criterion variable
+reg <- simulate_fixed(data = NULL, sim) %>%
+  generate_response(sim) # generates outcome variable
+reg
 ```
 
-This code takes the linear model form: conf ~ 1 + mastery + performance and simulates the predictor and outcome variables that have betas of .69 and .18 respectively. The intercept in the linear model was 1.15, but if it isn't reported then just use the mean for the outcome variable as the intercept. 
+This code takes the linear model form: conf ~ 1 + mastery + performance and simulates 2 ordinal variables (mastery and performance) that have betas of .69 and .18 respectively. The intercept in the linear model was 1.15. I've also added generate_response here so that R  also simulates the outcome variable (confidence).
 
 ### Creating dataframe
 
-Lets create a new dataframe called reg that gathers all the variables needed for this regression analysis.
+Alongside the variables of interest, this code also spits out other information like fixed_outcome (same as reposne variable) and random_effects. These are important for other operations with simglm but are redundant for our purposes.
+
+So lets create a new dataframe called reg with just the variables needed for our analysis.
 
 ```{r}
-reg <- data.frame(ID=ID, mastery=mastery, performance=performance, confidence=confidence)
+reg <- data.frame(ID=1:260, mastery=reg$mastery, peformance=reg$performance, conf=reg$conf) # save only variables of interest in new dataframe
 reg
 ```
 
