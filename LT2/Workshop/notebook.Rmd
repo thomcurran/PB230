@@ -51,7 +51,7 @@ What does this mean? Well it means that the data, collected from a representativ
 
 The assumption of independence is most often verified based on the design of the experiment and on the good control of experimental conditions rather than via a formal test. If you are still unsure about independence based on the experiment design, ask yourself if one observation is related to another (if one observation has an impact on another) within each group or between the groups themselves. If not, it is most likely that you have independent samples. 
 
-If observations between samples (forming the different groups to be compared) are dependent (for example, if three measurements have been collected on the same individuals as it is often the case in developmental research), the repeated measures ANOVA should be preferred in order to take into account the dependency between the samples.
+If observations between samples (forming the different groups to be compared) are dependent (for example, if three measurements have been collected on the same individuals as it is the case in within-person designs), the repeated measures ANOVA should be preferred in order to take into account the dependency between the samples.
 
 This more of a design issue, and we will talk more about this assumption as we move to multi-level modeling and accounting for independence of observations. But it is important to be aware of it.
 
@@ -69,7 +69,7 @@ This non-parametric test as we spoke briefly about last year, robust to non-norm
 
 Finally, there is also the option of bootstrapping to manage violations of this assumption, which is what we have been doing to date and what we will continue to do.
 
-*3. These normal distributions have a common or equality of variance.*
+*3. Each level of the factor has common or equality of variance.*
 
 What does this mean? Well, it means the variances of the different groups should be equal  (an assumption called homogeneity of variances, or even sometimes referred as homoscedasticity, as opposed to heteroscedasticity if variances are different across groups). When this assumption is satisfied, your parameter estimates will be optimal. When there are unequal variances of the dependent variable at different levels of the predictor (i.e., when this assumption is violated), you’ll have inconsistency in your standard error and parameter estimates in your model. Subsequently, your confidence intervals and significance tests will be biased.
 
@@ -94,7 +94,7 @@ This is a classic One-Way ANOVA with three levels of the independent variable (C
 First, lets load this data into our R environment. Go to the LT2 folder, and then to the workshop folder, and find the "perfectionism.csv" file. Click on it and then select "import dataset". In the new window that appears, click "update" and then when the dataframe shows, click import.
 
 ```{r}
-perfectionism <- read_csv("C:/Users/CURRANT/Dropbox/Work/LSE/PB130/LT2/Workshop/perfectionism.csv")
+perfectionism <- read_csv("C:/Users/CURRANT/Dropbox/Work/LSE/PB230/LT2/Workshop/perfectionism.csv")
 head(perfectionism)
 ```
 
@@ -187,9 +187,9 @@ boxplot(SOP ~ Country, data = perfectionism)
 ```
 
 
-The boxplots show a similar variance for the different countries. In the boxplot, this can be seen by the fact that the boxes and the whiskers have a comparable size. However, there are a couple of outliers as shown by the points outside the whiskers and the UK box seems a little fatter (this is likely becasue the sample size for UK is smaller so therefore more variance).
+The boxplots show a similar variance for the different countries. In the boxplot, this can be seen by the fact that the boxes and the whiskers have a comparable size. However, there are a couple of outliers as shown by the points outside the whiskers and the UK box seems a little fatter (this is likely because the sample size for UK is smaller so therefore more variance).
 
-Like the normality assumption, if you feel that the visual approach is not sufficient, you can formally test for equality of the variances with a Levene’s test. I would suggest there is enough doubt in ur box plots to run this test.
+Like the normality assumption, if you feel that the visual approach is not sufficient, you can formally test for equality of the variances with a Levene’s test. I would suggest there is enough doubt in our box plots to run this test.
 
 The null and alternative hypotheses for the Levene's test are:
 
@@ -241,7 +241,7 @@ Because ANOVA and regression ARE THE SAME ANALYSIS, the diagnostic testing follo
 
 Let’s review what our linear regression assumptions are conceptually, and then we’ll turn to diagnosing these assumptions in the next section.
 
-*1. Linearity.* Linear regression is based on the assumption that your model is linear (shocking, I know). Violation of this assumption is very serious–it means that your linear model probably does a bad job at predicting your actual (non-linear) data. Perhaps the relationship between your predictor(s) and criterion is actually curvilinear or cubic.
+*1. Linearity.* Linear regression is based on the assumption that your model is linear (shocking, I know). Violation of this assumption is very serious: it means that your linear model probably does a bad job at predicting your actual (non-linear) data. Perhaps the relationship between your predictor(s) and criterion is actually curvilinear or cubic.
 
 If that is the case, a linear model does a bad job at modeling that relationship, and it is inappropriate to use such a model. There’s no point in worrying about significance tests or confidence intervals if a linear model doesn’t reflect your non-linear data. 
 
@@ -249,18 +249,19 @@ We talked about polynomials last year, so you should know what this means. We fo
 
 *2. Normally distributed stuff & things.* The assumption of normality in regression manifests in two ways: 
 
-1. For significance tests of models to be accurate, the sampling distribution of the thing you’re testing must be normal.Think back the indirect effect. Remember I showed you how the sampling distribution of the indirect effect is skewed? This is why we bootstrapped it. Bootstrapping is vital to overcome this assumption. 
+1. For significance tests of models to be accurate, the sampling distribution of the thing you’re testing must be normal. Think back the indirect effect. Remember I showed you how the sampling distribution of the indirect effect is positively skewed? This is why we bootstrapped it. Bootstrapping is vital to overcome this assumption - thats why we use it all the time. 
 
 2. To get the best estimates of parameters (i.e., betas in a regression equation), the residuals in the population must be normally distributed. This is exactly the same assumption as we have just tested using ANOVA when we examined the distribution of the residuals. 
 
-*3. Homoscedasticity/homogeneity of variance* Homogeneity of variance occurs when the spread of scores for your dependednt variable is the same at each level of the predictor. Just as we have just looked at for ANOVA.
+*3. Each level of the continuous predictor has common or equality of variance* Equality of variance occurs when the spread of scores for your dependent variable is the same at each level of the predictor. Just as we have just looked at for ANOVA.
 
-*4. Independence.* Just like ANOVA, independence is similarly important for regression. It means that the errors in your model are not related to each other (i.e., no clusting or repeated measures). Computation of standard error relies on the assumption of independence, so if you don’t have standard error, say goodbye to confidence intervals and significance tests. As I mentioned above, we will look more into this as we move to multi-level modelling. It is a design issue and cannot be tested usign stats.
+*4. Independence.* Just like ANOVA, independence is similarly important for regression. It means that the errors in your model are not related to each other (i.e., no clustering or repeated measures). Computation of standard error relies on the assumption of independence, so if you don’t have standard error, say goodbye to confidence intervals and significance tests. As I mentioned above, we will look more into this as we move to multi-level modeling. It is a design issue and cannot be tested using stats.
 
-*4. No influential outliers.* This isn’t technically an assumption of regression, but it’s best practice to avoid influential outliers. Why is it problematic to have outliers in your data? Outliers can bias parameter estimates (e.g., mean), and they also affect your sums of squares. Sums of squares are used to estimate the standard error, so if your sums of squares are biased, your standard error likely is too. 
-It’s really bad to have a biased standard error because it is used to calculate confidence intervals around our parameter estimate. In other words, outliers could lead to biased confidence intervals. Not good! We need to rid ourselves of those pesky outliers. We looked at this topic in depth last semester when we cleaned the dataset. So make sure you always do a good job of cleaning and screening before you begin analyses!
+*4. No influential outliers.* This isn’t technically an assumption of linear regression, but it’s best practice to avoid influential outliers. Why is it problematic to have outliers in your data? Outliers can bias parameter estimates (e.g., mean), and they also affect your sums of squares. Sums of squares are used to estimate the standard error, so if your sums of squares are biased, your standard error likely is too. 
 
-## Testing The Linear ANOVA Assumptions
+It’s really bad to have a biased standard error because it is used to calculate confidence intervals around our parameter estimate. In other words, outliers could lead to biased confidence intervals. Not good and another reason we bootstrap! We need to rid ourselves of those pesky outliers. We looked at this topic in depth last semester when we cleaned the dataset and inspected for missing data and outliers. So make sure you always do a good job of cleaning and screening before you begin analyses!
+
+## Testing The Linear Regression Assumptions
 
 To practice diagnosing a linear regression model with continuous variables (simple regression), we are going to use the happiness and GDP variables in the WHR dataframe. Remember this data from last year? Our theory was that as the wealth of a country increases, so self-report happiness also increases. In other words, we are expecting a positive relationship between wealth as measured by GDP and happiness as measured by the Cantril life ladder.
 
@@ -271,13 +272,14 @@ RQ: Is there a linear relationship between GDP and happiness?
 First, lets load this data into our R environment. Go to the LT2 folder, and then to the workshop folder, and find the "WHR.csv" file. Click on it and then select "import dataset". In the new window that appears, click "update" and then when the dataframe shows, click import.
 
 ```{r}
-WHR <- read_csv("C:/Users/CURRANT/Dropbox/Work/LSE/PB130/LT2/Workshop/WHR.csv")
+WHR <- read_csv("C:/Users/CURRANT/Dropbox/Work/LSE/PB230/LT2/Workshop/WHR.csv")
 head(WHR)
 ```
 
 Before we begin, lets just filter the GDP variable to get rid of the cases with missing values.
 
 ```{r}
+library(tidyverse)
 WHR <- # into existing dataframe
 WHR %>% # from existing daraframe
 filter(GDP >= "1") # Filter GDP at a value of 1 and above (i.e., rid the dataframe of any non-numeric cases)
@@ -293,21 +295,23 @@ summary(lm.model)
 
 As we saw last year, these variables share a significant positive relationship (b = .74, p < .001).
 
-## Testing for linearity and homoscedasticty
+## Testing for linearity and equality of variances
 
-To test for linearity and homoscedasticty we plot the fitted values (predicted values) against the residuals:
+To test for linearity and equality of variances we plot the fitted values (predicted values) against the residuals.
+
+The plot of residuals versus predicted values is useful for checking the assumption of linearity and equality of variances. If the model does NOT meet the linear model assumption, we would see our residuals take on a defined shape or a distinctive pattern. For example, if your plot looks like a parabola, that’s bad. 
+
+Your scatterplot of residuals should look like the night sky–no distinctive patterns. The red line through your scatterplot should also be straight and horizontal, not overly curved, if the linearity assumption is satisfied. 
+
+To assess if the equality of variances assumption is met we look to make sure that the residuals are equally spread around the y = 0 line.
 
 ```{r}
 plot(lm.model,which=1)
 ```
 
-The plot of residuals versus predicted values is useful for checking the assumption of linearity and homoscedasticity. If the model does NOT meet the linear model assumption, we would see our residuals take on a defined shape or a distinctive pattern. For example, if your plot looks like a parabola, that’s bad. 
 
-Your scatterplot of residuals should look like the night sky–no distinctive patterns. The red line through your scatterplot should also be straight and horizontal, not overly curved, if the linearity assumption is satisfied. 
 
-To assess if the homoscedasticity assumption is met we look to make sure that the residuals are equally spread around the y = 0 line.
-
-How did we do? R automatically flagged 3 data points that have large residuals (observations 192, 191 and 190). Besides that, our residuals appear to be pretty darn linear, as is evidenced by the pretty straight red line plotted through our residuals (if they were quadratic, for example, that line would resemble the shape of a parabola). It also looks like our data are homoscedastic, given that they appear evenly spread around the y = 0 line. Hooray!
+How did we do? R automatically flagged 2 data points that have large residuals (observations 192 and 190). Besides that, our residuals appear to be pretty linear, as is evidenced by the almost straight red line plotted through our residuals (if they were quadratic, for example, that line would resemble the shape of a parabola). It also looks like our data are homoscedastic, given that they appear evenly spread around the y = 0 line. Hooray!
 
 ## Testing for Normality of Residuals
 
@@ -365,12 +369,19 @@ RQ: Is there a statistically significant difference in productivity between the 
 
 You task is to diagnose this data for normality of residuals and homogeneity of variance.
 
+First lets load in the data:
+
+```{r}
+
+```
+
+
 ## Task 1: Setting up the Model
 
 In the chunk below, write the code to create the build the ANOVA model using aov. Save the model as "music.model"
 
 ```{r}
-music.model <- lm(productivity ~ condition, data = music_data)
+
 ```
 
 ## Task 2: Plot the normality of residuals
@@ -378,12 +389,7 @@ music.model <- lm(productivity ~ condition, data = music_data)
 Use the below chunk to write the code to plot a histogram and QQ-plot for the residuls.
 
 ```{r}
-# histogram
-hist(music.model$residuals)
 
-# QQ-plot
-library(car)
-qqPlot(music.model$residuals) 
 ```
 
 What can we say about the normality of the residuals from a visual inspection?
@@ -393,7 +399,7 @@ What can we say about the normality of the residuals from a visual inspection?
 Use the below chunk to write the code for the Shapiro-Wilk test for normality
 
 ```{r}
-shapiro.test(music.model$residuals)
+
 ```
 
 What can we say about the normality of the residuals from this analysis?
@@ -403,7 +409,7 @@ What can we say about the normality of the residuals from this analysis?
 In the chunk below write the code to plot the distributions of the conditions in this experiment using box-plots.
 
 ```{r}
-boxplot(productivity ~ condition, data = music_data)
+
 ```
 
 What can we say about the homogeneity of variances from a visual inspection?
@@ -413,7 +419,7 @@ What can we say about the homogeneity of variances from a visual inspection?
 Use the below chunk to write the code for the Levene's test of homogeneity of variances.
 
 ```{r}
-leveneTest(productivity ~ condition, data = music_data)
+
 ```
 
 What can we say about the homogenetiy of variances from this analysis?
