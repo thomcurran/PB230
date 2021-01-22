@@ -25,7 +25,7 @@ Additionally, the data might contain some influential observations, such as outl
 
 We have covered these topics previously, but it is wise to be aware of them.
 
-In addition to these important topics, as we saw in the lecture, there are other assumptions. These include normality of the residuals, homoscedacity, and homogeneity of variances.  
+In addition to these important topics, as we saw in the lecture, there are other assumptions. These include independence, normality of the residuals and equality of variances.  
 
 In this workshop, we'll look at testing these remaining assumptions in the ANOVA and linear regression models. We'll finish by describing some built-in diagnostic plots in R. 
 
