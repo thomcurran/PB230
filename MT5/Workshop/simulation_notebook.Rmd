@@ -271,3 +271,9 @@ write.csv(reg, "C:/Users/CURRANT/Dropbox/Work/LSE/PB230/MT5/Workshop/reg.csv") #
 ```
 
 And thats it! You can extend the above code to create any number of additional predictor variables.
+
+## A note on the SD
+
+Sometimes, researchers will only report the means of their groups and not the SD. When this is the case, use the range rule to estimate it. The range rule tells us that the standard deviation of a sample is approximately equal to one-fourth of the range of the data.
+
+In other words, SD = (Maximum – Minimum)/4. 

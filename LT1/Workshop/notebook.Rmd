@@ -65,7 +65,7 @@ If, the assumption is violated then the Kruskal-Wallis test can be applied:
 
 kruskal.test(variable ~ group, data = dat in R)
 
-This non-parametric test as we spoke briefly about last year, robust to non-normal distributions, has the same goal than the ANOVA— compare 3 or more groups — but it uses sample medians instead of sample means to compare groups.
+This non-parametric test as we spoke briefly about last year, robust to non-normal distributions, has the same goal as the ANOVA — compare 3 or more groups — but it uses sample medians instead of sample means to compare groups.
 
 Finally, there is also the option of bootstrapping to manage violations of this assumption, which is what we have been doing to date and what we will continue to do.
 
@@ -89,12 +89,12 @@ To give an example of how to test for these assumptions prior to your analyses, 
 
 RQ: Do levels of perfectionism differ between samples from the US, Canada and the UK
 
-This is a classic One-Way ANOVA with three levels of the independent variable (Country) and one dependent variable (SOP). We tested this data without testing whether the assumptions of normality and homogeneity of variances were met. 
+This is a classic One-Way ANOVA with three levels of the independent variable (Country) and one dependent variable (SOP). We tested this data without testing whether the assumptions of normality and equality of variances were met. 
 
-First, lets load this data into our R environment. Go to the LT2 folder, and then to the workshop folder, and find the "perfectionism.csv" file. Click on it and then select "import dataset". In the new window that appears, click "update" and then when the dataframe shows, click import.
+First, lets load this data into our R environment. Go to the LT1 folder, and then to the workshop folder, and find the "perfectionism.csv" file. Click on it and then select "import dataset". In the new window that appears, click "update" and then when the dataframe shows, click import.
 
 ```{r}
-perfectionism <- read_csv("C:/Users/CURRANT/Dropbox/Work/LSE/PB230/LT2/Workshop/perfectionism.csv")
+perfectionism <- read_csv("C:/Users/CURRANT/Dropbox/Work/LSE/PB230/LT1/Workshop/perfectionism.csv")
 head(perfectionism)
 ```
 
@@ -106,8 +106,7 @@ Remember that normality of residuals can be tested visually via a histogram and 
 Before checking the normality assumption, we first need to compute the ANOVA. We then save the results in res_aov:
 
 ```{r}
-anova.model <- aov(SOP ~ Country,
-  data = perfectionism)
+anova.model <- aov(SOP ~ Country, data = perfectionism)
 ```
 
 We can now check normality of the residuals visually:
@@ -125,7 +124,7 @@ From the histogram and QQ-plot above, we can already see that the normality assu
 
 Some researchers stop here and assume that normality is met, while others also test the assumption via a formal statistical test. It is your choice to test it (i) only visually, (ii) only via a normality test, or (iii) both visually AND via a normality test. Bear in mind, however, the two following points:
 
-1. ANOVA is quite robust to small deviations from normality. This means that it is not an issue (from the perspective of the interpretation of the ANOVA results) if a small number of points deviates slightly from the normality.
+1. ANOVA is quite robust to small deviations from normality. This means that it is not an issue (from the perspective of the interpretation of the ANOVA results) if a small number of points deviate slightly from the normality.
 
 2. Normality tests are sometimes quite conservative, meaning that the null hypothesis of normality may be rejected due to a limited deviation from normality. This is especially the case with large samples as power of the test increases with the sample size.
 
@@ -171,9 +170,9 @@ It’s possible to use the function pairwise.wilcox.test() to calculate non-para
 pairwise.wilcox.test(perfectionism$SOP, perfectionism$Country, p.adjust.method = "BH")
 ```
 
-As we saw lat year, the Canada US contrast is significant, (p = .039) but all other contrasts are not difference from zero.
+As we saw lat year, the Canada US contrast is significant, (p = .039) but all other contrasts are not different from zero.
 
-## Testing Assumption of Homogenity of Variances
+## Testing Assumption of Equality of Variances
 
 Assuming residuals follow a normal distribution, it is now time to check whether the variances are equal across counties or not. The result will have an impact on whether we use the ANOVA or the Welch test.
 
@@ -187,7 +186,7 @@ boxplot(SOP ~ Country, data = perfectionism)
 ```
 
 
-The boxplots show a similar variance for the different countries. In the boxplot, this can be seen by the fact that the boxes and the whiskers have a comparable size. However, there are a couple of outliers as shown by the points outside the whiskers and the UK box seems a little fatter (this is likely because the sample size for UK is smaller so therefore more variance).
+The boxplots show a similar variance for the different countries. This can be seen by the fact that the boxes and the whiskers have a comparable size. However, there are a couple of outliers as shown by the points outside the whiskers and the UK box seems a little fatter (this is likely because the sample size for UK is smaller so therefore more variance).
 
 Like the normality assumption, if you feel that the visual approach is not sufficient, you can formally test for equality of the variances with a Levene’s test. I would suggest there is enough doubt in our box plots to run this test.
 
@@ -205,9 +204,9 @@ library(car)
 leveneTest(SOP ~ Country, data = perfectionism)
 ```
 
-The p-value being smaller than the significance level of 0.05, we reject the null hypothesis, so we must reject the hypothesis that variances are equal between species (p-value = 0.001). It seems the group variances do differ significantly.
+The p-value being smaller than the significance level of 0.05, we reject the null hypothesis, so we must reject the hypothesis that variances are equal between groups (p-value = 0.001). It seems the group variances do differ significantly.
 
-An alternative procedure to one-way ANOVA, called the Welch one-way test, does not require the homogeneity of variances assumption have been met. Therefore, if the Levene's test in significant (i.e., p > .05), researchers should use Welch. 
+An alternative procedure to one-way ANOVA, called the Welch one-way test, does not require the homogeneity of variances assumption to be met. Therefore, if the Levene's test in significant (i.e., p > .05), researchers should use Welch. 
 
 We can implement the Welch's test using the function oneway.test():
 
@@ -227,7 +226,7 @@ pairwise.t.test(perfectionism$SOP, perfectionism$Country, p.adjust.method = "BH"
 
 As before, this output reveals a similar story. the Canada US contrast is significant, (p = .046) but all other contrasts are not different from zero. 
 
-And that's it! Thats how we diagnose assumptions of ANOVA.
+And that's it! That's how we diagnose assumptions of ANOVA.
 
 # Linear Regression
 
@@ -311,7 +310,7 @@ plot(lm.model,which=1)
 
 
 
-How did we do? R automatically flagged 2 data points that have large residuals (observations 192 and 190). Besides that, our residuals appear to be pretty linear, as is evidenced by the almost straight red line plotted through our residuals (if they were quadratic, for example, that line would resemble the shape of a parabola). It also looks like our data are homoscedastic, given that they appear evenly spread around the y = 0 line. Hooray!
+How did we do? R automatically flagged 2 data points that have large residuals (observations 192 and 190). Besides that, our residuals appear to be pretty linear, as is evidenced by the almost straight red line plotted through our residuals (if they were quadratic, for example, that line would resemble the shape of a parabola). It also looks like our data have equal variance across the range of the predictor, given that they appear evenly spread around the y = 0 line. Hooray!
 
 ## Testing for Normality of Residuals
 
@@ -327,7 +326,7 @@ qqPlot(lm.model$residuals)
 ```
 
 
-How did we do? R automatically flagged those same 3 data points that have large residuals (observations 192, 191, and 190). However, aside from those 3 data points, observations lie well along the 45-degree line in the QQ-plot, and the histogram has a nice bell shape, so we may assume that normality holds here. 
+How did we do? R automatically flagged those same 2 data points that have large residuals (observations 192 and 190). However, aside from those 2 data points, observations lie well along the 45-degree line in the QQ-plot, and the histogram has a nice bell shape, so we may assume that normality holds here. 
 
 We could test this more formally, as we did for ANOVA. But regression is robust to small deviations in normality and, besides, our sample so large it will invariably turn a significant result. No need here. The residuals look pretty symmetrical.
 
@@ -355,11 +354,9 @@ The data are taken from last years secondary data assignment. If you remember, I
 
 1. a "control group" that did not listen to music (no_music)
 
-2.  a "treatment group" who listened to music,
-but had no choice of what they listened to (music_no_choice)
+2.  a "treatment group" who listened to music, but had no choice of what they listened to (music_no_choice)
 
-3. a second treatment group who listened to
-music and had a choice of what they listened to (music_choice)
+3. a second treatment group who listened to music and had a choice of what they listened to (music_choice)
 
 After a month of intervention, productivity was measured.
 
@@ -367,12 +364,13 @@ The research question was:
 
 RQ: Is there a statistically significant difference in productivity between the three conditions?
 
-You task is to diagnose this data for normality of residuals and homogeneity of variance.
+You task is to diagnose this data for normality of residuals and equality of variance.
 
 First lets load in the data:
 
 ```{r}
-
+music_data <- read_csv("C:/Users/CURRANT/Dropbox/Work/LSE/PB230/LT1/Workshop/music_data.csv")
+head(perfectionism)
 ```
 
 
@@ -381,15 +379,19 @@ First lets load in the data:
 In the chunk below, write the code to create the build the ANOVA model using aov. Save the model as "music.model"
 
 ```{r}
-
+music.model <- aov(productivity ~ condition, data = music_data)
 ```
 
 ## Task 2: Plot the normality of residuals
 
-Use the below chunk to write the code to plot a histogram and QQ-plot for the residuls.
+Use the below chunk to write the code to plot a histogram and QQ-plot for the residuals.
 
 ```{r}
+# histogram
+hist(music.model$residuals)
 
+# QQ-plot
+qqPlot(music.model$residuals) 
 ```
 
 What can we say about the normality of the residuals from a visual inspection?
@@ -399,27 +401,27 @@ What can we say about the normality of the residuals from a visual inspection?
 Use the below chunk to write the code for the Shapiro-Wilk test for normality
 
 ```{r}
-
+shapiro.test(music.model$residuals)
 ```
 
 What can we say about the normality of the residuals from this analysis?
 
-## Task 4: Plot the homogeneity of variance
+## Task 4: Plot the equaltiy of variance
 
 In the chunk below write the code to plot the distributions of the conditions in this experiment using box-plots.
 
 ```{r}
-
+boxplot(productivity ~ condition, data = music_data)
 ```
 
-What can we say about the homogeneity of variances from a visual inspection?
+What can we say about the equality of variances from a visual inspection?
 
 ## Task 5: Test the homogenity of variances
 
-Use the below chunk to write the code for the Levene's test of homogeneity of variances.
+Use the below chunk to write the code for the Levene's test of equality of variances.
 
 ```{r}
-
+leveneTest(productivity ~ condition, data = music_data)
 ```
 
-What can we say about the homogenetiy of variances from this analysis?
+What can we say about the equality of variances from this analysis?
