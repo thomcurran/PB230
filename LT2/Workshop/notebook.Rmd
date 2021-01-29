@@ -68,11 +68,11 @@ We can test two types of model:
 
 1. Over identified: A model with missing parameters (i.e., has degrees of freedom)
 
-![](https://i.ibb.co/2KrxL67/over.jpg)
+![](https://i.postimg.cc/SNSzPbGH/over.jpg) 
 
 2. Just identified: A model with all parameters (i.e., has no degrees of freedom)
 
-![](https://i.ibb.co/2hBWd2d/just.jpg)
+![](https://i.postimg.cc/W4BkYD97/just.jpg)    
 
 Multiple regression models are just identified. You can run them as a path model, sure, but you'll get the same answer. We ran a just identified mediation model last year when we tested mediation.
 
@@ -302,7 +302,7 @@ Also the linear model function we can display the model results using summary().
 
 To begin with, lets write the code that builds the just identified mediation model. That is, the model which contain all possible paths. It is also the model that directly mimics the linear regression approach we ran last year, as we will see later.
 
-![](https://i.ibb.co/Fg1Lpt0/justmodelsch.png)
+![](https://i.postimg.cc/KjZ4Cttt/justmodelsch.png)
 
 A couple of addition things to note:
 
@@ -463,7 +463,7 @@ semPaths(just.model, "par",
 
 I advise you make your own path model in powerpoint or similar. Something like this:
 
-![](https://i.ibb.co/z81kd91/justmodelout1.png)
+![](https://i.postimg.cc/c4k65gC8/justmodelout1.png)
 
 Much better!
 
@@ -475,7 +475,7 @@ Well, its because I wanted to show you the real purpose of path analysis. That i
 
 Recall from the lecture that one of the most important principals of science is parsimony. What if we decided that, actually, we don't need the direct path (c) in our model. The relationships between the variables are quite adequately represented by the indirect effect only. It is just creating more complexity where none is needed. Theory suggests the c path is not important because the effect of control on exhaustion goes fully through disconnection. Let's grab Occam's razor and shave it away!
 
-![](https://i.ibb.co/6ZrtBXL/overmodelsch.png)
+![](https://i.postimg.cc/2SBjc0gP/overmodelsch.png)
 
 Now we no longer have a just identified model. We have an over identified model because information is missing, namely the c path. Now all we have to go on to compute the correlation matrix is a and b. 
 
@@ -567,7 +567,7 @@ semPaths(over.model, "par",
 
 Much better to draw one ourselves:
  
-![](https://i.ibb.co/Gscq9HB/overmodelout2.png)
+![](https://i.postimg.cc/wxf66KpC/overmodelout2.png)
 
 In addition to the path coefficients and indirect effect, I've placed the variance explained (R2) in the top right hand corner of variable box. Looks good!
 
