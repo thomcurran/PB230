@@ -50,9 +50,9 @@ Before we begin getting to grips with path analysis, there are a few assumtions 
 
 6. The path model accounts for all relevant influences on the variables included. All models are wrong, but how wrong is yours?
 
-Path analysis is theoretically useful because, unlike GLM, it forces us to specify relationships among all of the variables. This results in models showing causal mechanisms through which independent variables produce both direct and indirect effects on a dependent variable. 
+Path analysis is theoretically useful because, unlike GLM, it forces us to specify the relationships with think are operating among all of the variables. This results in models showing causal mechanisms through which independent variables produce both direct and indirect effects on a dependent variable. It also means we can leave redundant paths out of the analysis, which is something we cannot do in multiple linear regression.
 
-We tested mediation last year, and if you recall, we had to do this with multiple models estimating the a, b, c, and c' paths. Path analysis allows us to test these paths simultaneously and omit any paths we think are redundant (ie., the direct effect)
+We tested mediation last year, and if you recall, we had to do this with multiple regression models estimating the a, b, c, and c' paths. Path analysis allows us to test these paths simultaneously and omit any paths we think are redundant (ie., the direct effect)
 
 Mainly, we will focus on how path models can be conducted simply as a series of regressions in the R package lavaan, including estimation of indirect effects with bootstrapping. We are armed with knowledge of the GLM, indirect effects, and bootstrapping, so we are well placed to tackle this topic!
 
@@ -68,11 +68,11 @@ We can test two types of model:
 
 1. Over identified: A model with missing parameters (i.e., has degrees of freedom)
 
-![](https://i.ibb.co/NY0myq2/over.jpg)
+![](https://i.ibb.co/2KrxL67/over.jpg)
 
 2. Just identified: A model with all parameters (i.e., has no degrees of freedom)
 
-![](https://i.ibb.co/3NK7fQL/just.jpg)
+![](https://i.ibb.co/2hBWd2d/just.jpg)
 
 Multiple regression models are just identified. You can run them as a path model, sure, but you'll get the same answer. We ran a just identified mediation model last year when we tested mediation.
 
@@ -159,7 +159,7 @@ Hypothetically, then, we can leave out the direct effect and total effects from 
 
 As always, before we delve into this topic lets just clarify the research question and null hypothesis we are testing:
 
-*Research Question* - Is the relationship between manager control and employee exhastion mediated by disconnection?
+*Research Question* - Is the relationship between manager control and employee exhaustion mediated by disconnection?
 
 *Null Hypothesis* - The indirect effect of the relationship between manager control and employee exhaustion through disconnection will be zero.
 
@@ -173,7 +173,7 @@ First missing value analysis using MICE:
 ## missing data
 data_var <-
   employee %>%
-  select(3:5) # select out only the items
+  dplyr::select(3:5) 
 md.pattern(data_var)
 ```
 
@@ -282,7 +282,7 @@ In this case the ~ symbols just means ‘regressed on’ or ‘is predicted by�
 
 You might recognize this as a mediation model. Thats because it is!
 
-Another feature of path modelling in lavaan that differs from the lm function is the operation must be enclosed within quotes ("). 
+Another feature of path modeling in lavaan that differs from the lm function is the operation must be enclosed within quotes ("). 
 
 So make sure you include the closing quote symbol, and also be careful when running the code which defines the model. RStudio can sometimes gets confused and only runs some of the lines, leading to errors. The simplest solution is to select the entire block explicitly and run that.
 
@@ -302,13 +302,13 @@ Also the linear model function we can display the model results using summary().
 
 To begin with, lets write the code that builds the just identified mediation model. That is, the model which contain all possible paths. It is also the model that directly mimics the linear regression approach we ran last year, as we will see later.
 
-![](https://i.ibb.co/2ZZrdK0/justmodelsch.png)
+![](https://i.ibb.co/Fg1Lpt0/justmodelsch.png)
 
 A couple of addition things to note:
 
 1. Within the mediation models, I label coefficients a, b and c with the astrix (*).
 
-2. You can use ":=" to define a new parameter, such as the indirect effect (ab). Note when you define new parameter with :=, you can use the astrix to multiply values. This is very useful for mediation models becuase the indirect effect is a multiplied by b.
+2. You can use ":=" to define a new parameter, such as the indirect effect (ab). Note when you define new parameter with :=, you can use the astrix to multiply values. This is very useful for mediation models because the indirect effect is a multiplied by b.
 
 3. I also request the total effect here, which you will recall is the indirect effect plus the direct effect.
 
@@ -463,7 +463,7 @@ semPaths(just.model, "par",
 
 I advise you make your own path model in powerpoint or similar. Something like this:
 
-![](https://i.ibb.co/YhhRC2X/justmodelout1.png)
+![](https://i.ibb.co/z81kd91/justmodelout1.png)
 
 Much better!
 
@@ -473,9 +473,9 @@ Now, you might be asking: Tom, if the just identified path model is just a fancy
 
 Well, its because I wanted to show you the real purpose of path analysis. That is, to test over identified models that omit paths and test how well they fit the data.
 
-Recall from the lecture that one of the most important principals of science is parsimony. What if we decided that, actually, we don't need the direct path (c) in our model. The relationships between the variables are quite adequately represented by the indirect effect only. It is just creating more complexity where none is needed. Theory suggests the c path is not important becuase the effect of control on exhaustion goes fully through disconnection. Let's grab Occam's razor and shave it away!
+Recall from the lecture that one of the most important principals of science is parsimony. What if we decided that, actually, we don't need the direct path (c) in our model. The relationships between the variables are quite adequately represented by the indirect effect only. It is just creating more complexity where none is needed. Theory suggests the c path is not important because the effect of control on exhaustion goes fully through disconnection. Let's grab Occam's razor and shave it away!
 
-![](https://i.ibb.co/DRXcQbt/overmodelsch.png)
+![](https://i.ibb.co/6ZrtBXL/overmodelsch.png)
 
 Now we no longer have a just identified model. We have an over identified model because information is missing, namely the c path. Now all we have to go on to compute the correlation matrix is a and b. 
 
@@ -584,7 +584,7 @@ Now it is your turn to have a good at path analysis. We are going to use the thi
 
 ## Load the data
 
-Let's go ahead and load the thirst dataset. You can chaneg the below code or manually load it from the files plane, upto you:
+Let's go ahead and load the thirst dataset. You can change the below code or manually load it from the files plane, upto you:
 
 ```{r}
 thirst <- read_csv("C:/Users/CURRANT/Dropbox/Work/LSE/PB230/LT2/Workshop/thirst.csv")
@@ -603,23 +603,23 @@ To address the research question and test whether we need the c path, lets run t
 
 just.thirst.model <- "
 # the b and c paths
-  consume ~ b * thirst + c * room_temp
+  ??
 # the a path
-  thirst ~ a * room_temp
-# indirect effect
-ab := a*b
-total := ab+c
+  ??
+# indirect effect and total effect
+??
+??
 "
 
 # Over identified model
 
 over.thirst.model <- "
 # the b path
-  consume ~ b * thirst
+  ??
 # the a path
-  thirst ~ a * room_temp
+  ??
 # indirect effect
-ab := a*b
+??
 "
 ```
 
@@ -627,10 +627,10 @@ And then lets fit those models:
 
 ```{r}
 # Fit the just identified model
-thirst.just.model.fit <- sem(just.thirst.model, data = thirst, se = "bootstrap", bootstrap = 100)
+thirst.just.model.fit <- sem(??)
 
 # Fit the over identified model
-thirst.over.model.fit <- sem(over.thirst.model, data = thirst, se = "bootstrap", bootstrap = 100)
+thirst.over.model.fit <- sem(??)
 ```
 
 
@@ -641,10 +641,10 @@ Now we've fit both models. Lets look at the just identified model first. To do t
 
 ```{r}
 # Summary of just identified model
-summary(thirst.just.model.fit, fit.measures=TRUE, standardized=TRUE, ci=TRUE)
+summary(??)
 
 # Parameter estimates of just identified model
-parameterestimates(thirst.just.model.fit, boot.ci.type = "perc", standardized = TRUE)
+parameterestimates(??)
 ```
 
 We know the fit of the just identified model is perfect, so we don't need to inspect the fit indexes. But we do need to look at the estimates.
@@ -663,10 +663,10 @@ Lets now summarise and request the parameter estimates for the over identified m
 
 ```{r}
 # Summary of over identified model
-summary(thirst.over.model.fit, fit.measures=TRUE, standardized=TRUE, ci=TRUE)
+summary(??)
 
 # Parameter estimates of over identified model
-parameterestimates(thirst.over.model.fit, boot.ci.type = "perc", standardized = TRUE)
+parameterestimates(??)
 ```
 
 Because the model is over identified we have fit indexes to inspect
