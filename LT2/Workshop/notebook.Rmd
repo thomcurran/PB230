@@ -402,7 +402,7 @@ When correlations are low, the researcher may lack the power to reject the model
 
 ### Back to the output
 
-As you can see, because the model is just identified, the fit indexes are perfect. Both CFI and TLI are 1, and RMSEA and RMR are 0. Although little use here, these fit indexes will become very useful late ron as we remove paths from the model.
+As you can see, because the model is just identified, the fit indexes are perfect. Both CFI and TLI are 1, and RMSEA and RMR are 0. Although little use here, these fit indexes will become very useful later on as we remove paths from the model.
 
 Also from the summary table we can see that control is a significant predictor of disconnection and disconnection, in turn, is a predictor of exhaustion. The interrelation of these output is EXACTLY the same as linear regression (z is the same as t). This implies that mediation is taking place.
 
@@ -536,7 +536,7 @@ cov(as.matrix(data_var[,c("Exhaustion","Disconnection", "Control")]))
 fitted(over.model)
 ```
 
-As you can see, the covariances are not exactly the same. The model has to estimate the data in the absence of full information. However, crucially, you will see that model pretty well approximates the data. The covariances are closely matched for the pairs of variables (with perhaps the exception of the control-exhaustion pair, which happens to be the path left out). Our model does a pretty good job!
+As you can see, the covariances are not exactly the same. The model has to estimated the data in the absence of full information. However, crucially, you will see that model pretty well approximates the data. The covariances are closely matched for the pairs of variables (with perhaps the exception of the control-exhaustion pair, which happens to be the path left out). Our model does a pretty good job!
 
 Let's now quickly call the parameter estimates for the test of that indirect effect:
 
@@ -603,23 +603,23 @@ To address the research question and test whether we need the c path, lets run t
 
 just.thirst.model <- "
 # the b and c paths
-  ??
+  consume ~ b * thirst + c * room_temp
 # the a path
-  ??
+  thirst ~ a * room_temp
 # indirect effect and total effect
-??
-??
+ab := a*b
+total := ab+c
 "
 
 # Over identified model
 
 over.thirst.model <- "
 # the b path
-  ??
+  consume ~ b * thirst
 # the a path
-  ??
+  thirst ~ a * room_temp
 # indirect effect
-??
+ab := a*b
 "
 ```
 
@@ -627,10 +627,10 @@ And then lets fit those models:
 
 ```{r}
 # Fit the just identified model
-thirst.just.model.fit <- sem(??)
+thirst.just.model.fit <- sem(just.thirst.model, data = thirst, se = "bootstrap", bootstrap = 100)
 
 # Fit the over identified model
-thirst.over.model.fit <- sem(??)
+thirst.over.model.fit <- sem(over.thirst.model, data = thirst, se = "bootstrap", bootstrap = 100)
 ```
 
 
@@ -641,10 +641,10 @@ Now we've fit both models. Lets look at the just identified model first. To do t
 
 ```{r}
 # Summary of just identified model
-summary(??)
+summary(thirst.just.model.fit, fit.measures=TRUE, standardized=TRUE, ci=TRUE)
 
 # Parameter estimates of just identified model
-parameterestimates(??)
+parameterestimates(thirst.just.model.fit, boot.ci.type = "perc", standardized = TRUE)
 ```
 
 We know the fit of the just identified model is perfect, so we don't need to inspect the fit indexes. But we do need to look at the estimates.
@@ -659,14 +659,14 @@ What can we say in relation to the study hypothesis?
 
 ## Summarise the over identified model
 
-Lets now summarise and request the parameter estimates for the over identified model.
+Lets now summarize and request the parameter estimates for the over identified model.
 
 ```{r}
 # Summary of over identified model
-summary(??)
+summary(thirst.over.model.fit, fit.measures=TRUE, standardized=TRUE, ci=TRUE)
 
 # Parameter estimates of over identified model
-parameterestimates(??)
+parameterestimates(thirst.over.model.fit, boot.ci.type = "perc", standardized = TRUE)
 ```
 
 Because the model is over identified we have fit indexes to inspect

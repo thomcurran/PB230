@@ -1,0 +1,164 @@
+---
+title: "LT1 Worksheet"
+output:
+  pdf_document: default
+  html_notebook: default
+  html_document:
+    df_print: paged
+---
+
+# Preliminaries
+
+For this worksheet, I would like you to screen, clean, diagnose and run a multiple linear regression model using knowledge from MT4 and LT1. 
+
+*Please write your answers and code in this R notebook and submit it as a .pdf file in the Moodle submission point.*
+
+Before you start, load the necessary packages: "readr", "tidyverse", "psych", "mice", "MissMEch", "performance",
+
+```{r}
+
+```
+
+# Multiple linear regression with data cleaning, screening, and diagnostics
+
+## Study Description
+
+A team of researchers were interested to know the effect of negative emotions about the impact of global warming on support for government climate change policy. Their hypothesis was that people who report higher negative emotions about climate change would report higher support for climate change policy. 
+
+They reasoned, though, that negative emotions perhaps arise because of certain cultural worldviews that people hold and therefore this variable should be controlled in analyses. 
+
+Accordingly, the researchers also measured the extent to which people considered themselves to be egalitarian or individualistic.
+
+The sample was 214 university students (Mage = 23.57, SD = 1.26).
+
+Government support (dependent variable) was measured with three items (GovSupport), negative emotions was measured with three items (NegEmot), egalitarianism was measured with three items (Egal), and individualism was measured with three items (Ind). All variables measured on a 1-7 Liket.
+
+## Activity
+
+*Research Question 1* - Does negative emotions about climate change positively predict support for government action on climate change, controlling for egalitarianism and individualism?
+
+*Null Hypothesis 1* - The relationship between negative emotions about climate change and support for government action on climate change, controlling for egalitarianism and individualism, will be zero
+
+There are several steps needed before we can conduct this analysis:
+
+1. Screening, missing value analysis and outliers
+
+Check data for erroneous values, inspect data for amount of missing data, and impute any missing values
+
+2. Linear regression model diagnostics
+
+Check for normality of residuals and equality of variances
+
+The dataset can be downloaded from here: https://www.dropbox.com/s/4tjqm9w7uozkx3v/climate.csv. The file is also available in the PB130 R project on the github under the folder worksheets --> LT3 and LT1.
+
+As a first step in the analysis, download the file and save it to a **logical** place where it can be easily located. I would recommend that you save it in your PBS folder under a subfolder called Worksheets. Now load the file by clicking on the dataframe name in the files window where you saved the protest data and click import data". A new screen will appear with the dataframe. Press "update" in the top right corner and then when it loads click import. You should also copy the R code produced in the bottom right corner and paste that code in this R chunk on your worksheet:
+
+
+```{r}
+
+```
+
+### Screening
+
+Check that the data conform to the appropriate range (i.e., 1-7) using the describe function.
+
+```{r}
+
+```
+
+If there are any values outside of that range then replace with na. If there are no values outside of that range then move on.
+
+### Missing Value analysis
+
+Use MICE to show how much missing data we are dealing with in this dataset. Don't forget to select out the variables of interest (columns 5:16 in the dataset) and save it as a new datafare called climate_var.
+
+```{r}
+
+```
+
+How many cases have missing data?
+
+How many are complete?
+
+#### Missing data mechanism
+
+Use the TestMCARNormality function to run Little's MCAR test
+
+```{r}
+
+```
+
+Is the p-value for the non-parametric test of homoscedasticity (equality of covariances) larger than .05?
+
+If so what does this mean for the missing mechanism? Are the data MCAR?
+
+#### Removing cases listwise with > 10% missing
+
+As the data appear to be MCAR, we can feel (relatively) safe (i.e., it won’t bias the sample) deleting subjects with missing values (i.e., listwise) provided the number of cases with missing data is small (i.e., < 5%) and those who we remove have large amounts of missing data (i.e., > 10%). This means that anyone with more that 1 item missing should be removed from analysis because they have more than 10% data missing. 
+
+To remove cases with > 1 missing items, create a new variable (na_count) in our climate_var dataset that contains the NA counts for each case.
+
+```{r}
+
+```
+
+Write the code that filters cases with an na_count above 1.
+
+```{r}
+
+```
+
+Were any cases filtered? If not why not?
+
+#### Scale mean imputation
+
+Because the data are missing MCAR and the amount of missing data is low, we can replace values with scale mean imputation. First write the code that calculates the scales means for each variable in the dataset. Remember to set na.rm= TRUE.
+
+```{r}
+
+```
+
+Then impute the mean scale score in the place of any missing scale item for each person. Remember that the missing data patterns told us that there are missing items for: Egal2 Ind2 GovSupport2 Egal1 Ind3 only.
+
+```{r}
+
+```
+
+Do a check on this scale mean imputation by running the MICE on the climate_var dataset:
+
+
+```{r}
+
+```
+
+
+### Model diagnostics
+
+
+Now build the linear model of government support for the purposes of model diagnostics. Remember to use the saved mean scores as the variables in this model. Save the linear model as an object called lm.model:
+
+
+```{r}
+
+```
+
+Now run the model diagnostics on this model using the check_model function:
+
+```{r}
+
+```
+
+Are the residuals approximately normal?
+
+Does the variance look approximately equal?
+
+### Test the linear model
+
+Write the code that summaries the linear model:
+
+```{r}
+
+```
+
+What do we conclude with respect to the research question?
+
