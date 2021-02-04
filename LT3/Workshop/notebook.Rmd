@@ -74,7 +74,7 @@ We can represent these sources of variance in a latent variable as such:
 
 These are sometimes called factors or latent factors. Typically you will see them referred to as latent variables, though. The common variance of the items is captured in the latent (oval) variable. What is left, the residual of each item, captures the error variance.
 
-Two statistical methods are avalaible to us in the analysis of measurement using latent variables.
+Two statistical methods are available to us in the analysis of measurement using latent variables.
 
 1. Exploratory Factor Analysis if the factor structure of the items is unknown
 
@@ -300,9 +300,9 @@ Great, we have successfully conducted exploratory factor analysis and have reduc
 
 # Confirmatory Factor Analysis (CFA)
 
-We have just conducted EFA to find the most optimal underlying factor solution for our questionnaire items. That's great. But lets say we collected data again on this questionnaire. We now know that it has a four factor solution. How then do we check that the measurement model to ensure that this four factor solution is good in our new dataset?
+We have just conducted EFA to find the most optimal underlying factor solution for our questionnaire items. That's great. But lets say we collected data again on this questionnaire. We now know that it has a four factor solution. How then do we check the measurement model to ensure that this four factor solution is good in our new dataset?
 
-Well, when we know the theoretical factor structure of a set of items, we can *confirm* that factor structure using something called confirmatory factor analysis.
+Well, when we know the theoretical factor structure of a set of items, we can *confirm* its factor structure using something called confirmatory factor analysis.
 
 Confirmatory factor analysis (CFA) is a type of structural equation model, just like path analysis. But in this case we use latent variables, or factors, rather than measured (or averaged) variables. 
 
@@ -351,9 +351,6 @@ The special symbols in the lavaan syntax used for latent varianbles in CFA model
 To run the analysis we pass the model specification and the data to the cfa() function. Again, just like last week:
 
 ```{r}
-# Recode that reverse item
-#anxiety.cor$Q03 <- car::recode(anxiety.cor$Q03, "1=5; 2=4; 3=3; 4=2; 5=1")
-
 # Fit the model
 cfa.fit <- cfa(cfa.model, data=anxiety.cor)
 summary(cfa.fit, fit.measures=TRUE, standardized=TRUE)
