@@ -157,7 +157,7 @@ There are a variety of approaches to determine the number of factors to extract.
 
 2. A priori criterion, i.e., a decision is made to identify a 	particular number of vectors.
 
-3. Kaiser’s (1960) stopping rule.  Extract only factors with	an eigenvalue of  1 or more. An eignenvalue is variance explained, bit like standardised sum of squares.
+3. Kaiser’s (1960) stopping rule.  Extract only factors with	an eigenvalue of  1 or more. An eignenvalue is variance explained, the sum of squares for the factor.
 
 4. Inspect a Scree Plot for the critical inflection point (Cattell, 1958).
 
