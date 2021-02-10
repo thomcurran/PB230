@@ -595,31 +595,20 @@ Here we have the core variables of interest: room_temp (x), thirst (m), and cons
 
 ## Set up the path models
 
-To address the research question and test whether we need the c path, lets run the analysis using both just and over identified models. First, lets set up each model:
+To address the research question and test whether we need the c path, lets run the analysis using both just and over identified models. First, set up each model:
 
 
 ```{r}
 # Just identified model
 
 just.thirst.model <- "
-# the b and c paths
-  consume ~ b * thirst + c * room_temp
-# the a path
-  thirst ~ a * room_temp
-# indirect effect and total effect
-ab := a*b
-total := ab+c
+
 "
 
 # Over identified model
 
 over.thirst.model <- "
-# the b path
-  consume ~ b * thirst
-# the a path
-  thirst ~ a * room_temp
-# indirect effect
-ab := a*b
+
 "
 ```
 
@@ -627,10 +616,10 @@ And then lets fit those models:
 
 ```{r}
 # Fit the just identified model
-thirst.just.model.fit <- sem(just.thirst.model, data = thirst, se = "bootstrap", bootstrap = 100)
+thirst.just.model.fit <- 
 
 # Fit the over identified model
-thirst.over.model.fit <- sem(over.thirst.model, data = thirst, se = "bootstrap", bootstrap = 100)
+thirst.over.model.fit <- 
 ```
 
 
@@ -641,10 +630,10 @@ Now we've fit both models. Lets look at the just identified model first. To do t
 
 ```{r}
 # Summary of just identified model
-summary(thirst.just.model.fit, fit.measures=TRUE, standardized=TRUE, ci=TRUE)
+
 
 # Parameter estimates of just identified model
-parameterestimates(thirst.just.model.fit, boot.ci.type = "perc", standardized = TRUE)
+
 ```
 
 We know the fit of the just identified model is perfect, so we don't need to inspect the fit indexes. But we do need to look at the estimates.
@@ -663,10 +652,10 @@ Lets now summarize and request the parameter estimates for the over identified m
 
 ```{r}
 # Summary of over identified model
-summary(thirst.over.model.fit, fit.measures=TRUE, standardized=TRUE, ci=TRUE)
+
 
 # Parameter estimates of over identified model
-parameterestimates(thirst.over.model.fit, boot.ci.type = "perc", standardized = TRUE)
+
 ```
 
 Because the model is over identified we have fit indexes to inspect

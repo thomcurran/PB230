@@ -1,0 +1,465 @@
+---
+title: "Latent Variable Structural Equation Modeling"
+output: html_notebook
+---
+
+# Preliminaries
+
+```{r}
+library(readr)
+library(lavaan)
+library(semPlot)
+```
+
+
+# Introduction
+
+This week we are going to combine our understanding of path analysis and confirmatory factor analysis to finish this section of the course with full latent variable strucutral equation modeling. Before we begin, though. Let's recap where we are before we get into SEM analysis.
+
+# The Roots of Structural Equation Modeling
+
+To date we have covered all the core concepts needed to understand and apply latent variable SEM. It is is complex analysis, but you have all the building blocks. 
+
+Last week, we looked at factor analytic techniques that test the assumption of a general factor of underlying a set of items (typically questionnaire items). This technique allows us to reduce a large number of variables to a smaller number of underlying constructs that are represented by unobserved or latent variables. We can test the fit of this measurement strucutre with confirmatory factor analysis, as we sw.
+
+We also saw last year with the general linear model a technique called multiple regression that allowed estimating the relation between two constructs while controlling for the otherwise biasing effects of confounding variables. 
+
+Finally, when we looked at path analysis, we saw Wright's tracing rules and path analytic techniques in which causal relations between various variables could be estimated at the same time. Below is an overview of these thre analyses, using simplified path diagram visualizations that are often used to depict SEMs. 
+
+These are the basic building blocks of SEM.
+
+![*A graphical depiction of three major statistical techniques*](https://i.postimg.cc/QNkPr3NV/SEM-Figure1-1024x321.png)
+
+
+# Latent Variable Structural Equation Modeling
+
+Based on these three techniques, statisticians started to think about some of the first SEM related techniques, which would allow researchers to break out of the boundaries of traditional statistical methods.
+
+It was a stroke og genius. They worked out a way to merge the logic of factor analysis, multiple regression, and path analysis. This yielded the unifying, more general framework of whats called covariance structure modeling, which is the core method underlying the SEM framework. 
+
+Recall from path analysis that covariance structure modeling is a method that got its name because instead of modeling all individual data points of a dataset, one takes only the variables’ variances and covariances (relationships). 
+
+To visualize this technique, a “full” latent variable structural equation model is depicted below. Full means that the model has measurement parts and a structural part. The model combines aspects of all three mentioned classical statistical approaches. 
+
+In the measurement parts of the model, the outer model, puts the factor structure of the psychological constructs into latent variables. This is the same as what we do with confirmatory factor analysis.
+
+The structural part of the model, the inner model, depicts how these latent psychological constructs relate to each other. Here, structures similar to multiple regression and path analysis are modeled.
+
+
+![*A depiction of a “full” structural equation model, including three measurement parts (one entangled in red) and a structural part (entangled in green*](https://i.postimg.cc/C5gjN5R0/SEM-Figure2-1024x652.png)
+
+By combining the measurement model and structural model, we can both test the adequacy of our measurement (confirmatory factor analysis) and the causal relationships between our latent variables. Pretty neat!
+
+The typical approach to this type of analysis is to test the measurement model first and then test the full structural model second (Anderson & Gerbin, 1988). We will look at these steps today.
+
+# Latent Variables: Chanting away measurement error
+
+There are many advantages to SEM, but arguably the biggest is that it permits tests of relationships in the absence of measurement error. This is crucial because an assumption of regression analysis is that variables are measured without error.
+
+Psychological characteristics are not directly measurable. We can ask people questions, we can measure their heart rate or brain activity, we can observe them in social interactions, but the resulting data do not directly tell us about people’s psychological characteristics. 
+
+Rather, we assume that our data relate to people’s psychological characteristics in specific ways that we try to model. In SEM, we do this by assuming that various variables correlate because they all indicate the level of the same psychological construct.
+
+For example, in the assessment of creativity, people are often asked to suggest many novel and useful ideas about what to do with everyday objects such as a can, a car tire, or a brick (e.g. Benedek et al., 2014). We can count how many ideas people come up with for each of these items. How should we use the resulting numbers to determine how creative people are? The statistician answer to this question is the latent variable, the idea of which is depicted below.
+
+![*Depiction of a latent variable (η1) in SEM and how it represents correlations between indicators (y1–y3) and their relations with other variables (z1)*](https://i.postimg.cc/DyWXX1jG/SEM-Figure-3-640x539.png)
+
+Above, a covariance matrix is depicted which shows  that number of novel ideas is positively correlated across the three items (variables y1–y3). The more ideas people have for the can, the more ideas they tend to have as well for what to do with the car tire and the brick. 
+
+Why is this so? The creativity researcher’s assumption is, surprise surprise, because some people are more creative than others! From a psychological point of view, this assumption entails that people’s creativity is the psychological construct underlying their ideas on all three items. 
+
+Translating this into statistics, creativity is a latent variable that explains the correlations between the three items because it caused the variation underlying them. In the figure, this is indicated by arrows pointing from the latent variable representing creativity toward the variables representing people’s number of ideas on the three items.
+
+Now, let’s see what it means to get rid of measurement error. In the correlation matrix there is also the variable z1, which represents people’s scores on a questionnaire that assesses openness. People’s openness for new experiences is positively correlated with their creativity. That is, being open might free people’s minds, and free minds might be open! 
+
+Also in the correlation matrix we see that the three creativity items show correlations of .3 with z1, the openness scores. In SEM, instead of modeling all of these three correlations, we sum up the items’ variance that represents creativity into a latent variable, η1. In this latent variable, all the variance that the three items share is represented (i.e., the common variance). 
+
+All the variance that the items do not share is assumed to be measurement error, which does not represent people’s creativity but rather assessment artifacts and randomness, and is thus left out of the latent variable. This can be seen in the three paths from the η1 variable to the y variables. These paths are factor loadings that show how strongly each item represents the construct that it is supposed to measure, in our case creativity. The factor loadings are all .71, which is lower than 1, indicating that only parts of the y variables’ variances go into the latent variable.
+
+Below, there is a depiction of how measurement error variance is cut out of the indicator variables and only the share of variance which supposedly really represents creativity goes into the latent variable.
+
+![*A variance cake illustration of the process of creating a latent variable*](https://i.postimg.cc/9MMGgKp8/SEM-Figure-4-609x640.png)
+
+The initial correlation between any of the y variables and z is .30. This is represented as an overlap in the y and z variables’ variances in the upper part of the figure. 
+
+In the latent variable, only a part of any of the y variables’ variances is represented. However, the overlap in variance with the z variable is still the same. Crucially, the three y variables’ correlations with the z variable are now all represented by the latent variables’ correlation with the z variable. 
+
+However, for the latter two variables, the proportion of overlapping variance is larger (i.e., the relationship is greater). As a result, the correlation that the latent variable has with z1 is estimated to be .42. This is higher than the three y-variables’ individual correlation estimates with the z1 variable, because it is corrected for measurement error, by just cutting it out of the variance cake. 
+
+This is the reason why you can get rid of measurement error by using SEM. This might look like magic, but it is not; it is a strong theory about a measured construct that has been translated into a SEM.
+
+# Estimation
+
+Estimating SEMs, like path analysis, consists of finding a set of parameters that fits the data best. For complex SEMs this is achieved by iterative algorithms, typically a maximum likelihood estimator, as we saw in the path analysis session (this is why SEM analyses do not have intercepts, the estimators and SEs are estimated by maximum likelihood, whcih we saw last year in logistic regression)
+
+Put simply, though, the estimation of SEMs can be well understood by applying Wright’s path tracing rules - just like in the path analysis session. Even though the estimators are quite complex in big models, the underlying principal is not too complicated!
+
+To sum up the estimation, lets go back to the creativity example. The correlations of the three creativity test items with each other are represented in the estimates of the factor loadings, and all three of the items’ correlations with the z variable are represented in the latent variables’ estimated correlation with the z variable, which is corrected for measurement error through the factor loadings. 
+
+Awesome. Let's go ahead and run the analyses!
+
+# Activity: The Data
+
+To apply latent variable SEM, we are going to use data from a paper I published a few years back:
+
+Curran, T. (2018). Parental conditional regard and the development of perfectionism in adolescent athletes: the mediating role of competence contingent self-worth. Sport, Exercise, and Performance Psychology, 7(3), 284.
+
+This paper looked to examine the role of parent conditional regard on young people' perfectionism through the mediated pathway of contingent self-worth in 148 young athletes aged between 12 and 18. 
+
+Lets load this data now:
+
+```{r}
+parent <- read_csv("C:/Users/CURRANT/Dropbox/Work/LSE/PB230/LT4/Workshop/parent.csv")
+head(parent)
+```
+
+In the parent data are fifteen variables that comprise four latent variables:
+
+*Latent Variable 1: Parent Conditional Regard.* Conditional regard is a controlling parental style whereby parents withhold love and affection when children have performed badly. It was measured with 5 items from the Parental Conditional Negative Regard Scale (Assor & Tal, 2012). The instrument assesses the degree to which children perceive their mother and father to be conditionally regarding separately and then scores are combined. The items were adapted slightly to measure parental conditional regard in the sport domain (e.g., “When I perform badly in sport, my mother/father stops giving me attention for a while”). The scale is rated on a 7-point Likert scale ranging from 1 (strongly disagree) to 7 (strongly agree). 
+
+Items for the latent parent conditional regard variable in the dataset: cr1, cr2, cr3, cr4, cr5
+
+*Latent Variable 2: Contingent Self-Worth.* Contingent self-worth is self-worth that is dependent (contingent) on performances. If someone has high contingent self-worth then their self-worth is strognly tied to their performances and they only feel good about themselves when they have performed well. It is measured with 5 items from the Contingencies of Self-Worth Scale (Crocker, Luhtanen, Cooper, & Bouvrette, 2003). To anchor responses in the correct domain, the items were adapted to measure competence contingent self-worth in sport (e.g., “I feel better about myself when I know I’m doing well in sport.”). Participants provide ratings of agreement on scales ranging from 1 (strongly disagree) to 7 (strongly agree). 
+
+Items for the latent contingent self-worth variable in the dataset: csw1, csw2, csw3, csw4, csw5
+
+*Latent Variable 3: Perfectionistic Strivings.* Perfectionistic strivings are the dimension of perfectionism that come from within (i.e., high self-set goals and expectations). Two measures were used as indicators of perfectionistic strivings in this study. They were the mean of the five item self-oriented perfectionism subscale of the HF-MPS (e.g., “One of my goals is to be perfect in everything I do.”) and the mean of the seven-item personal standards subscale of the F-MPS (e.g., “I hate being less than the best at things in my sport”). The HF-MPS has a 1-5 Likert scale and the F-MPS has a 1-7 Likert scale.
+
+Items for the latent perfectionistic strivings variable in the dataset: sop and ps
+
+*Latent Variable 3: Perfectionistic Concerns.* Perfectionistic concerns are the dimension of perfectionism that come from concerns of others (i.e., others high expectation and doubts about actions). Three measures were used as indicators of perfectionistic concerns in this study. They were the mean of the five item socially prescribed perfectionism subscale of the HF-MPS (e.g., “People expect nothing less than perfection from me.”), the mean of the eight-item concern over mistakes subscale of the F-MPS (e.g., “If I fail in competition I feel like a failure as a person”), and the mean of the six-item doubts about actions subscale from the F-MPS (e.g., “I usually feel unsure about the adequacy of my pre-competition practices”). The HF-MPS has a 1-5 Likert scale and the F-MPS has a 1-7 Likert scale.
+
+Items for the latent perfectionistic strivings variable in the dataset: spp, com, and doa
+
+The model to be tested is seen below. All relationships were hypothesized to be positive:
+
+![*Hypothesised SEM Model*](https://i.postimg.cc/2S17CVBk/sem1.png)
+
+I have cleaned and screened all the data in the parents dataset, so we are all ready to go!
+
+## Step 1: Testing the Measurement Model (CFA)
+
+Typically the first step in structural equation modeling is to establish what’s called a “measurement model”, a model which includes all of your observed variables that are going to be represented with latent variables.
+
+Constructing a measurement model allows to determine model fit related to the measurement portion of your model. This is exactly the same analysis as CFA last week, except this time we are checking the measurement of your causal model (rather than the factor structure of a new questionnaire). By running CFA on our model first, we can more precisely know where any model misfit is and make necessary adjustments. But, provided the variables measure what they are supposed to be measuring, we should have few issues.
+
+Below is the depicition of our measurement model for the parent data:
+
+![*CFA Model for Parent Data*](https://i.postimg.cc/j53H779k/sem2.png)
+
+Note there are no causal paths here from our hypothesized model above, just covarainces between the latent variables. We are not interested in testing the adequecy of the hypothesised model yet. Simply, we want to know: is the measurement good? Do the items belong to their intended latent variables?
+
+To test this we will build the CFA model in laavan, just like we have been doing to date.
+
+Recall that the lavaan syntax used for latent variables in CFA models is "=~" where the latent variable is listed before and the items listed after. Also recall that we fix the first item to 1 so that a one unit change in the latent variable is interpreted as 1 unit unit change in the scale of the that item.
+
+Lets build the measurement model now, saving the object as measurement.model.
+
+```{r}
+measurement.model <- "
+conditional_regard =~ 1*cr1 + cr2 + cr3 + cr4 + cr5
+contingent_self_worth =~ 1*csw1 + csw2 + csw3 + csw4 + csw5
+perfectionistic_strivings =~ 1*sop + ps 
+perfectionistic_concerns =~ 1*spp + com + doa
+"
+```
+
+Great, now lets fit that measurement model and request the fit indexes and model parameters.
+
+```{r}
+measurement.model.fit <- cfa(measurement.model, data=parent)
+summary(measurement.model.fit, fit.measures=TRUE, standardized=TRUE)
+```
+
+What can we see from this analysis? We have CFI = .92, TLI .90, RMSEA = .09, and SRMR = .08.  Thats pretty good! All of these fit indexes meet the thresholds for adequate fit that we have discussing (i.e., TLI & CFI > .90; RMSEA and SRMR < .10)
+
+As well, all but one standardised factor loading is > .40. That's also pretty good! We can take that one item out, csw5, if we want. But the fit is fine so it is also justifiable to leave it in. We will leave it in here.
+
+## Error Free Correlations
+
+The other thing of note in this output are the standardised covariances between the latent variables, listed under covariances. These are the error free correlation coefficients, equivalent to Pearson's r between the latent variables. With these correlations, we could create a matrix of error free correlations (error free because they reflect the correlation between latent variables, which are measured without error):
+
+![*Standardised Covariances Between Latent Variables (Error-Free Correlations)*](https://i.postimg.cc/c4PV3D8w/correlations.jpg)
+
+## Composite Reliability
+
+Also here we can calculate whats called the composite reliability of our latent variables, which is a bit like Cronbach's alpha but calculated from the factor loadings not split-half correlations. Although it’s not perfect, composite reliability takes care of many inappropriate assumptions that measures like Cronbach’s alpha make (including that a higher number of items means greater reliability).
+
+Composite reliability is calculated as:
+
+sum(sl)^2 / (sum(sl)^2 + sum(re))
+
+where sum(s1) is the sum of the standardsied factor loadings and sum(re) is the sum of the residual variances (i.e., 1-s1^2). Let's quickly calculate the composite reliability of parent conditional regard:
+
+```{r}
+# save standardised factor loadings in object s1
+sl <- standardizedSolution(measurement.model.fit)
+
+# extract from s1 standardised estimates (est.std) form only parent conditional regard
+sl <- sl$est.std[sl$lhs == "conditional_regard"]
+
+# calculate the residual variances
+re <- 1 - sl^2
+
+# calculate the composite reliability
+sum(sl)^2 / (sum(sl)^2 + sum(re))
+```
+
+We can see that the composite estimate of reliability is .92, within errors of rounding to those reported in the paper (I calculated the composite reliability by hand in the paper). We can run this code for all latent variables or there is a useful website, which will do the calculations for you from the standardised factor loadings here: http://www.thestatisticalmind.com/calculators/comprel/composite_reliability.htm
+
+## Visulaising the CFA
+
+As always, we can visualise the model being tested using semPaths:
+
+```{r}
+semPaths(measurement.model.fit, "std")
+```
+
+And we are done for CFA!
+
+## How its written
+
+The measurement model consisted of four inter-correlated latent variables. The five mother and five father conditional regard items were combined and used as the measured variables for the parental conditional regard factor (five indicators). Items were also used as the measured variables for the competence contingent self-worth factor (five indicators). For the perfectionism dimensions, subscales were used as measured variables for perfectionistic strivings (two indicators; self-oriented perfectionism and personal standards) and perfectionistic concerns (three indicators; socially prescribed perfectionism, doubts about actions, and concern over mistakes). 
+
+All standardised factor loadings for the measured variables on their latent factors were significant (parental conditional regard β range = .85 to .97; competence contingent self-worth β range = .39 to .78; perfectionistic strivings β range = .70 & .85; perfectionistic concerns β range = .43 to .87). Furthermore, each of these latent factors demonstrated acceptable composite reliability (parental conditional regard ρ = .92; competence contingent self-worth ρ = .71; perfectionistic strivings ρ = .75; perfectionistic concerns ρ = .71). The measurement model exhibited an acceptable fit to the data: χ² = 189.84 (84), p < .05; TLI = .90; CFI = .92; SRMR = .07; RMSEA = .09 (90% CI = .06 to .09). All error-free correlations between latent factors were positive, statistically significant, and ranged in magnitude from moderate-to-large according to conventional effect size criteria (i.e., small ≥ .10, moderate ≥ .30, large ≥ .50; Cohen 1988).  
+
+## Step 2: Testing the Full Latent Variable Strucutural Equation Model (SEM)
+
+Now, we need to estimate a full model that includes predictive components in addition to measurement components so that we can test our hypothesised causal relationships.
+
+![*Hypothesised SEM Model*](https://i.postimg.cc/mkpPLPV3/sem6.png) 
+
+
+We will still use the marker variable approach, making the measurement model portion of our model unchanged. However, to this measurement we are going to add the structural element, with pathways marked by "~", just like we did in path analysis. We will also stipulate the two indirect effects of interest, as well (a*b1 and a*b2):
+
+```{r}
+structural.model <- "
+# measurement portion of model
+conditional_regard =~ 1*cr1 + cr2 + cr3 + cr4 + cr5
+contingent_self_worth =~ 1*csw1 + csw2 + csw3 + csw4 + csw5
+perfectionistic_strivings =~ 1*sop + ps 
+perfectionistic_concerns =~ 1*spp + com + doa
+# structural portion of model
+contingent_self_worth ~ a*conditional_regard
+perfectionistic_strivings ~ b1*contingent_self_worth
+perfectionistic_concerns ~ b2*contingent_self_worth
+# the indirect effects
+ab1 := a*b1
+ab2 := a*b2
+"
+```
+
+Into the structural component of the model I have added the name of the a and b paths that make up the indirect effects (i.e., a* and b1* and b2*). As this is an indirect pathway model, I have left out the direct effects and stipulate only the indirect pathways. Great. Let's see how the structural model fits. Be aware that when fitting structural models, just like path analysis, you must use the sem() function not the cfa(). Let's also bootstrap the estimates for the confidence intervals which will be needed for the indirect effects. Typically you would request 5,000 resamples but for time we will request 100.
+
+
+```{r}
+structural.model.fit <- sem(structural.model, data=parent, se = "bootstrap", bootstrap = 100)
+summary(structural.model.fit, fit.measures=TRUE, standardized=TRUE)
+```
+
+What do we see here? First of all, the fit is not great. CFI is .91 but TLI is .89. Likewise RMSEA is a little high at .10, so too is SRMR at .11. So before we do anything else, we must diagnose this misfit. The measurement model was fine, so this suggests a problem with our structural pathways. It seems that one or both direct effects is needed from parent conditional regard to the perfectionism dimensions. Lets add these in to the model and specify:
+
+![*Respecfified Model with Direct Paths Added*](https://i.postimg.cc/HnFTvXBN/sem7.png)
+
+```{r}
+structural.model2 <- "
+# measurement portion of model
+conditional_regard =~ 1*cr1 + cr2 + cr3 + cr4 + cr5
+contingent_self_worth =~ 1*csw1 + csw2 + csw3 + csw4 + csw5
+perfectionistic_strivings =~ 1*sop + ps 
+perfectionistic_concerns =~ 1*spp + com + doa
+# structural portion of model with direct paths added
+contingent_self_worth ~ a*conditional_regard
+perfectionistic_strivings ~ b1*contingent_self_worth + conditional_regard
+perfectionistic_concerns ~ b2*contingent_self_worth + conditional_regard
+# the indirect effects
+ab1 := a*b1
+ab2 := a*b2
+"
+```
+
+Now lets fit that respecified model:
+
+```{r}
+structural.model.fit2 <- sem(structural.model2, data=parent,se = "bootstrap", bootstrap = 100)
+summary(structural.model.fit2, fit.measures=TRUE, standardized=TRUE)
+```
+
+Okay that looks better. We have CFI = .92, TLI .90, RMSEA = .09, and SRMR = .08. We say this model fits the data well - the model implied correlation matrix well approximates the actual correlation matrix. As we can see from the output, the direct path from parent conditional regard to perfectionistic concerns was indeed needed, it is  B = .34 and significant (i.e., p < .05). However, the direct path from parent conditional to perfectionistic strivings is probably not needed. It is minuscule and not significant (i.e., B = .01, p > .05). Removing it from the model should have little influence on the estimation of the observed correlation matrix since its size is small. In the interests of parsimony, then, we should leave it out. It is not needed. So let's quickly do that:
+
+```{r}
+structural.model3 <- "
+# measurement portion of model
+conditional_regard =~ 1*cr1 + cr2 + cr3 + cr4 + cr5
+contingent_self_worth =~ 1*csw1 + csw2 + csw3 + csw4 + csw5
+perfectionistic_strivings =~ 1*sop + ps 
+perfectionistic_concerns =~ 1*spp + com + doa
+# structural portion of model with only direct path to perfectionistic concerns added
+contingent_self_worth ~ a*conditional_regard
+perfectionistic_strivings ~ b1*contingent_self_worth
+perfectionistic_concerns ~ b2*contingent_self_worth + conditional_regard
+# the indirect effects
+ab1 := a*b1
+ab2 := a*b2
+"
+structural.model.fit3 <- sem(structural.model3, data=parent,se = "bootstrap", bootstrap = 100)
+summary(structural.model.fit3, fit.measures=TRUE, standardized=TRUE)
+```
+
+As you can see, we have same fit: CFI = .92, TLI .90, RMSEA = .09, and SRMR = .08. We removed the direct path from parent conditional regard to perfectionistic concerns with no loss in fit. Great, it looks like we have our final model. Let's now inspect the estimates and bootstrap confidence intervals for the regression paths and the indirect effects, which are the basis of our hypothesized model. If you recall from the path analysis session, we do this using the parameterestimates() function:
+
+```{r}
+parameterestimates(structural.model.fit3, boot.ci.type = "perc", standardized = TRUE)
+```
+
+The key sign to look for is "~" which specifies the regressions between variables. We have labeled the a and b paths so they are easily identifiable. We can see that conditional regard positively predicts contingent self worth (b = .12, B = .22, 95% CI = .04,.22). We can also see that contingent self-worth positively predicts both perfectionistic striving (b = .57, B = .56, 95% CI = .22,1.26) and perfectionistic concerns (b = .81, B = .63, 95% CI = .34,1.98). As we saw in the previous model, the direct path between parent conditional regards and perfectionistic concerns is also significant (b = .23, B = .34, 95% CI = .08,.43).
+
+Turning to the indirect effects, these can be found under ":=" for defined parameters (parameters that we defined in the SEM). We have two indirect effects here, ab1 (parent conditional regard on perfectionistic strivings via contingent self-worth) and ab2 (parent conditional regard on perfectionistic concerns via contingent self-worth). We can see that with 5000 resamples, the estimate for ab1 is .07 and the 95% confidence interval runs from .02 to .13. This interval does not include a zero indirect effect and therefore we can reject the null hypothesis. Contingent self-worth does indeed mediate the relationship between parent conditional regard and perfectionistic strivings.
+
+We can see that with 5000 resamples, the estimate for ab2 is .10 and the 95% confidence interval runs from .03 to .21. Again, this interval does not include a zero indirect effect and therefore we can reject the null hypothesis. Contingent self-worth does indeed mediate the relationship between parent conditional regard and perfectionistic concerns.
+
+Lastly, it is always a good idea to call the R2 for each of the latent variables in the model, to ascertain how much variance is explained by the model. We can do that with the lavInspect() function, requesting "rsquare". 
+
+```{r}
+lavInspect(structural.model.fit3, what = "rsquare")
+```
+
+We interpret these R2 values just like we always have. About 5% of variance in contingent self worth is explained by the SEM model, about 32% of the variance in perfectionistic strivings is explained by the SEM model, and about 61% of the variance in perfectionistic concerns is explained by the SEM model.
+
+Putting all this together in a path model can be done using semPaths()
+
+```{r}
+semPaths(structural.model.fit3, "std")
+```
+
+But as you can see, its really messy. Much better to build one yourself:
+
+![*Results of Structural Equation Modelling* ](https://i.postimg.cc/T3YmgWK6/sem8.png)
+
+That look a lot more tidy (and interpretable!) 
+
+## How its written
+
+A partial mediation model including both indirect and one direct path from parent conditional regard to perfectionistic concerns was preferred based on fit indexes. Fit indexes from this model suggested that this model possessed an acceptable fit to the data: TLI = .90; CFI = .92; SRMR = .08; RMSEA = .09. Parental conditional regard positively predicted contingent self-worth (b = .12, B = .22, 95% CI = .04,.22). In turn, competence contingent self-worth positively predicted both perfectionistic strivings (b = .57, B = .56, 95% CI = .22,1.26) and perfectionistic concerns (b = .81, B = .63, 95% CI = .34,1.98). The only direct path in the model, that between parent conditional regard and perfectionistic concerns, was significant (b = .23, B = .34, 95% CI = .08,.43). This model accounted for 5% of the variance in competence contingent self-worth, 32% of the variance in perfectionistic strivings, and 61% of the variance in perfectionistic concerns.
+
+To test the magnitude and statistical significance of the indirect pathways in the model, we calculated indirect effects alongside 95% percentile confidence intervals derived from 5,000 bootstrap iterations. The positive indirect effect for the pathway from parental conditional regard to perfectionistic strivings via competence contingent self-worth was significant (ab = .07, 95% BCa CI. .02, .13), as was the positive standardised indirect effect for the pathway from parental conditional regard to perfectionistic concerns via competence contingent self-worth (ab = .10, 95% BCa CI. .03, .21). 
+
+# Activity: Political Democracy Dataset
+
+This dataset is used throughout Bollen's classic 1989 on SEM. The dataset contains various measures of political democracy and industrialization in developing countries. They theory is that industrialization is positively correlated with political democracy. The variable in this dataset that we will use are:
+
+y5
+Expert ratings of the freedom of the press in 1965
+
+y6
+The freedom of political opposition in 1965
+
+y7
+The fairness of elections in 1965
+
+y8
+The effectiveness of the elected legislature in 1965
+
+x1
+The gross national product (GNP) per capita in 1960
+
+x2
+The inanimate energy consumption per capita in 1960
+
+x3
+The percentage of the labor force in industry in 1960
+
+The x variables make up indicators of industrialization, the y variables make up indicators of political democracy.
+
+The figure below contains a graphical representation of the model that we want to fit:
+
+![*Hypothesised Model*](https://i.postimg.cc/MT9gxsK8/sem45.png)
+
+## Load data
+
+Luckily, the Political Democracy dataset is a practice dataset contained in the lavaan package for CFA, so we don't need to load it from the computer, we can load it from the package. Lets do that now and save it as object called "pol":
+
+
+```{r}
+pol <- lavaan::PoliticalDemocracy
+head(pol)
+```
+
+## Step 1: Build and fit the CFA model
+
+Write the script to build the CFA model for two latent variables: political democracy and industrialization. Don't forget to specify the latent variables with "=~". Save the model object as "political.cfa"
+
+
+```{r}
+# Build CFA model
+political.cfa <- "
+industrialisation =~ 1*y5 + y6 + y7 + y8 
+political_democracy =~ 1*x1 + x2 + x3
+"
+```
+
+Now write the code to fit the CFA model to the data and save it as a new object called "political.cfa.fit". Then request the summary estimates:
+
+```{r}
+# Fit CFA model
+political.cfa.fit <- sem(political.cfa, data=pol,se = "bootstrap", bootstrap = 100)
+
+#Summarise CFA model
+summary(political.cfa.fit, fit.measures=TRUE, standardized=TRUE)
+```
+
+Summarize the key fit indexes for this model. Are they indicative of adequate fit?
+
+Do the items loading well on their respective latent variables?
+
+How are the factors correlated with each other?
+
+## Step 2: Full Latent Variable SEM
+
+Write the script to build the SEM model for two latent variables: political democracy and industrialization. Don't forget to specify the latent variables with "=~" and the regression with "~". Save the model object as "political.sem"
+
+```{r}
+# Build SEM model
+political.sem <- "
+political_democracy =~ 1*y5 + y6 + y7 + y8 
+industrialisation =~ 1*x1 + x2 + x3
+political_democracy ~ industrialisation
+"
+```
+
+Now write the code to fit the SEM model to the data and save it as a new object called "political.sem.fit". Then request the summary estimates:
+
+```{r}
+# Parameter SEM model
+political.sem.fit <- sem(political.sem, data=pol,se = "bootstrap", bootstrap = 100)
+
+# Summary of SEM model
+summary(political.sem.fit, fit.measures=TRUE, standardized=TRUE)
+```
+
+Summarize the key fit indexes for this model. Are they indicative of adequate fit?
+
+What is the regression coefficient between industrialization and political democracy?
+
+Is it statistically significant?
+
+Then, lets request the parameter estimates for the bootstrap confidence interval of the regression in this SEM, as well as the variance explained in industrisation by political democracy:
+
+```{r}
+# Parameter estimates of SEM model
+parameterestimates(political.sem.fit, boot.ci.type = "perc", standardized = TRUE)
+
+# R2 of SEM model
+lavInspect(political.sem.fit, what = "rsquare")
+```
+
+What is the 95% bootstrap confidence interval for the regression of political democracy on industrialization?
+
+How much variance is explained in industrialization by the SEM model?
+
+Finally, write the code to visualize the SEM model with the standardised estimates plotted. Don't forget to use semPaths
+
+```{r}
+semPaths(political.sem.fit, "std")
+```
+
