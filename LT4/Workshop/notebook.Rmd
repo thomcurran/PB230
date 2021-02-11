@@ -20,11 +20,11 @@ This week we are going to combine our understanding of path analysis and confirm
 
 To date we have covered all the core concepts needed to understand and apply latent variable SEM. It is is complex analysis, but you have all the building blocks. 
 
-Last week, we looked at factor analytic techniques that test the assumption of a general factor of underlying a set of items (typically questionnaire items). This technique allows us to reduce a large number of variables to a smaller number of underlying constructs that are represented by unobserved or latent variables. We can test the fit of this measurement strucutre with confirmatory factor analysis, as we sw.
+Last week, we looked at factor analytic techniques that test the assumption of a general factor of underlying a set of items (typically questionnaire items). This technique allows us to reduce a large number of variables to a smaller number of underlying constructs that are represented by unobserved or latent variables. We can test the fit of this measurement structure with confirmatory factor analysis, as we saw.
 
 We also saw last year with the general linear model a technique called multiple regression that allowed estimating the relation between two constructs while controlling for the otherwise biasing effects of confounding variables. 
 
-Finally, when we looked at path analysis, we saw Wright's tracing rules and path analytic techniques in which causal relations between various variables could be estimated at the same time. Below is an overview of these thre analyses, using simplified path diagram visualizations that are often used to depict SEMs. 
+Finally, when we looked at path analysis, we saw Wright's tracing rules and path analytic techniques in which causal relations between various variables could be estimated at the same time. Below is an overview of these three analyses, using simplified path diagram visualizations that are often used to depict SEMs. 
 
 These are the basic building blocks of SEM.
 
@@ -35,7 +35,7 @@ These are the basic building blocks of SEM.
 
 Based on these three techniques, statisticians started to think about some of the first SEM related techniques, which would allow researchers to break out of the boundaries of traditional statistical methods.
 
-It was a stroke og genius. They worked out a way to merge the logic of factor analysis, multiple regression, and path analysis. This yielded the unifying, more general framework of whats called covariance structure modeling, which is the core method underlying the SEM framework. 
+It was a stroke of genius. They worked out a way to merge the logic of factor analysis, multiple regression, and path analysis. This yielded the unifying, more general framework of whats called covariance structure modeling, which is the core method underlying the SEM framework. 
 
 Recall from path analysis that covariance structure modeling is a method that got its name because instead of modeling all individual data points of a dataset, one takes only the variables’ variances and covariances (relationships). 
 
