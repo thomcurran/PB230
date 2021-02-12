@@ -14,7 +14,7 @@ library(semPlot)
 
 # Introduction
 
-This week we are going to combine our understanding of path analysis and confirmatory factor analysis to finish this section of the course with full latent variable strucutral equation modeling. Before we begin, though. Let's recap where we are before we get into SEM analysis.
+This week we are going to combine our understanding of path analysis and confirmatory factor analysis to finish this section of the course with full latent variable structural equation modeling. Before we begin, though. Let's recap where we are before we get into SEM analysis.
 
 # The Roots of Structural Equation Modeling
 
@@ -334,7 +334,7 @@ semPaths(structural.model.fit3, "std")
 
 But as you can see, its really messy. Much better to build one yourself:
 
-![*Results of Structural Equation Modelling* ](https://i.postimg.cc/T3YmgWK6/sem8.png)
+![*Results of Structural Equation Modelling* ](https://i.postimg.cc/T3YmgWK6/sem8.png)  
 
 That look a lot more tidy (and interpretable!) 
 
@@ -373,7 +373,7 @@ The x variables make up indicators of industrialization, the y variables make up
 
 The figure below contains a graphical representation of the model that we want to fit:
 
-![*Hypothesised Model*](https://i.postimg.cc/MT9gxsK8/sem45.png)
+![*Hypothesised Model*](https://i.postimg.cc/MT9gxsK8/sem45.png) 
 
 ## Load data
 
