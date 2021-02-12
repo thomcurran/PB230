@@ -393,8 +393,7 @@ Write the script to build the CFA model for two latent variables: political demo
 ```{r}
 # Build CFA model
 political.cfa <- "
-industrialisation =~ 1*y5 + y6 + y7 + y8 
-political_democracy =~ 1*x1 + x2 + x3
+
 "
 ```
 
@@ -402,10 +401,10 @@ Now write the code to fit the CFA model to the data and save it as a new object 
 
 ```{r}
 # Fit CFA model
-political.cfa.fit <- sem(political.cfa, data=pol,se = "bootstrap", bootstrap = 100)
+
 
 #Summarise CFA model
-summary(political.cfa.fit, fit.measures=TRUE, standardized=TRUE)
+
 ```
 
 Summarize the key fit indexes for this model. Are they indicative of adequate fit?
@@ -421,9 +420,7 @@ Write the script to build the SEM model for two latent variables: political demo
 ```{r}
 # Build SEM model
 political.sem <- "
-political_democracy =~ 1*y5 + y6 + y7 + y8 
-industrialisation =~ 1*x1 + x2 + x3
-political_democracy ~ industrialisation
+
 "
 ```
 
@@ -431,10 +428,10 @@ Now write the code to fit the SEM model to the data and save it as a new object 
 
 ```{r}
 # Parameter SEM model
-political.sem.fit <- sem(political.sem, data=pol,se = "bootstrap", bootstrap = 100)
+
 
 # Summary of SEM model
-summary(political.sem.fit, fit.measures=TRUE, standardized=TRUE)
+
 ```
 
 Summarize the key fit indexes for this model. Are they indicative of adequate fit?
@@ -447,10 +444,10 @@ Then, lets request the parameter estimates for the bootstrap confidence interval
 
 ```{r}
 # Parameter estimates of SEM model
-parameterestimates(political.sem.fit, boot.ci.type = "perc", standardized = TRUE)
+
 
 # R2 of SEM model
-lavInspect(political.sem.fit, what = "rsquare")
+
 ```
 
 What is the 95% bootstrap confidence interval for the regression of political democracy on industrialization?
@@ -460,6 +457,6 @@ How much variance is explained in industrialization by the SEM model?
 Finally, write the code to visualize the SEM model with the standardised estimates plotted. Don't forget to use semPaths
 
 ```{r}
-semPaths(political.sem.fit, "std")
+
 ```
 
