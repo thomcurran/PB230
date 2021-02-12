@@ -119,7 +119,7 @@ In the parent data are fifteen variables that comprise four latent variables:
 
 Items for the latent parent conditional regard variable in the dataset: cr1, cr2, cr3, cr4, cr5
 
-*Latent Variable 2: Contingent Self-Worth.* Contingent self-worth is self-worth that is dependent (contingent) on performances. If someone has high contingent self-worth then their self-worth is strognly tied to their performances and they only feel good about themselves when they have performed well. It is measured with 5 items from the Contingencies of Self-Worth Scale (Crocker, Luhtanen, Cooper, & Bouvrette, 2003). To anchor responses in the correct domain, the items were adapted to measure competence contingent self-worth in sport (e.g., “I feel better about myself when I know I’m doing well in sport.”). Participants provide ratings of agreement on scales ranging from 1 (strongly disagree) to 7 (strongly agree). 
+*Latent Variable 2: Contingent Self-Worth.* Contingent self-worth is self-worth that is dependent (contingent) on performances. If someone has high contingent self-worth then their self-worth is strongly tied to their performances and they only feel good about themselves when they have performed well. It is measured with 5 items from the Contingencies of Self-Worth Scale (Crocker, Luhtanen, Cooper, & Bouvrette, 2003). To anchor responses in the correct domain, the items were adapted to measure competence contingent self-worth in sport (e.g., “I feel better about myself when I know I’m doing well in sport.”). Participants provide ratings of agreement on scales ranging from 1 (strongly disagree) to 7 (strongly agree). 
 
 Items for the latent contingent self-worth variable in the dataset: csw1, csw2, csw3, csw4, csw5
 
@@ -143,7 +143,7 @@ Typically the first step in structural equation modeling is to establish what’
 
 Constructing a measurement model allows to determine model fit related to the measurement portion of your model. This is exactly the same analysis as CFA last week, except this time we are checking the measurement of your causal model (rather than the factor structure of a new questionnaire). By running CFA on our model first, we can more precisely know where any model misfit is and make necessary adjustments. But, provided the variables measure what they are supposed to be measuring, we should have few issues.
 
-Below is the depicition of our measurement model for the parent data:
+Below is the depiction of our measurement model for the parent data:
 
 ![*CFA Model for Parent Data*](https://i.postimg.cc/j53H779k/sem2.png)
 
