@@ -90,7 +90,7 @@ This is the reason why you can get rid of measurement error by using SEM. This m
 
 # Estimation
 
-Estimating SEMs, like path analysis, consists of finding a set of parameters that fits the data best. For complex SEMs this is achieved by iterative algorithms, typically a maximum likelihood estimator, as we saw in the path analysis session (this is why SEM analyses do not have intercepts, the estimators and SEs are estimated by maximum likelihood, whcih we saw last year in logistic regression)
+Estimating SEMs, like path analysis, consists of finding a set of parameters that fits the data best. For complex SEMs this is achieved by iterative algorithms, typically a maximum likelihood estimator, as we saw in the path analysis session (this is why SEM analyses do not have intercepts, the estimators and SEs are estimated by maximum likelihood, which we saw last year in logistic regression)
 
 Put simply, though, the estimation of SEMs can be well understood by applying Wright’s path tracing rules - just like in the path analysis session. Even though the estimators are quite complex in big models, the underlying principal is not too complicated!
 
@@ -205,7 +205,9 @@ re <- 1 - sl^2
 sum(sl)^2 / (sum(sl)^2 + sum(re))
 ```
 
-We can see that the composite estimate of reliability is .92, within errors of rounding to those reported in the paper (I calculated the composite reliability by hand in the paper). We can run this code for all latent variables or there is a useful website, which will do the calculations for you from the standardised factor loadings here: http://www.thestatisticalmind.com/calculators/comprel/composite_reliability.htm
+We can see that the composite estimate of reliability is .92, within errors of rounding to those reported in the paper (I calculated the composite reliability by hand in the paper). We can run this code for all latent variables or there is a useful website, which will do the calculations for you from the standardised factor loadings here: http://www.thestatisticalmind.com/calculators/comprel/composite_reliability.htm.
+
+We interpret composite reliability just like we interpret Cronbach's alpha. Composite reliabilities of .70 or greater are indicative of good relaibility for the measure.
 
 ## Visulaising the CFA
 
