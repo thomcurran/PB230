@@ -173,6 +173,7 @@ summary(School.Rich.Reg.Model)
 School.Poor.Reg.Model <- lm(happy ~ friend.c, data = subset(school, school>3))
 summary(School.Poor.Reg.Model)
 ```
+
 Notice, we have a negative, significant effect for Friends in the rich schools but a positive, significant effect of Friends in the poor school. Thats no good!
 
 ## Whats the Problem?
@@ -250,6 +251,7 @@ friend.happy.fit <- lmer(formula = happy ~ 1 + friend.c + (1 + friend.c|school),
 summary(friend.happy.fit)
 confint(friend.happy.fit, method="boot", nsim=100)
 ```
+
 The "1 + friend.c|school" portion of this equation is requesting that both the intercepts "1" and slope of friends "friend.c" are allowed to vary randomly across schools "|school".
 
 This output needs some explaining.
@@ -621,14 +623,13 @@ To start, we  fit the empty model that provides us information about how much of
 Write the code to fit the empty model for negative affect (negaff):
 
 ```{r}
-empty.neg.model <- lmer(formula = negaff ~ 1 + (1|id), data=stress, REML = FALSE)
-summary(empty.neg.model)
+empty.neg.model <- 
 ```
 
 Use the intercept add residual variance to calculate the ICC:
 
 ```{r}
-.42/(.42+.66)
+
 ```
 
 How much of the variance in negative affect is between-person?
@@ -641,11 +642,10 @@ Remember to use the person mean centered stress variable here (stress_pmc). Also
 
 ```{r}
 # Fit and sumarise multilevel model
-neg.stress.model <- lmer(formula = negaff ~ 1 + stress_pmc + (1 + stress_pmc|id), data=stress, REML = FALSE)
-summary(neg.stress.model)
+neg.stress.model <- 
 
 # Call bootstrap confidence intervals
-confint(neg.stress.model, method="boot", nsim=100)
+
 ```
 
 What is the fixed effect of stress on negative affect (i.e., stress reactivity)?
@@ -681,11 +681,10 @@ Recall in this model we need the stress, neuroticism and the stress by neurotici
 
 ```{r}
 # Fit and summarise multilevel model with level 2 predictor and interaction
-neg.neurotic.model <- lmer(formula = negaff ~ 1 + stress_pmc + neurotic_gmc +  stress_pmc*neurotic_gmc + (1 + stress_pmc|id), data=stress, REML = FALSE)
-summary(neg.neurotic.model)
+neg.neurotic.model <- 
 
 # Call bootstrap confidence intervals
-confint(neg.neurotic.model, method="boot", nsim=100) 
+
 ```
 
 Is the stress*neuroticism interaction significant? (i.e., does a person's stress reactivity depend on their score of neuroticism)
@@ -695,7 +694,7 @@ Is the stress*neuroticism interaction significant? (i.e., does a person's stress
 Let's plot our interaction using the johnson_neyman() function:
 
 ```{r}
-johnson_neyman(model=neg.neurotic.model, pred=stress_pmc, modx=neurotic_gmc)
+
 ```
 
 What does this plot tell us?
