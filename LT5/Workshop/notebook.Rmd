@@ -11,6 +11,7 @@ library(interactions)
 library(ggplot2)
 library(tidyverse)
 library(lme4)
+library(readr)
 ```
 
 # The Scourge of Data Dependence
@@ -76,7 +77,7 @@ In MLM, the random error terms for Level-1 coefficients (the deviations of the g
 
 When an error term for a coefficient is included in a model, the coefficient is referred to as a random effect (because it is allowed to vary randomly). When an error term is not included, the coefficient is referred to as a fixed effect (because it is not allowed to vary). Fixed effects are analogous to the coefficients yielded in normal regression.
 
-There are two main types of clustering: clutering within units and clustering within persons. let's begin by looking at clustering within units.
+There are two main types of clustering: clustering within units and clustering within persons. let's begin by looking at clustering within units.
 
 # Cross-Sectional Data: People Nested Within Units
 
@@ -212,7 +213,7 @@ Put simply, using a multilevel model allows us to separate the within-school eff
 
 ## The Empty Model
 
-The first thing we do in multilevel modeling is check whether there is indeed within-cluster variance in the outcome variable. We do this with the intraclass correlation coefficient which is calculated using the total and residual variance from an empty model of happiness.
+The first thing we do in multilevel modeling is check whether there is indeed between-cluster variance in the outcome variable. We do this with the intraclass correlation coefficient which is calculated using the between-group and residual variance from an empty model of happiness.
 
 To run a multilevel linear model, we use the lmer() function (“Linear Mixed Effects in R”) from the lme4 package. The syntax will look very similar to the syntax from all of the regression functions we have used thus far. Fitting the empty model for happiness looks like this:
 
@@ -231,7 +232,7 @@ The residual section reads 209.21, and represents the variability that is left u
 
 To partition the variance into between-school and between-pupil sources, we take the variance component of the intercept and divide it by the sum of the residual variance and the intercept variance. This is the calculation for the ICC we saw in the lecture:
 
-ICC = σbg2 / (σbg2 + σerror2 ) or variance between schools / total variance
+ICC = σbg2 / (σbg2 + σerror2) or variance between schools / total variance
 
 This leaves us with: 54.56 / (54.56 + 209.21) = 0.21. We can calculate this in R:
 
@@ -264,7 +265,7 @@ Fixed Effects (mean of the random intercepts and slopes):
 
 Random Effects (variability of random intercepts and slopes):
 
-1. sd((Intercept)): There is between-school variability in the intercepts of happiness (variance = 42.32, sd = 6.51). To know whether this variability is significantly greater than zero, we inspect sig01 from the confidence interval table. We can see that the standardised variance of the intercepts (i.e., the SD) is 6.51 with a 95% CI from 1.73 to 10.07. This does not include zero. So even though the intercept variance is reduced with the addition of friends to the empty model, there is still a significant amount of random variance in the intercepts to be explained. Thsi is to say that 
+1. sd((Intercept)): There is between-school variability in the intercepts of happiness (variance = 42.32, sd = 6.51). To know whether this variability is significantly greater than zero, we inspect sig01 from the confidence interval table. We can see that the standardised variance of the intercepts (i.e., the SD) is 6.51 with a 95% CI from 1.73 to 10.07. This does not include zero. So even though the intercept variance is reduced with the addition of friends to the empty model, there is still a significant amount of random variance in the intercepts to be explained.  
 
 2. sd(friend.c): There is between-school variability in the slopes of happiness on friends (variance = 17.75, sd = 4.21). In other words, there is substantial variance in the slopes of happiness on friends from school to school (but we already know this!). 
 
@@ -288,7 +289,7 @@ ggplot(data=school, aes(x=friend.c, y=happy, group=factor(school), colour="gray"
 geom_vline(xintercept=0)
 ```
 
-The blue line here shows the fixed intercept (i.e., where the fixed slope line crosses zero) and fixed slope of stress on time (i.e., the mean relationship over the sample). As we saw from the MLM output, the fixed slope is not significant even though it is a fairly large positive correlation. It is not significant, of course, because there is substantial variability between schools in relationships betwen friends and happiness as we can see in the individual slopes for each school.
+The blue line here shows the fixed intercept (i.e., where the fixed slope line crosses zero) and fixed slope of stress on time (i.e., the mean of the random slopes). As we saw from the MLM output, the fixed slope is not significant even though it is a fairly large positive correlation. It is not significant, of course, because there is substantial variability between schools in relationships between friends and happiness as we can see in the individual slopes for each school.
 
 ## What Does This All Mean?
 
@@ -316,7 +317,7 @@ Ram, N., Conroy, D. E., Pincus, A. L., Hyde, A. L., & Molloy, L. E. (2012). Teth
 
 As we saw in the lecture, longitudinal data is a special case of nested data where time points are nested within people. In this case, the data Ram collected was from a diary study of workers in a big tech firm. Once a day for eight days, researchers measured employees' levels of stress and negative affect (this is why it is called a diary study, participants typically complete a daily diary). 
 
-At the end of the study, they took one measure of neuroticism. In this way, the researchers has data at two-levels. At level one, they had between person differences in neuroticism (i.e., how people differ from the sample mean in terms of their neuroticism). At level two, they had within-person differences in stress and negative affect (i.e., how people differ from their own mean stress and negative affect on a particular day).
+At the end of the study, they took one measure of neuroticism. In this way, the researchers have data at two-levels. At level two, they had between person differences in neuroticism (i.e., how people differ from the sample mean in terms of their neuroticism). At level one, they had within-person differences in stress and negative affect (i.e., how people differ from their own mean stress and negative affect on a particular day).
 
 ![*A Two-Level Nested Longitudinal Data-Structure*](https://i.postimg.cc/7Z7FRGrb/mlm1.png)
 
@@ -405,7 +406,7 @@ Combining Level 1 and Level 2 equations gives us:
 
 stressti = Ma + (MB + WBi)*dayti + Ba*(neurotici) + BB*(dayti*neurotici) + Wai + eti
 
-Note the difference between this model and the school model is that we are interested in whether the level 1 stress trajectories are different depending on the level 2 variable: neuroticism. Therefore, we have a cross-level interaction in the model that tests this hyopthesis.
+Note the difference between this model and the school model is that we are interested in whether the level 1 stress trajectories are different depending on the level 2 variable: neuroticism. Therefore, we have a cross-level interaction in the model that tests this hypothesis.
 
 ## Fitting the Empty Model
 
@@ -413,7 +414,7 @@ Now that we have defined the stress trajectory model we can begin to fit it usin
 
 As before, we make use of the lme4 package for fitting such multilevel models. The lmer() function fits the MLM.
 
-Like in the school example above, we often first fit an empty model that provides us information about how much of the total variance in the outcome variable is within-person variance and how much is between-person variance.
+Like in the school example above, we often first fit an empty model that provides us information about how much of the total variance in the outcome variable is between-person variance and how much is between-day variance.
 
 Fitting the empty model for stress looks like this:
 
@@ -426,7 +427,7 @@ In this model, the code for the model reads, “stress ~ 1 + (1|id).” The “1
 
 The residual section reads .28, and represents the variability that is left unexplained in the empty model (much like the error variance in an ANOVA model). This left over variance is the between-day variance (i.e., variability in stress from day to day, irrespective of person)
 
-To partition the variance into between-person and within-person sources, we take the variance component of the intercept and divide it by the sum of the residual variance and the intercept variance. 
+To partition the variance into between-person and between-day sources, we take the variance component of the intercept and divide it by the sum of the residual variance and the intercept variance. 
 
 This leaves us with: .19 / (.19 + .28) = 0.40. We can calculate this in R:
 
@@ -465,7 +466,7 @@ Random Effects:
 
 1. sd((Intercept)): There is between-person variability in the intercepts of stress (variance = 0.17, sd = 0.42). To know whether this variability is significantly greater than zero, we inspect sig01 from the confidence interval table. We can see that the standardised variance of the intercepts (i.e., the SD) is .42 with a 95% CI from .34 to .49. This does not include zero. So even though the intercept variance in reduced with the addition of time to the empty model, there is still a significant amount of random variance in the intercepts to be explained.
 
-2. sd(day): There is between-person variability in the within-person trajectories of stress over time (variance = 0.003, sd = 0.05). In other words, although the mean change in stress is negligible, there is some variance around that mean change from person to person. Some people's stress increases, some peoples decreases across time. Overall, this means a zero slope in the sample (per fixed effect), but this disguises significant person to person variability.
+2. sd(day): There is between-person variability in the within-person trajectories of stress over time (variance = 0.003, sd = 0.05). In other words, although the mean change in stress is negligible, there is some variance around that mean. Some people's stress increases, some peoples decreases across time. Overall, this means a zero slope in the sample (per fixed effect), but this disguises significant person to person variability.
 
 To know whether this person to person variability in the trajectories of stress is significantly greater than zero, we inspect sig03 from the confidence interval table. We can see that the standardised variance of the slopes (i.e., the SD) is .05 with a 95% CI from .03 to .08. This does not include zero. So even though the fixed effect of time is not-significant, there is still a significant amount of random variance in the slopes to be explained.
 
@@ -489,7 +490,9 @@ The blue line here shows the fixed intercept (i.e., where the fixed slope crosse
 
 ## Adding a Between-Person Predictor of the Random Intercepts and Slopes
 
-We now add trait neuroticism to the MLM model to see if and how between-person differences in neuroticism are related to the intercepts and trajectories of stress. Like in the example above, it is important to grand mean center the neuroticism variable so that the unit of measurement for neuroticism is deviation from the sample mean. To do this, we fit MLM model using the neurotic_gmc variable in the dataset.
+We now add trait neuroticism to the MLM model to see if and how between-person differences in neuroticism are related to the intercepts and trajectories of stress. To examine whether neuroticism explains between-person differences in the intercepts and slopes we must add both the main effect of neuroticism and its interaction with day. The interaction becomes the focal effect: i.e., does the relationship between day and stress depend on neuroticism? In other words, is variability in the trajectories of stress explained by neuroticism?
+
+It is important to grand mean center the neuroticism variable before we fit this model so that the unit of measurement for neuroticism is deviation from the sample mean. To do this, we fit MLM model using the neurotic_gmc variable in the dataset.
 
 ```{r}
 time.stress.fit2 <- lmer(formula = stress ~ 1 + day + neurotic_gmc + day*neurotic_gmc + (1 + day|id), data=stress)
@@ -503,13 +506,13 @@ Fixed Effects:
 
 1. (Intercept): The expected value of stress for the average person on the first time point is 1.39
 
-2. day: As before, stress increased marginally over the course of the study days. For every unit increase in day, stress increased by .001 (95% CI = -.01, .02). This is not a significant change (i.e., CI includes zero). But as we saw above, we are not interested in the mean stress change, we are interested here in the variance of that mean change and whether it can be predicted by between-person differences in neuroticism
+2. day: As before, stress increased marginally over the course of the study days. For every unit increase in day, stress increased by .001 (95% CI = -.01, .02). This is not a significant change (i.e., CI includes zero). But as we saw above, we are not interested in the mean stress change, we are interested here in the variance around that mean trajectory and whether it can be predicted by between-person differences in neuroticism
 
 3. neurotic_gmc: On average, people with higher neuroticism also tended to experience higher stress (b = 0.17). For every 1 unit increase in neuroticism away from the group mean, there is a corresponding .17 deviation in stress from the group mean. This is a significant relationship (95% CI = .08, .24). Like the mean day fixed effect, this is interesting, but the between-person relation of neuroticism with stress is not the focal effect of interest here.
 
 4. day:neurotic_gmc: This is the focal coefficient of interest when adding a between person predictor to a MLM model of trajectories. This is because it tells us whether the relationship between time and an outcome (i.e., the change trajectory) differs depending on the level of a between person moderator.
 
-We can see that between-person deviations for the grand mean in neuroticism moderates the relationship between day and stress (b = -.02). The confidence associated with this interaction indicates that it is just significantly greater than zero (95% CI = -.03,-.0001). We can conclude that indeed the variance of the within-person trajectories of stress is explained, in part, by between-person differences in neuroticism.
+We can see that between-person deviations for the grand mean in neuroticism moderates the relationship between day and stress (b = -.02). The confidence associated with this interaction indicates that it is just significantly greater than zero (95% CI = -.03,-.0001). We can conclude that variance in the trajectories of stress is explained, in part, by between-person differences in neuroticism.
 
 Random Effects:
 
@@ -547,7 +550,7 @@ The intraclass correlation for stress was first calculated based on the empty mo
 
 In model 2, we added fixed and random effects for the intercepts and time slopes of stress to model 1. Although the fixed effect of time on stress was not different from zero, there was significant between-person variance in both the intercepts and time slopes of stress. As such, intercepts and slopes were permitted to vary randomly in tests of neurotic vulnerability to daily stress.
 
-In model three, added the cross-level interaction of time  (Level 1; within-person) and neuroticism (Level 2; between person) to model two. In this model, time interacted with neuroticism. The positive sign of this interaction is consistent with the interpretation that higher neuroticism is associated with steeper incline trajectory slopes in stress across the period of study.
+In model three, we added the cross-level interaction of time  (Level 1; within-person) and neuroticism (Level 2; between person) to model two. In this model, time interacted with neuroticism. The positive sign of this interaction is consistent with the interpretation that higher neuroticism is associated with steeper incline trajectory slopes in stress across the period of study.
 
 To illustrate this interaction, we plotted the conditional mean of the trajectory slopes and 95% confidence bands for stress across the range of neuroticism. When neuroticism was below 1.79, the trajectory slopes for stress were non-significant (i.e., confidence bands included zero). However, when neuroticism was above 1.79, the trajectory slopes for stress were positive and significant (i.e., p > .05).
 
@@ -623,7 +626,7 @@ To start, we  fit the empty model that provides us information about how much of
 Write the code to fit the empty model for negative affect (negaff):
 
 ```{r}
-empty.neg.model <- 
+
 ```
 
 Use the intercept add residual variance to calculate the ICC:
