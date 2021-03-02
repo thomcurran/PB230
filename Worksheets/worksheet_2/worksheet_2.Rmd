@@ -1,0 +1,232 @@
+---
+title: "Worksheet 2"
+output: html_notebook
+---
+
+# Preliminaries
+
+For this worksheet, I would like you to apply path analysis and then Anderson and Gerbing's (1988) two-step approach to the analysis of the cleaned data in the last worksheet. 
+
+*As always, please write your answers and code in an R notebook and submit it as a .pdf file in the Moodle submission point.*
+
+Before you start, load the necessary packages: "readr", "lavaan", "Hmisc".
+
+```{r}
+
+```
+
+# Path Analysis, Confirmatory Factor Analysis, and Exploratory Factor Analysis
+
+## Study Description
+
+A team of researchers were interested to know the effect of negative emotions about the impact of global warming on support for government climate change policy. Their hypothesis was that people who report higher negative emotions about climate change would report higher support for climate change policy. 
+
+We saw in the last worksheet, though, that the relationship between emotions and government support was reducted when an egalitarian worldview was added to the model. This suggest that rather than a multiple regression model, the best fit for this data is a mediaiton model whereby emotions mediated the relationship between egalitarianism and government support. This is the model you will test using first path analysis and then second Anderson and Gerbing's (1988) to-step approach.
+
+The sample was 214 university students (Mage = 23.57, SD = 1.26).
+
+Government support (dependent variable) was measured with three items (GovSupport), negative emotions was measured with three items (NegEmot), egalitarianism was measured with three items (Egal), and individualism was measured with three items (Ind). All variables measured on a 1-7 Liket.
+
+## Activity
+
+*Research Question 1* - Does negative emotions about climate mediate the relationship between egalitarianism and support for government action on climate change?
+
+*Null Hypothesis 1* - The indirect effect of egalitarianism on support for government action on climate changeb will be zero
+
+We have already cleaned the data, so thats good! The cleaned dataset can be downloaded from here: https://www.dropbox.com/s/l4y98b5deevokev/climate_clean.csv. The file is also available in the PB130 R project on the github under the folder worksheets --> worksheet_2.
+
+As a first step in the analysis, download the file and save it to a **logical** place where it can be easily located. I would recommend that you save it in your PBS folder under a subfolder called Worksheets. Now load the file by clicking on the dataframe name in the files window where you saved the protest data and click import data". A new screen will appear with the dataframe. Press "update" in the top right corner and then when it loads click import. You can also copy the R code produced in the bottom right corner and paste that code in an R chunk on your worksheet. For example:
+
+
+```{r}
+climate_clean <- read_csv("C:/Users/CURRANT/Dropbox/LSE/PB230/Worksheets/climate_clean.csv")
+climate_clean
+```
+
+# Task 1: Path Analysis
+
+## Correlations
+
+As always with any regression-based analysis, it is important to begin by inspecting the correlations between the measured variables in the climate_clean dataframe. In the dataframe, we have a set of calcuated (averaged) variables that we computed in the last workshet. Write the code to check the correlations between our variables of interest: egal, emot, gov.
+
+```{r}
+
+```
+
+Comment on each of the correlations, their direction, their significance, and their effect size:
+
+
+
+## Build the Path Model
+
+To begin with, lets write the code that builds the just identified mediation model. That is, the model which contains all possible paths. Build this model using laavan code and save it as a new model called med.model.
+
+![](https://i.postimg.cc/LsZhBWVH/path3.jpg)   
+
+A couple of things to note:
+
+1. Within the mediation models, label coefficients a, b and c with the astrix (*).
+
+2. You can use ":=" to define a new parameter, such as the indirect effect (ab). Note when you define new parameter with :=, you can use the astrix to multiply values. Reall the indirect effect is a multiplied by b.
+
+```{r}
+med.model <- "
+
+"
+```
+
+## Fit the Path Model
+
+Now fit the path model using sem(), remembering to request the bootstrapping standard errors with 5,000 resamples. Call the fitted object med.fit
+
+```{r}
+med.fit <- 
+```
+
+Finally, summarise the model using summary(). In this summary, don't forget to request:
+
+1.The confidence intervals for our different effects, so in the summary statement, we can include ‘ci=TRUE.’
+
+2. The standardized estimates as well as the unstandardised estimates. So in the summary statement, we can include 'standardized=TRUE'.
+
+3. The fit indexes of our model. For the fit indexes, in the summary statement we can include 'fit.measures=TRUE'.
+
+```{r}
+
+```
+
+Why is the model fit perfect for this model?
+
+
+
+To request the bootstrap confidence intervals from the model, pass the model through the parameterestimates() function and stipulate that we want boot.ci.type = "perc".
+
+```{r}
+
+```
+
+Comment on the estimate and confidence interval for the a path:
+
+
+
+Comment on the estimate and confidence interval for b path:
+
+
+
+Comment on the estimate and confidence interval for c path:
+
+
+
+Comment on the estimate and confidence interval for ab path:
+
+
+
+Comment on the research question, what can we conclude?
+
+
+
+# Task 2: Confirmatory Factor Analysis
+
+As we know, analyzing this data with path analysis is not ideal because we have measurement error in our variables. To overcome this problem, researchers can create latent variables of their measures and test relationships between these latent variables using something call latent variable structural equation modeling (SEM). SEM has two steps, 1) confirmatory factor analysis to confirm the measurment model, and 2) latent variable SEM to test the hypothesised relationships.
+
+Let's now test our climate model using latent variable SEM, starting with confirmatory factory analysis.
+
+First we need to set up our latetn variables. In our dataframe, we have three items for each variable:
+
+1) emotions = NegEmot1, NegEmot2, NegEmot3
+2) egalitarianism = Egal1, Egal2, Egal3
+3) government = GovSupport1, GovSupport2, GovSupport3
+
+## Build the CFA Model
+
+Recall that the lavaan syntax used for latent variables in CFA models is "=~" where the latent variable is listed before and the items listed after. Also recall that we fix the first item to 1 so that a one unit change in the latent variable is interpreted as 1 unit unit change in the scale of the that item.
+
+Build the measurement model now, saving the object as cfa.model
+
+```{r}
+cfa.model <- "
+
+"
+```
+
+## Fit and Summarize the CFA Model
+
+Now fit and summarize the CFA using the cfa() function and save it as a new object called cfa.fit:
+
+```{r}
+# Fit CFA
+
+
+# Summarize CFA
+
+```
+
+Comment on the model fit indexes for the CFA, TLI, RMSEA, and SRMR, are they indicative of good fit?
+
+
+
+Comment on the standardized factor loading for the latent variables, are they > .40?
+
+
+
+Comment on the error free correlations between the latent variables (standardized covariances), are they significant?
+
+
+
+What is you overall assessment of the measurement model, is it good enough to move forward?
+
+
+
+## Build the SEM Model
+
+Now build the SEM using the sem() function and save it as a new object called sem.model. The SEM model should include all structural paths and look like this:
+
+![](https://i.postimg.cc/76t2Kz24/sem1.jpg)     
+
+Don't forget to include the ab path and remember: to the measurement model we add the structural element, with pathways marked by "~", just like we did in path analysis.
+
+```{r}
+sem.model <- "
+
+"
+```
+
+## Fit and Summarize the SEM Model
+
+Now fit the model and save it as a new object called sem.fit. In the same code chunk, summarize the SEM model, remembering to request bootstrap standard errors:
+
+```{r}
+# Fit SEM Model
+
+
+# Summarize SEM model
+
+```
+
+You may get a "some estimated ov variances are negative" message, ignore it. Comment on the model fit indexes for the SEM, TLI, RMSEA, and SRMR, are they indicative of good fit?
+
+
+To request the bootstrap confidence intervals from the model, pass the model through the parameterestimates() function and stipulate that we want boot.ci.type = "perc".
+
+```{r}
+
+```
+
+Comment on the estimate and confidence interval for the a path:
+
+
+
+Comment on the estimate and confidence interval for b path:
+
+
+
+Comment on the estimate and confidence interval for c path:
+
+
+
+Comment on the estimate and confidence interval for ab path:
+
+
+
+Comment on the research question, what can we conclude?
+
