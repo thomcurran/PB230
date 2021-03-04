@@ -1,0 +1,421 @@
+---
+title: "LT7: Latent Growth Curve Modelling"
+output: html_notebook
+---
+
+# Preliminaries
+
+```{r}
+library(lme4)
+library(lavaan)
+library(interactions)
+library(tidyverse)
+library(sjmisc)
+library(semPlot)
+```
+
+
+# Latent Growth Curve Modelling
+
+Latent growth curve (LGC) models are in a sense, just a different form of the longitudinal multilevel model we looked at before reading week. In some ways they are more flexible, mostly because they are conducted in the structural equation modeling framework that allows for indirect, and other more complicated process models. Mainly, though, their main application is to developmental research where people are measured over a considerable amount of time and their trajectories of change are the dependent variables of interest.
+
+LGC models are a very popular SEM technique in the psychological and behavioral sciences, so it makes sense to become familiar with them. To best understand a growth curve model, I still think it’s instructive to see it from the multilevel model framework, where things are mostly interpretable from what you know about random intercepts and slope trajectories. We will do that here. First looking at addressing LT5's research question using multilevel modelling and then doing the same analysis with LGC modeling.
+
+## Random effects
+
+As a reminded of why we need this type of analysis: often data is clustered (e.g. students within schools or observations for individuals over time). The general linear model assumes independent observations, and in these situations we definitely do not have that. This is massive problem for estiamtes, as we saw in LT5.
+
+One very popular way to deal with clustering are a class of models called multilevel models. They are some times called mixed models because there is a mixture of fixed effects and random effects. The fixed effects are the regression coefficients one has in standard modeling approaches. We saw how these work and are applied in LT5.
+
+The random effects are especially important because they allow each cluster to have its own unique intercept and slope in addition to the overall fixed intercept and slope. The random effect fro any cluster is simply the cluster's intercept and slope deviation from the overall intercept and slopes. 
+
+## Fixed and Random Effects in SEM
+
+As we’ve seen with our work on structural equation modeling, the latent variables capture common variance in a set of correlated items, usually with a mean, and some standard deviation. Well this is also what random effects are in mixed models (i.e., variance in a set of correlated intercepts or slopes), and it’s through this that we can start to get a sense of random effects as latent variables. 
+
+![*Fixed and Random Effects in MLM*](https://i.postimg.cc/qMNZ2P7p/random.png)
+
+We saw in the multilevel modeling framework that the multilevel equation for this set of effects can be express as:
+
+Yit = Ma + MB + WBt + Wat + eit
+
+Where Ma is the fixed intercept, MB is the fixed slope, WB is the random slope variance, Wa is the random intercept variance, and Y is the outcome variable for individual i at time point t. e is simply the error left over once the multilevel model is subtracted out (i.e., the error in simple ANOVA).
+
+Rather than express this model in notation form, we can also express it in latent variable form. Lets have a look at that:
+
+![*Fixed and Random Effects in LGCM*](https://i.postimg.cc/8ckcDr1n/lgc1.jpg) 
+
+To all intents and purposes, this model is exactly the same as the multilevel model we have just expressed in notional format above. Just this time, the intercepts and slopes are represented by latent variables. We have a latent variable representing the random intercepts and a latent variable representing the random slopes. All loadings for the intercept latent variable are fixed at 1 so that the intercept latent variable has a mean that is the mean of the first time point (Ma). This is the fixed effect for the intercept. The intercept latent variable also has a variance that is the variability around the mean of the first time point (Wa). This is the random effect for the intercept.
+
+The loadings for the slope latent variable are arbitrary, but should accurately reflect the time spacing, and typically, just like in the multilevel model, it is good to start at zero, so that the zero (the intercept) is the mean of the first time point. Hence, there is no loading for T0 because the T0 loading would be zero. Every loading for each time point thereafter is 1, 2, 3 and so on for a linear trajectory (we could take the square of these time points for a quadratic trend, for example, but we will stick with linear trajectories for now). In this way, the slope factor is simply the regression of time on our outcome variable (in this example, shame). The slope latent variable mean being the mean slope or trajectory of time (MB). This the fixed effect of the slope. The slope latent variable variance being the variability in the trajectories (WB).
+
+The cool thing about modeling longitudinal trajectories in this way is that we can add latent variable predictors to explain latent variable variance in the intercept or slopes. In this way, we are modeling relationships in the absence of error and we know that is crucially important for regression.
+
+Okay lets run this LGC with the same data we looked at in LT5.
+
+# Longitudinal Data: Time Points Nested Within People
+
+Recall from LT5 that the data we worked with for the analysis of longitudinal data is the stress data from Ram et al (2012). This is a classic diary design, whereby the researchers were interested to know the effects of personalty of daily levels of stress. The citation for the work is here:
+
+Ram, N., Conroy, D. E., Pincus, A. L., Hyde, A. L., & Molloy, L. E. (2012). Tethering theory to method: Using measures of intraindividual variability to operationalize individuals’ dynamic characteristics. In G. Hancock & J. Harring (Eds.), Advances in longitudinal methods in the social and behavioral sciences (pp. 81-110). New York: Information Age.
+
+As we saw in LT5, longitudinal data is a special case of nested data where time points are nested within people. In this case, the data Ram collected was from a diary study of workers in a big tech firm. Once a day for eight days, researchers measured employees' levels of stress and negative affect (this is why it is called a diary study, participants typically complete a daily diary). 
+
+At the end of the study, they took one measure of neuroticism. In this way, the researchers have data at two-levels. At level two, they had between person differences in neuroticism (i.e., how people differ from the sample mean in terms of their neuroticism). At level one, they had within-person differences in stress and negative affect (i.e., how people differ from their own mean stress and negative affect on a particular day).
+
+![*A Two-Level Nested Longitudinal Data-Structure*](https://i.postimg.cc/7Z7FRGrb/mlm1.png)
+
+The researchers were interested to know whether neuroticism in the workplace predicted the change trajectories of stress over the period of study
+
+To address this question with LGC we need to create our growth curve model of stress and then see whether neuroticism explains variance in the slope trajectories.
+
+![*A Two-Level Nested Longitudinal Data-Structure*](https://i.postimg.cc/4xzNq5GQ/lgcm3.jpg)
+
+## The Data
+
+As always, let's first load in the data here:
+
+```{r}
+stress <- read_csv("C:/Users/CURRANT/Dropbox/Work/LSE/PB230/LT7/Workshop/stress.csv")
+head(stress, 16)
+```
+
+## Estimating the Model Using MLM
+
+Let’s estimate this as a multilevel model first using the lme4 package like last week. See if you can match the parameters from our simulated data to the output.
+
+First just the stress trajectory model with the first time point centered day variable. This is equivalent to the growth curve model. Essentially what we are doing here is examining the mean (fixed) trajectory of stress across the study, and the person-to-person variability (random) around that fixed effect. Is stress changing and do different people change in different ways?
+
+```{r}
+time.stress.fit <- lmer(formula = stress ~ 1 + day + (1 + day|id), REML=FALSE, data=stress)
+summary(time.stress.fit)
+confint(time.stress.fit, method="boot", nsim=100)
+```
+
+We saw that the slopes for stress were essentially flat according to the fixed effect (MB = .001), but there was significant person-to-person variability around that mean trajectory (WB = .05, 95% Ci = .02, .07). This was our justification for throwing neuroticism in the model as a between-person predictor of this variance.
+
+Let's run that model now with neuroticism interacting with day to predict the random slopes of stress:
+
+```{r}
+time.stress.fit2 <- lmer(formula = stress ~ 1 + day + neurotic_gmc + day*neurotic_gmc + (1 + day|id), data=stress)
+summary(time.stress.fit2)
+confint(time.stress.fit2, method="boot", nsim=100)
+```
+
+Of interest her was the interaction of neuroticism with day. We can see that the estimate for this interaction was .02 with a 95% confidence interval that does not include zero (.0002, .03). We then plotted this interaction:
+
+```{r}
+johnson_neyman(model=time.stress.fit2, pred=day, modx=neurotic_gmc)
+```
+
+To show that the trajectories of stress were positive (i.e., stress increased over time) among people with higher levels of neuroticism.
+
+Let's now do this analysis using latent growth curve modeling.
+
+## Doing Latent Growth Curve Analysis
+
+As we have been doing for latent variable analysis, we’ll use lavaan to conduct LGC modeling, but now the code will look a bit strange compared to what we’re used to because we have to fix the factor loadings to specific values in order to make it work. 
+
+This also leads to non-standard output relative to other SEM models, as there is nothing to estimate for the many fixed parameters.
+
+Specifically, we’ll have a latent variable representing the random intercepts, as well as one representing the random slopes. All loadings for the intercept factor are 1. The loadings for the effect of time run from 0 to 7, just like in the multilevel model.
+
+## Data Structure
+
+As can probably be guessed,  our data needs to be in wide format to contain the time points as measured variables. Here, each row represents a person and we have separate columns for each time point of the target variable, as opposed to the long format we used in the previous multilevel model. We can use the spread function from tidyr to help with that.
+
+```{r}
+stress_wide <- stress %>%
+  dplyr::select(id,day,stress,neurotic) %>%
+  spread(day, stress) %>% 
+  rename_at(vars(-id), function(x) paste0('y', x))
+head(stress_wide)
+```
+
+## Building the LGC Model for Stress
+
+Now we’re ready to run the LGC model. This is essentially the same model as the first multilevel model tested above. It asks: Is stress changing and do different people change in different ways? Only this time, we are capturing the fixed and random effects with latent variables.
+
+![*LGCM of Stress*](https://i.postimg.cc/yxr9kz8K/lgcm5.jpg)
+
+When building the model, we will use the typical "=~" command to stipulate our latent variables. To give our time points their specific factor loadings, we will use "*". But otherwise, we are just building a latent variable model, just like we have been doing in the SEM content. Lets build that model now, specifying the unique factor loadings we want for each time point on each of the intercept and slope latent variables:
+
+```{r}
+lgc.model <- "
+    # intercept and slope with fixed coefficients
+    intercept =~ 1*y0 + 1*y1 + 1*y2 + 1*y3 + 1*y4 + 1*y5 + 1*y6 + 1*y7
+    slope =~ 0*y0 + 1*y1 + 2*y2 + 3*y3 + 4*y4 + 5*y5 + 6*y6 + 7*y7
+"
+```
+
+## Fitting the LGCM
+
+Note that lavaan has a specific function, growth, to use for these models. It doesn’t spare us any effort for the model coding (as above), but does make it unnecessary to set various things with the sem function: 
+
+```{r}
+lgc.fit <- growth(lgc.model, data=stress_wide)
+summary(lgc.fit, fit.measures=TRUE, standardized=TRUE)
+```
+
+Most of the output is blank, which is needless clutter, but we do get the same five parameter values we are interested in.
+
+Start with the ‘intercepts’:
+
+It might be odd to call your fixed effects ‘intercepts’, but that is where lavaan prints the fixed effects for our intercepts and slopes. This makes sense if we are thinking of it as a multilevel model as depicted previously, where we actually broke out the random effects as a separate model. The estimates here for the fixed intercept (1.360) and fixed slope (.004) are more or less the same as our multilevel model model estimates (the trivial differences are due to different estimation approaches). We can also see that, just like our multilevel model, the mean (fixed) slope is not different from zero (i.e., p > .05) indicating that the average trajectory for stress is pretty much flat.
+
+Now let’s look at the variance estimates:
+
+The estimation of residual variance for each time point in the LGC is the variance in the differences between observed time point stress scores and the model predicted stress score for that measurement occasion. We could fix them to be identical here, or conversely allow them to be estimated in the multilevel model framework (multilevel models by default assume the same variance for each time point). Thats another reasons why the results are not identical, by the way.
+
+The main thing to worry about here, though, is the variance of the intercepts and slopes. There are the random effects for the model. Just like in the multilevel model, we can see that the variance of the intercepts (.189) and, importantly, the slopes (.003) are greater than zero (i.e., p > .05). So even though the average stress trajectory is flat, there is significant variability around that average.
+
+The covariance is the relationship between the random intercept and random slope, just like in the multilevel model.
+
+We also have model fit indexes that are interpreted in exactly the same way we have been doing to date for SEM. We have CFI = .93, TLI .94, RMSEA = .08, and SRMR = .08.  Thats pretty good! If there was some missfit here, it might be that we need to remove the intercept or slope factor (if no variance) or perhaps model the trajectories using quadratic or cubic terms. None of these are needed here though.
+
+Given we have substantial variance in the random intercepts and slopes within out LGC model, we should add neuroticism to ascertain whether i can explain this variance.
+
+## Adding a Categorical Predictor to the LGC Model
+
+In explaining intercept and slope variance in a LGC model, we can add either categorical or continuous predictors. And these predictors can be observed or latent variables. This flexibility is what gives LGC modeling its advantage over multilevel modeling.
+
+Lets begin with a categorical predictor. Adding a categorical variable would allow for different trajectories of stress across different groups of neuroticism. To begin with, lets create a categorical neuroticism variable, which does a simple media split such that people with neuroticism scores above the median (i.e., > 3) are coded 1, and those below the median (i.e., < 3) are coded 0.
+
+```{r}
+stress_wide <- dicho(stress_wide, yneurotic, dich.by = 3) 
+```
+
+We now have a new variable, yneurotic_d which contains high and low scores on the neuroticism scale. When we regress this variable on our latent intercept and slope variables from the stress LGC model, we split the variance in stress intercepts and slopes by high and low neuroticism:
+
+![*LGCM of Stress with Categorical Predictor*](https://i.postimg.cc/fTrNzWYL/lgcm6.jpg)
+
+All we do to add this predictor to the model is regress it on the intercept and slope latent variables using ~. Simple!
+
+```{r}
+lgc.cat.model <- "
+    # intercept and slope with fixed coefficients
+    intercept =~ 1*y0 + 1*y1 + 1*y2 + 1*y3 + 1*y4 + 1*y5 + 1*y6 + 1*y7
+    slope =~ 0*y0 + 1*y1 + 2*y2 + 3*y3 + 4*y4 + 5*y5 + 6*y6 + 7*y7
+    # regress categorcial predictor on the slopes and intercepts
+    intercept ~ yneurotic_d
+    slope ~ yneurotic_d
+"
+```
+
+Then we simply fit that model and inspect the estimates remembering this time to request the confidence intervals from bootstrap given the structural relationship now in the model:
+
+```{r}
+lgc.cat.fit <- growth(lgc.cat.model, data=stress_wide, se = "bootstrap", bootstrap = 100)
+summary(lgc.cat.fit, fit.measures=TRUE, standardized=TRUE)
+parameterestimates(lgc.cat.fit, boot.ci.type = "perc", standardized = TRUE)
+```
+
+First of all, the model fit looks pretty good. We have CFI = .93, TLI .93, RMSEA = .07, and SRMR = .07. Of interest here are the regressions, first of the latent stress intercept on categorical neuroticism and second of the latent stress slope on categorical neuroticism.
+
+We can see that the regression of stress intercepts on neuroticism is .26 and this is a significant effect according the the 95% bootstrap confidence interval (95% Ci = .11, .41). The interpretation of this regression is that people with high neuroticism start the study (i.e., time point 0) with stress levels that are .26 units higher than people with low neuroticism. Interesting, but what we really want to know is whether the trajectories of stress differ across neuroticism groups.
+
+To answer that question we need to look to the regression of stress slopes on neuroticism. Here we have an estimate of -.03 and this is not a significant effect according the the 95% bootstrap confidence interval (95% Ci = -.05, .01). The interpretation of this regression is that people with high neuroticism have stress trajectories that are -.03 units smaller (shallower, less steep) than people with low neuroticism.
+
+## Adding a Continuous Predictor to the LGC Model
+
+If you cast your mind back to last year when we split off continuous variables, we saw that doing so was a pretty bad idea because we are shrinking the variance in our x variable and thereby reducing the amount of error we could potentially explain in y. For this reason, it is always better to use the full range of a continuous variable. So lets now look to see if our continuous neuroticism variable can explain variability in the latent stress intercept and slope variables from the LGC model. In thsi way, we can ascertain whether the trajectory slopes of stress difference across the full range of neuroticism.
+
+![*LGCM of Stress with Continuous Predictor*](https://i.postimg.cc/Nf8SP1xR/lgcm-6.jpg) 
+
+For this model we simply swap out yneurotic_d from the last model and replace it with yneurotic. Let's build that model now:
+
+```{r}
+lgc.con.model <- "
+    # intercept and slope with fixed coefficients
+    intercept =~ 1*y0 + 1*y1 + 1*y2 + 1*y3 + 1*y4 + 1*y5 + 1*y6 + 1*y7
+    slope =~ 0*y0 + 1*y1 + 2*y2 + 3*y3 + 4*y4 + 5*y5 + 6*y6 + 7*y7
+    # regress continuous predictor on the slopes and intercepts
+    intercept ~ yneurotic
+    slope ~ yneurotic
+"
+```
+
+Now lets fit that model in exactly the same way we did for the categorical predictor:
+
+```{r}
+lgc.con.fit <- growth(lgc.con.model, data=stress_wide, se = "bootstrap", bootstrap = 100)
+summary(lgc.con.fit, fit.measures=TRUE, standardized=TRUE)
+parameterestimates(lgc.con.fit, boot.ci.type = "perc", standardized = TRUE)
+```
+
+First of all, again, the model fit looks pretty good. We have CFI = .93, TLI .93, RMSEA = .07, and SRMR = .07. Of interest here are the regressions, first of the latent stress intercept on continuous neuroticism and second of the latent stress slope on continuous neuroticism.
+
+We can see that the regression of stress intercepts on neuroticism is .16 and this is a significant effect according the the 95% bootstrap confidence interval (95% Ci = .08, .24). The interpretation of this regression is that for every one unit increase in neuroticism there is a .16 unit increase in the stress starting point (i.e., time point 0). Interesting, again, but what we really want to know is whether the trajectories of stress differ across the range of neuroticism.
+
+To answer that question we need to look to the regression of stress slopes on neuroticism. Here we have an estimate of -.02 and this is not a significant effect according the the 95% bootstrap confidence interval (95% Ci = -.03, .00001). The interpretation of this regression is that for every one unit increase in neuroticism the trajectory slopes of stress decrease by .02. However, this is not a significant decrease. Unlike the multilevel model, the growth curve analysis suggests that neuroticism does not impact on the trajectory slopes of stress.
+
+We can visualize this model using SEM plot:
+
+```{r}
+semPaths(lgc.con.fit, "std")
+```
+
+## Adding a Continuous Latent Predictor to the LGC Model
+
+By adding the measured neurotic variables to the LGCM of stress (continuous or categorical), we are simply conducting an analysis that is, to all intents and purposes, the same as multilevel modeling. We are also, importantly, using predict variables that contain measurement error. We know this is problematic for estimates.
+
+The major advantage of the LGCM approach is that we can add latent predictors which, as we know, are measured without error. Unfortunately, the Ram et al stress data set does not contain any item level data - just the averaged measures. No problem, we can simply simulate three correlated variables and merge them to our stress_wide dataset. Let's quickly do that now:
+
+```{r}
+require(MASS)
+out <- mvrnorm(191, mu = c(0,0,0), Sigma = matrix(c(1,0.65,0.65,0.65,1,0.65,0.65,0.65,1), ncol = 3),
+               empirical = TRUE)
+out <- as.data.frame(out)
+stress_wide$v1 <- out$V1
+stress_wide$v2 <- out$V2
+stress_wide$v3 <- out$V3
+```
+
+Great, we now have 3 new random correlated variables, v1, v2, and v3, in the stress_wide dataset. Let's say for the sake our our example they are the neuroticism items. Remember, they are random, so we should not expect them to be correlated with stress. This example is simply to show you how the analysis is done and the interpretation of the output.
+
+When a latent variable predictor is in the model, the LGCM looks like below, with the predictor represented by a latent variable that is the common variance of its items (i.e., measured without error).
+
+![*LGCM of Stress with Latent Variable Predictor*](https://i.postimg.cc/8kRh6FnS/neur.jpg)
+
+## Build the LGCM model with Latent Predictor
+
+All we do to add our latent predictor to the LGCM model is create it as a new latent variable using =~ and then regress it on the intercept and slope latent variables using ~. Simple!
+
+```{r}
+lgc.lat.model <- "
+    # intercept and slope with fixed coefficients
+    intercept =~ 1*y0 + 1*y1 + 1*y2 + 1*y3 + 1*y4 + 1*y5 + 1*y6 + 1*y7
+    slope =~ 0*y0 + 1*y1 + 2*y2 + 3*y3 + 4*y4 + 5*y5 + 6*y6 + 7*y7
+    # latent neuroticism predictor variable
+    neuroticism =~ 1*v1 + v2 + v3
+    # regress latent variable predictor on the slopes and intercepts
+    intercept ~ neuroticism
+    slope ~ neuroticism
+"
+```
+
+Now lets fit that model in exactly the same way we did for the categorical and continuous predictors:
+
+```{r}
+lgc.lat.fit <- growth(lgc.lat.model, data=stress_wide, se = "bootstrap", bootstrap = 100)
+summary(lgc.lat.fit, fit.measures=TRUE, standardized=TRUE)
+parameterestimates(lgc.lat.fit, boot.ci.type = "perc", standardized = TRUE)
+```
+
+First of all, again, the model fit looks pretty good. We have CFI = .97, TLI .97, RMSEA = .05, and SRMR = .06. The standardised factor loadings for the neuroticism latent variable are also all above .40, which means the measurement is good. Of interest here are the regressions, first of the latent stress intercept on latent neuroticism variable and second of the latent stress slope on latent neuroticism variable.
+
+We can see that the regression of stress intercepts on neuroticism is .02 and this is a non-significant effect according the the 95% bootstrap confidence interval (95% Ci = -.08, .18). We should not be surprised by this, the items were simulated randomly and therefor these is no reason to expect any relationship. The interpretation of this regression is that for every one unit increase in the latent neuroticism variable there is a .02 unit increase in the stress starting point (i.e., time point 0). Interesting, again, but what we really want to know is whether the trajectories of stress differ across the range of neuroticism.
+
+To answer that question we need to look to the regression of stress slopes on the latent neuroticism variable. Here we have an estimate of -.01 and this is not a significant effect according the the 95% bootstrap confidence interval (95% Ci = -.03, .01). As with the intercept regression, we should expect this given the random simulation of the neuroticism items. The interpretation of this regression is that for every one unit increase in neuroticism the trajectory slopes of stress decrease by .01. This is not a significant decrease. 
+
+We can visualize this model using SEM plot:
+
+```{r}
+semPaths(lgc.lat.fit, "std")
+```
+
+The difference here being neuroticism is reflected by a latent variable, rather than a measured one.
+
+Okay, that is it. That is how we do LGCM with categorical, continuous and latent variable predictors.
+
+# Activity: Reading Ability Dataset
+
+In the example we will work with for this activity, we use an dataset called Demo.growth from the lavaan package, where a standardized score on a reading ability scale is measured on 4 time points among kindergarten children in the US (t1, t2, t3, t4. There are also a couple of predictors in this dataset that we might use to predict the intercepts and slopes in reading ability: 
+
+x1
+Parent Support
+
+x2
+Teacher Support
+
+We will build a model that uses the measure of parent support to predict the intercepts and slopes of reading ability. 
+
+We expect that parent support would exhibit a positive relationship with the intercepts and slopes of reading ability.
+
+## Load data
+
+Luckily, the Political Democracy dataset is a practice dataset contained in the lavaan package for CFA, so we don't need to load it from the computer, we can load it from the package. Lets do that now and save it as object called "pol":
+
+
+```{r}
+reading <- lavaan::Demo.growth
+head(reading)
+```
+
+## Building and Fitting the LGC Model of Reading Ability
+
+Before we test the relationships between support and reading ability, we first need to take a look at the growth model of reading ability, to make sure that there is intercept and slope variance to be explained. 
+
+To do that we need to first build the simple growth model of reading ability that contains no predictors. Write the code to build the LGM of reading ability and save it as a new object called lgc.reading (don't forget to fix the factors loadings appropriately):
+
+```{r}
+lgc.reading <- "
+    intercept =~ 1*t1 + 1*t2 + 1*t3 + 1*t4
+    slope =~ 0*t1 + 1*t2 + 2*t3 + 3*t4
+"
+```
+
+Now fit that LGCM of reading ability to the data. Don't forget to use the growth() function and save the new object as reading.fit:
+
+```{r}
+reading.fit <- growth(lgc.reading, data=reading)
+summary(reading.fit, fit.measures=TRUE, standardized=TRUE)
+```
+
+Summarize the model fit for this LGCM, does it fit the data well?
+
+
+What is the fixed effect for the intercept? What does this mean?
+
+
+What is the fixed effect for the slope? What does this mean?
+
+
+What is the random effect for the intercept? Is it significant? What does this mean?
+
+
+What is the random effect for the slope? Is it significant? What does this mean?
+
+
+What is the covariance between the intercepts and slopes? What does this mean?
+
+
+## Adding a Predictor Variable
+
+Okay so we have significant variability around our fixed intercepts and slopes of reading ability. As we know, this means that there is substantial between-child variability in starting points of reading ability (intercepts) as well as in the positive change trajectories of reading ability (slopes). To see if support can explain any variability in these intercepts and slopes, lets regress the random intercepts and slopes of reading ability on parent support (x1).
+
+First, write the code that builds this LGCM with the parent support predictor. Recall that parent support in the dataset is the x1 variable. Call the model object lgc.reading.model:
+
+```{r}
+lgc.reading.model <- "
+    intercept =~ 1*t1 + 1*t2 + 1*t3 + 1*t4
+    slope =~ 0*t1 + 1*t2 + 2*t3 + 3*t4
+    intercept ~ x1
+    slope ~ x1
+"
+```
+
+No write the code to fit that model to the data and save the new object as lgc.reading.fit. Don't forget to bootstrap the standard errors and request the parameter estimates:
+
+```{r}
+## Fit the lgc.reading.model
+lgc.reading.fit <- growth(lgc.reading.model, data=reading, se = "bootstrap", bootstrap = 100)
+
+## Summarize the fitted model
+summary(lgc.reading.fit, fit.measures=TRUE, standardized=TRUE)
+
+## Request the parameter estimates for the 95% bootstrap confidence intervals
+parameterestimates(lgc.reading.fit, boot.ci.type = "perc", standardized = TRUE)
+```
+
+Summarize the model fit for this LGCM, does it fit the data well?
+
+
+What is the regression estimate for reading ability intercepts on parent support? Is it statistically significant? What does it mean?
+
+
+What is the regression estimate for reading ability slopes on parent support? Is it statistically significant? What does it mean?
+
+
+What can we conclude with regard to our original hypothesis? Do children with high parent support experience greater improvement in reading ability over time?
+
