@@ -149,7 +149,7 @@ Now lets create the dataframe that combines these two conditions using the data.
 
 ```{r}
 library(tidyverse)
-indt <- data.frame(ID=1:75, cheater=cheater, cheating=cheating)
+indt <- data.frame(cheater=cheater, cheating=cheating)
 indt <- gather(indt, key=condition, value=heads, cheater, cheating)
 indt
 ```
@@ -205,7 +205,7 @@ mean(grp3)
 Now lets create the dataframe that combines these three conditions using the data.frame function. Because the data need to be stacked horizontally (between-subjects so each row is a new case), we are again going to use the gather function in tidyverse to create a condition factor and the words outcome variable. This way, we can easily run the one-way in a data format that is familiar to you.
 
 ```{r}
-anova <- data.frame(ID=1:60, grp1=grp1, grp2=grp2, grp3=grp3)
+anova <- data.frame(grp1=grp1, grp2=grp2, grp3=grp3)
 anova <- gather(anova, key=condition, value=words, grp1, grp2, grp3)
 anova
 ```

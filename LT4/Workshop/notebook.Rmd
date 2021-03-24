@@ -207,11 +207,11 @@ sum(sl)^2 / (sum(sl)^2 + sum(re))
 
 We can see that the composite estimate of reliability is .92, within errors of rounding to those reported in the paper (I calculated the composite reliability by hand in the paper). We can run this code for all latent variables or there is a useful website, which will do the calculations for you from the standardised factor loadings here: http://www.thestatisticalmind.com/calculators/comprel/composite_reliability.htm.
 
-We interpret composite reliability just like we interpret Cronbach's alpha. Composite reliabilities of .70 or greater are indicative of good relaibility for the measure.
+We interpret composite reliability just like we interpret Cronbach's alpha. Composite reliabilities of .70 or greater are indicative of good reliability for the measure.
 
 ## Visulaising the CFA
 
-As always, we can visualise the model being tested using semPaths:
+As always, we can visualize the model being tested using semPaths:
 
 ```{r}
 semPaths(measurement.model.fit, "std")

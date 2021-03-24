@@ -1,0 +1,257 @@
+---
+title: "Worksheet 3"
+output: html_notebook
+---
+
+# Preliminaries
+
+For this worksheet, I would like you to apply multilevel modelling and latent growth curve modelling to the analysis of the cleaned data in two datasets. 
+
+*As always, please write your answers and code in an R notebook and submit it as a .pdf file in the Moodle submission point.*
+
+Before you start, load the necessary packages: "readr", "lavaan", "lme4", and "interactions".
+
+```{r}
+library(lme4)
+library(readr)
+library(interactions)
+library(lavaan)
+```
+
+# Multilevel Modelling
+
+## Study Description
+
+A team of researchers were interested to know the effect of extroversion on popularity among a sample of high school students. They collected data from 2000 pupils in 100 schools. 
+
+The main outcome variable is the pupil popularity, a popularity rating on a scale of 1–10 derived by a sociometric procedure. This procedure asks all pupils in a school to rate all the other pupils, and then assigns the average received popularity rating to each pupil. Because of the sociometric procedure, group effects as apparent from higher-level school variance components are exceptionally strong. So this clustering needs controlling for in analyses of the focal research question.
+
+As a secondary aim, the researcher wanted to know if the effect of extroversion on popularity was moderated by a level 1 variable: school catchment socioeconomic status (between-school variable; measured between 0 and 30, 30 being the most deprived and 0 the least).
+
+Their hypothesis was that pupils scoring higher in extroversion would be more popular and that this relationship would be moderated such that effects are stronger in less deprived schools.
+
+## Activity
+
+*Research Question 1* - Does extroversion positively predict popularity controlling?
+
+*Research Question 2* - Does SES moderate the relationship between extroversion and popularity?
+
+*Null Hypothesis 1* - The relationship between extroversion and popularity controlling for gender and ses will be zero.
+
+*Null Hypothesis 2* - The cross level interaction of extroversion and SES on popularity will be be zero.
+
+I have already cleaned the data and centered the variables for you, so that's good! The popular dataset can be downloaded from here: https://www.dropbox.com/s/m9t8d3mykl7cujg/popular.csv. 
+
+The file is also available in the PB230 R project on the github under the folder worksheets --> worksheet_3.
+
+As a first step in the analysis, download the file and save it to a **logical** place where it can be easily located. I would recommend that you save it in your PBS folder under a subfolder called Worksheets. Now load the file by clicking on the dataframe name in the files window where you saved the protest data and click import data". A new screen will appear with the dataframe. Press "update" in the top right corner and then when it loads click import. You can also copy the R code produced in the bottom right corner and paste that code in an R chunk on your worksheet. For example:
+
+```{r}
+popular <- read_csv("C:/Users/CURRANT/Dropbox/LSE/PB230/Worksheets/popular.csv")
+popular
+```
+
+You will see that data contains measures for our variables:
+
+1. popular: This is the popularity measure, which can range from 0 to 10 It is an aggregate score from multiple measures and higher values mean higher happiness.
+
+2. extra: This is the extroversion measure and can range from 0 to 7. Higher values mean more extroversion.
+
+3. ses: This is the gpa variable. Higher values mean more deprivation.
+
+4. pupil: This is the unique pupil id number for level 1 units.
+
+5. school: This is the unique school identifier for level 2 units.
+
+6. extra_c: The group (school) mean centered extroversion variable. This is the deviation for each pupils extroversion score from their school mean.
+
+7. ses_c: This is grand mean centered ses variable. This is the deviation of for each school from the overall mean ses.
+
+# Task 1: Multilevel Modelling
+
+## The Empty Model
+
+The first thing we do in multilevel modeling is check whether there is between-cluster variance in the outcome variable. We do this with the intraclass correlation coefficient which is calculated using the between-group and residual variance from an empty model of popularity.
+
+Remember: to run a multilevel linear model, we use the lmer() function (“Linear Mixed Effects in R”) from the lme4 package. The syntax will look very similar to the syntax from all of the regression functions we have used thus far. Fitting the empty model for happiness looks like this:
+
+```{r}
+## Fit empty model
+empty.popular.fit <- 
+
+## Summarize model
+summary(empty.popular.fit)
+```
+
+Calculate the the Intraclass Correlation Coefficient:
+
+```{r}
+
+```
+
+What percent of the variance in happiness is due to between-school differences?
+
+Is there a justification for Multilevel Modelling?
+
+## Adding the Level 2 Predictor Variable to the Empty Model
+
+Now add the Level 2 predictor of extroversion to see whether it can explain the variance in popularity using a multilevel model with school as the random effect. Recall that extroversion in this data was measured using the centered extrav_c variable. Also request bootstrap confidence intervals for the fixed and random effects for statistical inference using confint(). 
+
+```{r}
+# fit model
+popular.extra.fit <- 
+  
+# summarize model
+
+
+# bootstrap confidence intervals
+
+```
+
+Comment on the fixed effect of extroversion on popularity, what is it telling us?
+
+Comment on the confidence interval for the fixed effect of extroversion, does it suggest a significant relationship?
+
+Comment on the random effect for extroversion, what is it telling us?
+
+Comment on the confidence interval for the random effect of extroversion, does it suggest a significant between-school variance?
+
+What do we conclude in relation to research question one?
+
+## Adding a Between-School (level 1) Predictor of the Random Intercepts and Slopes
+
+To see whether SES moderates the effect of extroversion on popularity, we now add SES to the MLM model to see if and how between-school differences in SES are related to the intercepts and slopes of the relationship between extroversion and popularity. 
+
+To do so, we must add both the main effect of extroversion and its interaction with SES to the previous model of popularity. The interaction becomes the focal effect: i.e., does the relationship between extroversion and popularity depend on SES?
+
+In the chunk below, add to the previous model the cross level interaction of extroversion and SES. Remember to use the grand mean centered SES variable (i.e., ses_c):
+
+```{r}
+# fit model
+popular.int.fit <- 
+
+# summarize model
+
+
+# bootstrap confidence intervals
+```
+
+Comment on the fixed effect of the interaction, what is it telling us?
+
+Comment on the confidence interval for the fixed effect of interaction, does it suggest a significant cross-level interaction?
+
+## Plotting the interaction
+
+The moderation of extroversion and SES is significant so we should plot and probe the interaction term using the johnson_neyman function. Write the code that does that now:
+
+```{r}
+
+```
+
+
+Describe the moderation in this plot?
+
+What do we conclude in relation to research question two?
+
+# Task 2: Latent Growth Curve Modelling
+
+A team of researchers was interested to investigate the predictors of changes in stress during the first COVID-19 lockdown among students. Once a month for four months, students reported how stressed they were in their lives in the past month. The satisfaction response item ran from -15 (totally unstressed) to +15 (totally stressed).
+
+The researchers hypothesized that each persons change trajectory in stress would differ - most would report increased stress as lockdown went by, but some might be flat, and some even report decreases. They speculated that one of the reasons why there will be individual differences in the change trajectories is due to personality factors. One of those factors is perfectionism.
+
+They thought that, perhaps, government restrictions would hit those who are high on perfectionism especially hard because they tend to amplify stressful situations, especially those that threaten their sense of control.  This was the authors hypothesis.
+
+## Activity
+
+*Research Question* - Does perfectionism predict the trajectory slopes of stress during the first COVID-19 lockdown?
+
+*Null Hypothesis* - The relationship between perfectionism and the trajectory slopes of stress will be zero.
+
+The data are contained in the covid dataset that can be downloaded from here: https://www.dropbox.com/s/45cca2417ms59bi/covid.csv. 
+
+The file is also available in the PB230 R project on the github under the folder worksheets --> worksheet_3.
+
+As a first step in the analysis, download the file and save it to a **logical** place where it can be easily located. I would recommend that you save it in your PBS folder under a subfolder called Worksheets. Now load the file by clicking on the dataframe name in the files window where you saved the protest data and click import data". A new screen will appear with the dataframe. Press "update" in the top right corner and then when it loads click import. You can also copy the R code produced in the bottom right corner and paste that code in an R chunk on your worksheet. For example:
+
+```{r}
+popular <- read_csv("C:/Users/CURRANT/Dropbox/LSE/PB230/Worksheets/covid.csv")
+popular
+```
+
+
+As you can see, the dataset contains four measures of stress (t1, t2, t3, and t4). There is also a measure of perfectionism for each student, labelled "perf", which runs from 0-6 (higher scores = higher perfectionism).
+
+As this is question that requires predicting change trajectories, it perfectly suited for latent growth curve analysis.
+
+## Build and Fit the LGC Model of Stress
+
+Before we test the relationships between perfection and stress trajectories, we first need to take a look at the growth model of stress, to make sure that there is intercept and slope variance to be explained. 
+
+To do that we need to first build the simple growth model of stress that contains no predictors. As this is a latent variable model we need to write the code to build it and save it as a new object called lgc.stress (don't forget to fix the factors loadings appropriately):
+
+```{r}
+lgc.stress <- "
+
+"
+```
+
+Now fit that LGCM of stress to the data. Don’t forget to use the growth() function and save the new object as stress.fit:
+
+```{r}
+## Fit the lgc.stress model
+stress.fit <- 
+
+## Summarise the model
+
+```
+
+Summarize the model fit for this LGCM, does it fit the data well?
+
+What is the fixed effect (intercepts) for the intercept? What does this mean?
+
+What is the fixed effect (intercepts) for the slope? What does this mean?
+
+What is the random effect (variances) for the intercept? Is it significant? What does this mean?
+
+What is the random effect (variances) for the slope? Is it significant? What does this mean?
+
+What is the covariance between the intercepts and slopes? What does this mean?
+
+## Adding Perfectionism
+
+Okay so we have significant variability around our fixed intercepts and slopes of reading ability. As you know, this means that there is substantial between-student variability in starting points of stress (intercepts) as well as in the increasing change trajectories of stress (slopes). ]
+
+To see if perfectionism can explain any variability in these intercepts and slopes, lets regress the random intercepts and slopes of stress on perfectionism (perf).
+
+First, write the code that builds this LGCM with the perfectionism predictor. Recall that perfectionism in the dataset is the perf variable. Call the model object lgc.stress.model:
+
+```{r}
+lgc.stress.model <- "
+ 
+"
+```
+
+Now write the code to fit that model to the data and save the new object as lgc.reading.fit. Don't forget to bootstrap the standard errors and request the parameter estimates:
+
+```{r}
+## Fit the lgc.stress.model
+lgc.stress.fit <- 
+
+## Summarize the fitted model
+
+
+
+## Request the parameter estimates for the 95% bootstrap confidence intervals
+
+```
+
+Summarize the model fit for this LGCM, does it fit the data well?
+
+
+What is the regression estimate for stress intercepts on perfectionism? Is it statistically significant? What does it mean?
+
+
+What is the regression estimate for stress slopes on perfectionism? Is it statistically significant? What does it mean?
+
+
+What can we conclude with regard to our original research question? Did students with high perfectionism experience greater increases in stress over the lockdown period?

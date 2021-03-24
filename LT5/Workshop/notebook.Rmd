@@ -244,12 +244,16 @@ This means that 21 percent of the variance in happiness is due to between-school
 
 ## Adding the Level 2 Predictor Variable to the Empty Model
 
-OK - let’s add the Level 2 predictor of friends to see whether it can explain the within-person variance in happiness. Recall that friends in this data was measured using the centered friend.c variable. We can also get bootstrap confidence intervals for the fixed and random effects for statistical inference using confint(). 
+OK - let’s add the Level 2 predictor of friends to see whether it can explain variance in happiness using a multilevel model with school as a random effect (i.e., effects allowed to vary over schools). Recall that friends in this data was measured using the centered friend.c variable. We can also get bootstrap confidence intervals for the fixed and random effects for statistical inference using confint(). 
 
 ```{r}
 # fit model
 friend.happy.fit <- lmer(formula = happy ~ 1 + friend.c + (1 + friend.c|school), REML=FALSE, data=school)
+
+# summarize model
 summary(friend.happy.fit)
+
+# bootstrap confidence intervals
 confint(friend.happy.fit, method="boot", nsim=100)
 ```
 

@@ -189,7 +189,7 @@ filter(na_count <= "3")
 data_var
 ```
 
-So we are now left with a dataset in which missing caes have < 10% missing data.
+So we are now left with a dataset in which missing cases have < 10% missing data.
 
 ## Replacing missing values 
 
