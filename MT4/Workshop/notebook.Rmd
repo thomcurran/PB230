@@ -111,7 +111,7 @@ To display the amount of missing data and the missing data patterns, we can use 
 ```{r}
 data_var <-
   data %>%
-  select(6:34) # select out only the items
+  select(4:12) # select out only the items
 md.pattern(data_var) # run the missing data pattern function
 ```
 
@@ -380,7 +380,7 @@ summary(linear.model)
 
 Now use the table below  to find the critical value of chi square for the numerator (model) degrees of freedom (for this example it is 3) in the linear model at p = .001. 
 
-![](https://i.stack.imgur.com/PbEqv.jpg)   
+![](https://www.statology.org/wp-content/uploads/2020/01/chi_square_table_small.jpg)   
 
 With 3 degrees of freedom, the critical chi-square value is 16.27 at the p = .001 level. Simply remove the cases with Mahalanobis Distances exceeding this critical value.
 
