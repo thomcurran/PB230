@@ -79,7 +79,7 @@ You see, the larger the effect size, the smaller the sample needed to reliabilit
 Now you have a go. What is the sample size needed for a paired-sample t-test to obtain a power of 0.80, when the effect size is large (0.50) and a significance level of 0.05 is employed. Write the code needed to find the n.
 
 ```{r}
-pwr.t.test(d = .50, power = .8, sig.level = .05, type = c("paired"))
+pwr.t.test(d = ??, power = ??, sig.level = ??, type = c("paired"))
 ```
 
 ## One-way ANOVA
@@ -146,7 +146,7 @@ Now you have a go. What is the sample size needed for a correlation to obtain a 
 
 
 ```{r}
-pwr.r.test(r = .50, sig.level = .05, power =.80)
+
 ```
 
 ## Two-way ANOVA
