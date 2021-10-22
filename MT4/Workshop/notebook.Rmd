@@ -111,7 +111,7 @@ To display the amount of missing data and the missing data patterns, we can use 
 ```{r}
 data_var <-
   data %>%
-  select(4:12) # select out only the items
+  select(6:34) # select out only the items
 md.pattern(data_var) # run the missing data pattern function
 ```
 
