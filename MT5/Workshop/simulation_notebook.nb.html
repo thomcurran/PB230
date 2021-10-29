@@ -252,8 +252,8 @@ summary {
 <p>Let’s create a sample that replicates the sample in the original study. This sample will have 48 prescriptions, with a mean of 1.15 and a standard deviation of 0.11.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHJlc2NyaXB0aW9uIDwtIHJub3JtKDEwLCBtZWFuID0gMS4xNSwgc2QgPSAwLjExKVxuYGBgIn0= -->
-<pre class="r"><code>prescription &lt;- rnorm(10, mean = 1.15, sd = 0.11)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHJlc2NyaXB0aW9uIDwtIHJub3JtKDQ4LCBtZWFuID0gMS4xNSwgc2QgPSAwLjExKVxuYGBgIn0= -->
+<pre class="r"><code>prescription &lt;- rnorm(48, mean = 1.15, sd = 0.11)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -281,8 +281,8 @@ prescription[prescription &lt; -4] &lt;- -4</code></pre>
 <p>To save the newly simulated data, we just simply ask R to write the variables as a new .csv file with the write.csv function.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud3JpdGUuY3N2KHByZXNjcmlwdGlvbiwgXCJDOi9Vc2Vycy9DVVJSQU5UL0Ryb3Bib3gvV29yay9MU0UvUEIyMzAvTVQ1L1dvcmtzaG9wL29uZXNhbXBsZXQuY3N2XCIpICMgUmVtZW1iZXIgdG8gaW5zZXJ0IHRoZSBjb3JyZWN0IGZpbGUgbG9jYXRpb24gZm9yIHlvdXIgUEMgXG5gYGAifQ== -->
-<pre class="r"><code>write.csv(prescription, &quot;C:/Users/CURRANT/Dropbox/Work/LSE/PB230/MT5/Workshop/onesamplet.csv&quot;) # Remember to insert the correct file location for your PC </code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud3JpdGUuY3N2KHByZXNjcmlwdGlvbiwgXCJDOi9Vc2Vycy9DVVJSQU5UL0Ryb3Bib3gvV29yay9MU0UvUEIyMzAvTVQ1L1dvcmtzaG9wL29uZXNhbXBsZXQuY3N2XCIpICMgUmVtZW1iZXIgdG8gaW5zZXJ0IHRoZSBjb3JyZWN0IGZpbGUgbG9jYXRpb24gZm9yIHlvdXIgY29tcGVuZGl1bVxuYGBgIn0= -->
+<pre class="r"><code>write.csv(prescription, &quot;C:/Users/CURRANT/Dropbox/Work/LSE/PB230/MT5/Workshop/onesamplet.csv&quot;) # Remember to insert the correct file location for your compendium</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -335,8 +335,8 @@ pairedt</code></pre>
 <p>Just like above, to save the newly simulated data, we just simply ask R to write the variables to a new .csv file with the write.csv function.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud3JpdGUuY3N2KHBhaXJlZHQsIFwiQzovVXNlcnMvQ1VSUkFOVC9Ecm9wYm94L1dvcmsvTFNFL1BCMjMwL01UNS9Xb3Jrc2hvcC9wYWlyZWR0LmNzdlwiKSAjIFJlbWVtYmVyIHRvIGluc2VydCBjb3JyZWN0IGZpbGUgbG9jYXRpb24gZm9yIHlvdXIgUEMgXG5gYGAifQ== -->
-<pre class="r"><code>write.csv(pairedt, &quot;C:/Users/CURRANT/Dropbox/Work/LSE/PB230/MT5/Workshop/pairedt.csv&quot;) # Remember to insert correct file location for your PC </code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud3JpdGUuY3N2KHBhaXJlZHQsIFwiQzovVXNlcnMvQ1VSUkFOVC9Ecm9wYm94L1dvcmsvTFNFL1BCMjMwL01UNS9Xb3Jrc2hvcC9wYWlyZWR0LmNzdlwiKSAjIFJlbWVtYmVyIHRvIGluc2VydCB0aGUgY29ycmVjdCBmaWxlIGxvY2F0aW9uIGZvciB5b3VyIGNvbXBlbmRpdW0gXG5gYGAifQ== -->
+<pre class="r"><code>write.csv(pairedt, &quot;C:/Users/CURRANT/Dropbox/Work/LSE/PB230/MT5/Workshop/pairedt.csv&quot;) # Remember to insert the correct file location for your compendium </code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -378,18 +378,10 @@ cheating[cheating &lt; 0] &lt;- 0</code></pre>
 <p>Check means</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubWVhbihjaGVhdGVyKVxuYGBgIn0= -->
-<pre class="r"><code>mean(cheater)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubWVhbihjaGVhdGVyKVxubWVhbihjaGVhdGluZylcbmBgYCJ9 -->
+<pre class="r"><code>mean(cheater)
+mean(cheating)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDQuNzMzNjg3XG4ifQ== -->
-<pre><code>[1] 4.733687</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubWVhbihjaGVhdGluZylcbmBgYCJ9 -->
-<pre class="r"><code>mean(cheating)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDUuMjM2NDMyXG4ifQ== -->
-<pre><code>[1] 5.236432</code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>Now lets create the dataframe that combines these two conditions using the data.frame function. Because the data need to be stacked horizontally (between-subjects so each row is a new case), we are also going to use the gather function in tidyverse to create a condition factor and the heads outcome variable. This way, we can easily run the independent t-test in a data format that is familiar to you.</p>
@@ -408,8 +400,8 @@ indt</code></pre>
 <p>Just like above, to save the newly simulated data, we just simply ask R to write the variables to a new .csv file with the write.csv function.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud3JpdGUuY3N2KGluZHQsIFwiQzovVXNlcnMvQ1VSUkFOVC9Ecm9wYm94L1dvcmsvTFNFL1BCMjMwL01UNS9Xb3Jrc2hvcC9pbmR0LmNzdlwiKSAjIFJlbWVtYmVyIHRvIGluc2VydCB0aGUgY29ycmVjdCBmaWxlIGxvY2F0aW9uIGZvciB5b3VyIFBDIFxuYGBgIn0= -->
-<pre class="r"><code>write.csv(indt, &quot;C:/Users/CURRANT/Dropbox/Work/LSE/PB230/MT5/Workshop/indt.csv&quot;) # Remember to insert the correct file location for your PC </code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud3JpdGUuY3N2KGluZHQsIFwiQzovVXNlcnMvQ1VSUkFOVC9Ecm9wYm94L1dvcmsvTFNFL1BCMjMwL01UNS9Xb3Jrc2hvcC9pbmR0LmNzdlwiKSAjIFJlbWVtYmVyIHRvIGluc2VydCB0aGUgY29ycmVjdCBmaWxlIGxvY2F0aW9uIGZvciB5b3VyIGNvbXBlbmRpdW0gXG5gYGAifQ== -->
+<pre class="r"><code>write.csv(indt, &quot;C:/Users/CURRANT/Dropbox/Work/LSE/PB230/MT5/Workshop/indt.csv&quot;) # Remember to insert the correct file location for your compendium </code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -470,8 +462,8 @@ anova</code></pre>
 <p>Just like above, to save the newly simulated data, we just simply ask R to write the variables to a new .csv file with the write.csv function.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud3JpdGUuY3N2KGFub3ZhLCBcIkM6L1VzZXJzL0NVUlJBTlQvRHJvcGJveC9Xb3JrL0xTRS9QQjIzMC9NVDUvV29ya3Nob3AvYW5vdmEuY3N2XCIpICMgUmVtZW1iZXIgdG8gaW5zZXJ0IHRoZSBjb3JyZWN0IGZpbGUgbG9jYXRpb24gZm9yIHlvdXIgUEMgXG5gYGAifQ== -->
-<pre class="r"><code>write.csv(anova, &quot;C:/Users/CURRANT/Dropbox/Work/LSE/PB230/MT5/Workshop/anova.csv&quot;) # Remember to insert the correct file location for your PC </code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud3JpdGUuY3N2KGFub3ZhLCBcIkM6L1VzZXJzL0NVUlJBTlQvRHJvcGJveC9Xb3JrL0xTRS9QQjIzMC9NVDUvV29ya3Nob3AvYW5vdmEuY3N2XCIpICMgUmVtZW1iZXIgdG8gaW5zZXJ0IHRoZSBjb3JyZWN0IGZpbGUgbG9jYXRpb24gZm9yIHlvdXIgY29tcGVuZGl1bSBcbmBgYCJ9 -->
+<pre class="r"><code>write.csv(anova, &quot;C:/Users/CURRANT/Dropbox/Work/LSE/PB230/MT5/Workshop/anova.csv&quot;) # Remember to insert the correct file location for your compendium </code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -522,8 +514,8 @@ reg</code></pre>
 <p>Just like above, to save the newly simulated data, we just simply ask R to write the variables to a new .csv file with the write.csv function.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud3JpdGUuY3N2KHJlZywgXCJDOi9Vc2Vycy9DVVJSQU5UL0Ryb3Bib3gvV29yay9MU0UvUEIyMzAvTVQ1L1dvcmtzaG9wL3JlZy5jc3ZcIikgIyBSZW1lbWJlciB0byBpbnNlcnQgdGhlIGNvcnJlY3QgZmlsZSBsb2NhdGlvbiBmb3IgeW91ciBQQyBcbmBgYCJ9 -->
-<pre class="r"><code>write.csv(reg, &quot;C:/Users/CURRANT/Dropbox/Work/LSE/PB230/MT5/Workshop/reg.csv&quot;) # Remember to insert the correct file location for your PC </code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud3JpdGUuY3N2KHJlZywgXCJDOi9Vc2Vycy9DVVJSQU5UL0Ryb3Bib3gvV29yay9MU0UvUEIyMzAvTVQ1L1dvcmtzaG9wL3JlZy5jc3ZcIikgIyBSZW1lbWJlciB0byBpbnNlcnQgdGhlIGNvcnJlY3QgZmlsZSBsb2NhdGlvbiBmb3IgeW91ciBjb21wZW5kaXVtXG5gYGAifQ== -->
+<pre class="r"><code>write.csv(reg, &quot;C:/Users/CURRANT/Dropbox/Work/LSE/PB230/MT5/Workshop/reg.csv&quot;) # Remember to insert the correct file location for your compendium</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
