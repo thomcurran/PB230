@@ -24,7 +24,7 @@ The question to ask of these scores is whether they are on average different fro
 Let’s create a sample that replicates the sample in the original study. This sample will have 48 prescriptions, with a mean of 1.15 and a standard deviation of 0.11. 
 
 ```{r}
-prescription <- rnorm(10, mean = 1.15, sd = 0.11)
+prescription <- rnorm(48, mean = 1.15, sd = 0.11)
 ```
 
 The above line of code will sample 48 numbers from the normal distribution. However, there is a potential problem that needs to be addressed. It is possible for the rnorm function to sample numbers larger than +/-4. These would be values beyond the range of the scale. To address this problem, we can use logical operators in R to find and replace any numbers larger than +4 with the value +4, and any number smaller than -4 with the value -4.
