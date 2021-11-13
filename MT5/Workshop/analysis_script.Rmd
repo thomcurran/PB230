@@ -21,7 +21,7 @@ H0: There will be no significant difference in mean heads reported between the c
 
 ```{r}
 library(readr)
-data <- read_csv("~/Compendium/Data/data.csv")
+data <- read_csv("C:/Users/CURRANT/Dropbox/Work/LSE/PB230/MT5/Workshop/indt.csv")
 ```
 
 ## Preliminary analysis
@@ -70,18 +70,19 @@ plot1 <-
   ggplot(data, aes(x=heads)) + geom_histogram(binwidth=.5, colour="black", fill="white") + 
     facet_grid(condition ~ .) +
     geom_vline(data=means, aes(xintercept=heads.mean),
-               linetype="dashed", size=1, colour="red") + theme_classic() +
+               linetype="dashed", size=1, colour="red") + theme_classic()
 
 ## Save plot
 
-ggsave(file="~/Compendium/Plots/plot_1.png")
+ggsave(file="C:/Users/CURRANT/Dropbox/Work/LSE/PB230/MT5/Workshop/plot_1.png")
+plot1
 ```
 
 And finally create am APA table with the mean and sd for each condition.
 
 ```{r}
 library(apaTables)
-apa.1way.table(iv=condition,dv=heads,data=data,filename="~/Compendium/Tables/table_1.doc",table.number = 1)
+apa.1way.table(iv=condition,dv=heads,data=data,filename="C:/Users/CURRANT/Dropbox/Work/LSE/PB230/MT5/Workshop/table_1.doc",table.number = 1)
 ```
 
 
@@ -123,5 +124,5 @@ geom_errorbar(aes(ymin  = Trad.lower,
   xlab("Condition") +
   ylab("Mean Number of Heads")+
   theme_classic()+
-  ggsave(file="~/Compendium/Plots/plot_2.png")
+  ggsave(file="C:/Users/CURRANT/Dropbox/Work/LSE/PB230/MT5/Workshop/plot_2.png")
 ```

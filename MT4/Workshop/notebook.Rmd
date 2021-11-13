@@ -606,7 +606,7 @@ describe(activity)
 ```{r}
 vis_miss(activity)
 
-#out.MCAR.ws1 <- TestMCARNormality(activity, del.lesscases = 1)
+out.MCAR.ws1 <- TestMCARNormality(activity, del.lesscases = 1)
 summary(out.MCAR.ws1)
 
 activity$na_count <- apply(is.na(activity), 1, sum)
@@ -694,6 +694,7 @@ activity <-
   activity %>%
   filter(zex >= -3.30 & zex <= 3.30)
 
+activity
 ```
 
 
