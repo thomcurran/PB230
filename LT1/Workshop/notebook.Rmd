@@ -94,6 +94,7 @@ This is a classic One-Way ANOVA with three levels of the independent variable (C
 First, lets load this data into our R environment. Go to the LT1 folder, and then to the workshop folder, and find the "perfectionism.csv" file. Click on it and then select "import dataset". In the new window that appears, click "update" and then when the dataframe shows, click import.
 
 ```{r}
+library(readr)
 perfectionism <- read_csv("C:/Users/CURRANT/Dropbox/Work/LSE/PB230/LT1/Workshop/perfectionism.csv")
 head(perfectionism)
 ```
@@ -216,7 +217,7 @@ oneway.test(SOP ~ Country, data = perfectionism)
 
 The results are similar to what we saw above - the ANOVA is significant (i.e., p < .05). There is a difference.
 
-To examine pairwise t-tests of this model with no assumption of equal variances, we must request the corrected t-tests (for multiple comparisons). But this time we are also going to stipulate that the SDs are not pooled (because the assumption of equal variance has been violated).
+To examine pairwise t-tests of this model with no assumption of equal variances, we must request the corrected t-tests (for multiple comparisons). But this time we are also going to stipulate that the SDs are not pooled (because the assumption of equal variance has not been met).
 
 Lets do that now:
 
@@ -271,7 +272,7 @@ RQ: Is there a linear relationship between GDP and happiness?
 First, lets load this data into our R environment. Go to the LT2 folder, and then to the workshop folder, and find the "WHR.csv" file. Click on it and then select "import dataset". In the new window that appears, click "update" and then when the dataframe shows, click import.
 
 ```{r}
-WHR <- read_csv("C:/Users/CURRANT/Dropbox/Work/LSE/PB230/LT2/Workshop/WHR.csv")
+WHR <- read_csv("C:/Users/CURRANT/Dropbox/Work/LSE/PB230/LT1/Workshop/WHR.csv")
 head(WHR)
 ```
 
@@ -370,7 +371,7 @@ First lets load in the data:
 
 ```{r}
 music_data <- read_csv("C:/Users/CURRANT/Dropbox/Work/LSE/PB230/LT1/Workshop/music_data.csv")
-head(perfectionism)
+head(music_data)
 ```
 
 
