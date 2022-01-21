@@ -39,7 +39,7 @@ ANOVA is a three or more parameter linear model. It tests for differences in one
 
 ## ANOVA Assumptions
 
-WHat I didn't tell you last year was that there are a few important assumptions of ANOVA that should be checked before you run the test. I didn't tell you about these because my core objective was to have you learn the mechanics of the analysis - what is going on under the bonnet.
+What I didn't tell you last year was that there are a few important assumptions of ANOVA that should be checked before you run the test. I didn't tell you about these because my core objective was to have you learn the mechanics of the analysis - what is going on under the bonnet.
 
 If on top of all that I tried to teach the diagnostics too, I would have lost you. Just like I was lost when my stats professor taught the analysis and the diagnostics at the same time. The most important thing is to understand the statistics. Once you have done that, we can add on these auxiliary topics. 
 
@@ -61,17 +61,17 @@ What does this mean? Well, it means the residuals should follow approximately a 
 
 The normality assumption can be tested visually thanks to a histogram and a QQ-plot, and/or formally via a normality test such as the Shapiro-Wilk or Kolmogorov-Smirnov test. 
 
-If, the assumption is violated then the Kruskal-Wallis test can be applied:
+If the assumption is violated then the Kruskal-Wallis test can be applied:
 
 kruskal.test(variable ~ group, data = dat in R)
 
-This non-parametric test as we spoke briefly about last year, robust to non-normal distributions, has the same goal as the ANOVA — compare 3 or more groups — but it uses sample medians instead of sample means to compare groups.
+This non-parametric test, as we spoke briefly about last year, is robust to non-normal distributions, has the same goal as the ANOVA — compare 3 or more groups — but it uses sample medians instead of sample means to compare groups.
 
 Finally, there is also the option of bootstrapping to manage violations of this assumption, which is what we have been doing to date and what we will continue to do.
 
 *3. Each level of the factor has common or equality of variance.*
 
-What does this mean? Well, it means the variances of the different groups should be equal  (an assumption called homogeneity of variances, or even sometimes referred as homoscedasticity, as opposed to heteroscedasticity if variances are different across groups). When this assumption is satisfied, your parameter estimates will be optimal. When there are unequal variances of the dependent variable at different levels of the predictor (i.e., when this assumption is violated), you’ll have inconsistency in your standard error and parameter estimates in your model. Subsequently, your confidence intervals and significance tests will be biased.
+What does this mean? Well, it means the variances of the different groups should be equal  (an assumption called homogeneity of variances, or even sometimes referred as homoscedasticity, as opposed to heteroscedasticity if variances are different across groups). When this assumption is met, your parameter estimates will be optimal. When there are unequal variances of the dependent variable at different levels of the predictor (i.e., when this assumption is violated), you’ll have inconsistency in your standard error and parameter estimates in your model. Subsequently, your confidence intervals and significance tests will be biased.
 
 This assumption can be tested graphically by comparing the dispersion of each group in a boxplot for instance, or more formally via the Levene’s test:
 
@@ -379,7 +379,7 @@ head(perfectionism)
 In the chunk below, write the code to create the build the ANOVA model using aov. Save the model as "music.model"
 
 ```{r}
-music.model <- aov(productivity ~ condition, data = music_data)
+music.model <- aov(??)
 ```
 
 ## Task 2: Plot the normality of residuals
@@ -388,10 +388,10 @@ Use the below chunk to write the code to plot a histogram and QQ-plot for the re
 
 ```{r}
 # histogram
-hist(music.model$residuals)
+hist(??)
 
 # QQ-plot
-qqPlot(music.model$residuals) 
+qqPlot(??) 
 ```
 
 What can we say about the normality of the residuals from a visual inspection?
@@ -401,7 +401,7 @@ What can we say about the normality of the residuals from a visual inspection?
 Use the below chunk to write the code for the Shapiro-Wilk test for normality
 
 ```{r}
-shapiro.test(music.model$residuals)
+shapiro.test(??)
 ```
 
 What can we say about the normality of the residuals from this analysis?
@@ -411,7 +411,7 @@ What can we say about the normality of the residuals from this analysis?
 In the chunk below write the code to plot the distributions of the conditions in this experiment using box-plots.
 
 ```{r}
-boxplot(productivity ~ condition, data = music_data)
+boxplot(??)
 ```
 
 What can we say about the equality of variances from a visual inspection?
@@ -421,7 +421,7 @@ What can we say about the equality of variances from a visual inspection?
 Use the below chunk to write the code for the Levene's test of equality of variances.
 
 ```{r}
-leveneTest(productivity ~ condition, data = music_data)
+leveneTest(??)
 ```
 
 What can we say about the equality of variances from this analysis?
