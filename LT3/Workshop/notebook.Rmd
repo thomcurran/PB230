@@ -194,6 +194,15 @@ head(anxiety)
 
 You will see that the dataset contains responses to 23 items regarding R anxiety. Great we can get started factor analyzing to see whether we can identify the optimal factor structure from the underlying items.
 
+## Reverse item 
+
+Item 3 is positively worded, so it first needs to be reversed. Let's do that now.
+
+```{r}
+anxiety$Q03 <- car::recode(anxiety$Q03, "1=5; 2=4; 3=3; 4=2; 5=1")
+```
+
+
 ## Correlations Between Items
 
 The first thing to do when conducting a factor analysis or PCA is to look at the correlations of the variables. The correlations between variables can be checked using the cor() function to create a correlation matrix of all variables.
@@ -373,14 +382,12 @@ What can we say from this output? Well, the CFI and TLI are our first areas of c
 
 When we take a look at the standardized factor loadings for the latent variables, we see a few issues. There is one item here with low loading on its hypothesised factor (Q23 of Peer Evaluation; "If I am good at statistics, people will think I'm a nerd"). It had a standardised loading of 0.27. One rule of thumb is that factor loadings < .40 are weak and factor loadings > .60 are strong (Garson, 2010). This is a very weak loading so we should remove the item and respecify the model.
 
-We also see a negative factor loading here for Q03 on the statistics fear latent variable. When we look at the questionnaire, it is evident that Q03 is a bit ambiguous and should be reverse coded ("standard deviations excite me"). Again, given the ambiguity and negative loading, we need to remove it and respecify the model.
-
 ```{r}
-# Model respecifcation removing Q03 and Q23
+# Model respecifcation removing Q23
 
 cfa.model2 <- "
 computerFear =~ Q06 + Q07 + Q10 + Q13 + Q14 + Q15 + Q18
-statisticsFear=~ Q01 + Q04 + Q05 + Q12 + Q16 + Q20 + Q21
+statisticsFear=~ Q01 + Q04 + Q05 + Q12 + Q16 + Q20 + Q21 + Q03
 mathFear =~ Q08 + Q11 + Q17
 peerEvaluation =~ Q02 + Q09 + Q19 + Q22
 "
@@ -391,7 +398,7 @@ cfa.fit2 <- cfa(cfa.model2, data=anxiety.cor)
 summary(cfa.fit2, fit.measures=TRUE, standardized=TRUE)
 ```
 
-Now we have CFI = .90, TLI .89, RMSEA = .06, and SRMR = .05. As well, all standardised factor loadings are > .40. That's pretty good! Our anxiety questionnaire has successfully passed the EFA and CFA with four factors that fit the data adequately from the initial pool of 23 item items. Lets visualize that model with semPlot plotting the standardized factor loadings and covariances (correlations):
+Now we have CFI = .90, TLI .88, RMSEA = .06, and SRMR = .05. As well, all standardised factor loadings are > .40. That's pretty good! Our anxiety questionnaire has successfully passed the EFA and CFA with four factors that fit the data adequately from the initial pool of 23 item items. Lets visualize that model with semPlot plotting the standardized factor loadings and covariances (correlations):
 
 ```{r}
 semPaths(cfa.fit2, "std")
@@ -472,6 +479,7 @@ Write the script to build the model for three latent variables: visual, writing,
 Now write the code to fit the CFA model to the data and save it as a new object called "mental.fit". Then request the summary estimates:
 
 ```{r}
+
 
 ```
 

@@ -3,6 +3,15 @@ title: "Latent Variable Structural Equation Modeling"
 output: html_notebook
 ---
 
+## Install packages
+
+```{r}
+install.packages("readr")
+install.packages("lavaan")
+install.packages("semPlot")
+```
+
+
 # Preliminaries
 
 ```{r}
