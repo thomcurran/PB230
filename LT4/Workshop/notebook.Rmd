@@ -190,6 +190,27 @@ The other thing of note in this output are the standardised covariances between 
 
 ![*Standardised Covariances Between Latent Variables (Error-Free Correlations)*](https://i.postimg.cc/c4PV3D8w/correlations.jpg)
 
+Compare these with the correlations from the aggregated variables (i.e., those measured with error).
+
+```{r}
+library(tidyverse)
+library(Hmisc)
+parent <- parent %>%
+  mutate(con_reg = (cr1 + cr2 + cr3 + cr4 + cr5)/5)
+parent <- parent %>%
+  mutate(csw = (csw1 + csw2 + csw3 + csw4 + csw5)/5)
+parent <- parent %>%
+  mutate(ps = (sop + ps)/2)
+parent <- parent %>%
+  mutate(pc = (spp + com + doa)/3)
+rcorr(as.matrix(parent[,c("con_reg","csw", "ps", "pc")], type="pearson"))
+
+
+
+```
+
+See how they're far smaller that the correlations from the CFA? That's not a surprise. When we aggregate the variable we don;t remove the error variance, and that error variance has nothing to do with the things that's being explained. So aggregated variables therefore have less true variance to explain. Hence, when we look at correlations between aggregated variables, we are looking a correlations that are smaller than they should be. And that's why latent variables are so important.
+
 ## Composite Reliability
 
 Also here we can calculate whats called the composite reliability of our latent variables, which is a bit like Cronbach's alpha but calculated from the factor loadings not split-half correlations. Although it’s not perfect, composite reliability takes care of many inappropriate assumptions that measures like Cronbach’s alpha make (including that a higher number of items means greater reliability).
