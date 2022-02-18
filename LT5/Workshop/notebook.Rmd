@@ -3,6 +3,17 @@ title: "LT5: Multilevel Modeling"
 output: html_notebook
 ---
 
+# Packages
+
+```{r}
+install.packages("jtools")
+install.packages("interactions")
+install.packages("ggplot2")
+install.packages("tidyverse")
+install.packages("lme4")
+install.packages("readr")
+```
+
 # Preliminaries
 
 ```{r}
@@ -275,8 +286,7 @@ Random Effects (variability of random intercepts and slopes):
 
 To know whether this school to school variability in the slopes of happiness on friends is significantly greater than zero, we inspect sig03 from the confidence interval table. We can see that the standardised variance of the slopes (i.e., the SD) is 4.21 with a 95% CI from 1.37 to 6.71. This does not include zero. There is a significant amount of random variance in the slopes.
 
-3. cov((Intercept),friend.c: The correlation between the random intercept and random slope was 0.53, which indicates that those schools who had higher intercepts for happiness were also likely to have greater associations between friends and happiness. To know whether this correlation is significantly greater than zero, we inspect sig02 from the confidence interval table. We can see that the relationship between the intercepts and slopes is not significant (95% CI = -
-33,1.00).
+3. cov((Intercept),friend.c: The correlation between the random intercept and random slope was 0.53, which indicates that those schools who had higher intercepts for happiness were also likely to have greater associations between friends and happiness. To know whether this correlation is significantly greater than zero, we inspect sig02 from the confidence interval table. We can see that the relationship between the intercepts and slopes is not significant (95% CI = -.36,1.00).
 
 We can plot the within-school happiness slopes and intercepts to get a sense of the school to school variability in this data:
 
