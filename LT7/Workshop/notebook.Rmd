@@ -169,7 +169,7 @@ Now let’s look at the variance estimates:
 
 The estimation of residual variance for each time point in the LGC is the variance in the differences between observed time point stress scores and the model predicted stress score for that measurement occasion. We could fix them to be identical here, or conversely allow them to be estimated in the multilevel model framework (multilevel models by default assume the same variance for each time point). Thats another reasons why the results are not identical, by the way.
 
-The main thing to worry about here, though, is the variance of the intercepts and slopes. There are the random effects for the model. Just like in the multilevel model, we can see that the variance of the intercepts (.189) and, importantly, the slopes (.003) are greater than zero (i.e., p > .05). So even though the average stress trajectory is flat, there is significant variability around that average.
+The main thing to worry about here, though, is the variance of the intercepts and slopes. There are the random effects for the model. Just like in the multilevel model, we can see that the variance of the intercepts (.189) and, importantly, the slopes (.003) are greater than zero (i.e., p < .05). So even though the average stress trajectory is flat, there is significant variability around that average.
 
 The covariance is the relationship between the random intercept and random slope, just like in the multilevel model.
 
@@ -181,7 +181,7 @@ Given we have substantial variance in the random intercepts and slopes within ou
 
 In explaining intercept and slope variance in a LGC model, we can add either categorical or continuous predictors. And these predictors can be observed or latent variables. This flexibility is what gives LGC modeling its advantage over multilevel modeling.
 
-Lets begin with a categorical predictor. Adding a categorical variable would allow for different trajectories of stress across different groups of neuroticism. To begin with, lets create a categorical neuroticism variable, which does a simple media split such that people with neuroticism scores above the median (i.e., > 3) are coded 1, and those below the median (i.e., < 3) are coded 0.
+Lets begin with a categorical predictor. Adding a categorical variable would allow for different trajectories of stress across different groups of neuroticism. To begin with, lets create a categorical neuroticism variable, which does a simple median split such that people with neuroticism scores above the median (i.e., > 3) are coded 1, and those below the median (i.e., < 3) are coded 0.
 
 ```{r}
 stress_wide <- dicho(stress_wide, yneurotic, dich.by = 3) 
@@ -207,7 +207,7 @@ lgc.cat.model <- "
 Then we simply fit that model and inspect the estimates remembering this time to request the confidence intervals from bootstrap given the structural relationship now in the model:
 
 ```{r}
-lgc.cat.fit <- growth(lgc.cat.model, data=stress_wide, se = "bootstrap", bootstrap = 100)
+lgc.cat.fit <- growth(lgc.cat.model, data=stress_wide, se = "bootstrap", bootstrap = 5000)
 summary(lgc.cat.fit, fit.measures=TRUE, standardized=TRUE)
 parameterestimates(lgc.cat.fit, boot.ci.type = "perc", standardized = TRUE)
 ```
@@ -362,6 +362,7 @@ Now fit that LGCM of reading ability to the data. Don't forget to use the growth
 
 ## Summarize the fitted model
 
+
 ```
 
 Summarize the model fit for this LGCM, does it fit the data well?
@@ -390,7 +391,7 @@ First, write the code that builds this LGCM with the parent support predictor. R
 
 ```{r}
 lgc.reading.model <- "
-  
+   
 "
 ```
 
