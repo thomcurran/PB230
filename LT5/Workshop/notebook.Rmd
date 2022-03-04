@@ -414,7 +414,7 @@ The Level 2 random slopes (Bi) are modeled as:
 
 Bi = MB + BB(neurotici) + WBi
 
-where the slope for person i, Bi (the stress trajectory for person i) is modeled as a function of a fixed effect MB, which describes the mean stress trajectory across the sample; BB, which is the relationship of the random stress trajectory with neuroticism. The random effect WBi is the residual unexplained stress trajectory not explained by neuroticism (the difference between the model predicted stress trajectory for person i and the actual stress trajectory for person i).
+where the slope for person i, Bi (the stress trajectory for person i) is modeled as a function of a fixed effect MB, which describes the mean stress trajectory across the sample; BB, which is the relationship of the random stress trajectory with neuroticism (i.e., do those with higher neuroticism show steeper increases in stress over time?). The random effect WBi is the residual unexplained stress trajectory not explained by neuroticism (the difference between the model predicted stress trajectory for person i and the actual stress trajectory for person i).
 
 Combining Level 1 and Level 2 equations gives us:
 
@@ -471,14 +471,14 @@ The "1 + day|id" portion of this equation is requesting that both the intercepts
 This output needs some explaining.
 
 Fixed Effects:
-
-1. (Intercept): The expected value of stress for the average person on the first time point is 1.39
+1
+1. (Intercept): The expected value of stress for the average person on the first time point is 1.39 (95% CI = 1.32,1.47).
 
 2. day: Stress increased marginally over the course of the study days. For every unit increase in day, stress increased by .001 (95% CI = -.01, .02). This is not a significant change (i.e., CI includes zero)
 
 Random Effects:
 
-1. sd((Intercept)): There is between-person variability in the intercepts of stress (variance = 0.17, sd = 0.42). To know whether this variability is significantly greater than zero, we inspect sig01 from the confidence interval table. We can see that the standardised variance of the intercepts (i.e., the SD) is .42 with a 95% CI from .34 to .49. This does not include zero. So even though the intercept variance in reduced with the addition of time to the empty model, there is still a significant amount of random variance in the intercepts to be explained.
+1. sd((Intercept)): There is between-person variability in the intercepts of stress (variance = 0.17, sd = 0.42). To know whether this variability is significantly greater than zero, we inspect sig01 from the confidence interval table. We can see that the standardised variance of the intercepts (i.e., the SD) is .42 with a 95% CI from .34 to .49. This does not include zero. So even though the intercept variance is reduced with the addition of time to the empty model, there is still a significant amount of random variance in the intercepts to be explained.
 
 2. sd(day): There is between-person variability in the within-person trajectories of stress over time (variance = 0.003, sd = 0.05). In other words, although the mean change in stress is negligible, there is some variance around that mean. Some people's stress increases, some peoples decreases across time. Overall, this means a zero slope in the sample (per fixed effect), but this disguises significant person to person variability.
 
@@ -640,7 +640,7 @@ To start, we  fit the empty model that provides us information about how much of
 Write the code to fit the empty model for negative affect (negaff):
 
 ```{r}
-
+empty.neg.model <- 
 ```
 
 Use the intercept add residual variance to calculate the ICC:
@@ -660,7 +660,7 @@ Remember to use the person mean centered stress variable here (stress_pmc). Also
 ```{r}
 # Fit and sumarise multilevel model
 neg.stress.model <- 
-
+  
 # Call bootstrap confidence intervals
 
 ```
@@ -699,9 +699,9 @@ Recall in this model we need the stress, neuroticism and the stress by neurotici
 ```{r}
 # Fit and summarise multilevel model with level 2 predictor and interaction
 neg.neurotic.model <- 
-
+  
 # Call bootstrap confidence intervals
-
+ 
 ```
 
 Is the stress*neuroticism interaction significant? (i.e., does a person's stress reactivity depend on their score of neuroticism)
