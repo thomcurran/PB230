@@ -84,7 +84,7 @@ Null Hypothesis 2 - The effect of ego orientation on engagement will be zero
 
 ## Checking data accuracy
 
-The first step in data cleaning is to check that the data are entered correctly. If possible the data should be proofread against the original data (on the questionnaires, etc) to check that item has been entered correctly. Preferably someone other than the person who entered the data should do this (but not essential). We don't have access to the questionnaires here any data entry errors will need to be coded as misssing. 
+The first step in data cleaning is to check that the data are entered correctly. If possible the data should be proofread against the original data (on the questionnaires, etc) to check that item has been entered correctly. Preferably someone other than the person who entered the data should do this (but not essential). We don't have access to the questionnaires here any data entry errors will need to be coded as missing. 
 
 Let's check that the data conform to the appropriate range (i.e., 1-5).
 
