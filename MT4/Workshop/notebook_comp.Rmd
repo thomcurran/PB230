@@ -597,27 +597,76 @@ activity <- read_csv("MT4/Workshop/activity.csv")
 ## Step 2: Check data for errors
 
 ```{r}
-
+describe(activity)
 ```
 
 
 ## Step 3: Check amount and pattern of missing data and remove any caes with > 10% missing
 
 ```{r}
+vis_miss(activity)
 
+out.MCAR.ws1 <- TestMCARNormality(activity, del.lesscases = 1)
+summary(out.MCAR.ws1)
+
+activity$na_count <- apply(is.na(activity), 1, sum)
+activity
+
+activity <- 
+activity %>% 
+filter(na_count <= "2")
+activity
 ```
 
 
 ## Step 4: Imputate values using scale mean
 
 ```{r}
-
+activity <-
+  activity %>%
+  rowwise()%>%
+  mutate(meanaut = mean(c(AutSup1,AutSup2,AutSup3,AutSup4,AutSup5), na.rm = TRUE)) %>%
+  mutate(meancon = mean(c(CON1,CON2,CON3,CON4), na.rm = TRUE)) %>%
+  mutate(meanex = mean(c(EX1,EX2,EX3,EX4,EX5), na.rm = TRUE)) 
+activity
 ```
 
 
 ## Step 5: Create variables using mean scores
 
 ```{r}
+# Task
+
+activity <- within(activity, AutSup1 <- ifelse(is.na(AutSup1), meanaut, AutSup1))
+activity <- within(activity, AutSup2 <- ifelse(is.na(AutSup2), meanaut, AutSup2))
+activity <- within(activity, AutSup3 <- ifelse(is.na(AutSup3), meanaut, AutSup3))
+activity <- within(activity, AutSup4 <- ifelse(is.na(AutSup4), meanaut, AutSup4))
+activity <- within(activity, AutSup5 <- ifelse(is.na(AutSup5), meanaut, AutSup5))
+
+# Ego
+
+activity <- within(activity, CON1 <- ifelse(is.na(CON1), meanaut, CON1))
+activity <- within(activity, CON2 <- ifelse(is.na(CON2), meanaut, CON2))
+activity <- within(activity, CON3 <- ifelse(is.na(CON3), meanaut, CON3))
+activity <- within(activity, CON4 <- ifelse(is.na(CON4), meanaut, CON4))
+
+# ex
+
+activity <- within(activity, EX1 <- ifelse(is.na(EX1), meanaut, EX1))
+activity <- within(activity, EX2 <- ifelse(is.na(EX2), meanaut, EX2))
+activity <- within(activity, EX3 <- ifelse(is.na(EX3), meanaut, EX3))
+activity <- within(activity, EX4 <- ifelse(is.na(EX4), meanaut, EX4))
+activity <- within(activity, EX5 <- ifelse(is.na(EX5), meanaut, EX5))
+
+activity <-
+  activity %>%
+  rowwise()%>%
+  mutate(meanaut = mean(c(AutSup1,AutSup2,AutSup3,AutSup4,AutSup5), na.rm = TRUE)) %>%
+  mutate(meancon = mean(c(CON1,CON2,CON3,CON4), na.rm = TRUE)) %>%
+  mutate(meanex = mean(c(EX1,EX2,EX3,EX4,EX5), na.rm = TRUE)) 
+activity
+
+vis_miss(activity)
 
 ```
 
@@ -625,13 +674,50 @@ activity <- read_csv("MT4/Workshop/activity.csv")
 ## Step 6: Detect and remove univariate outliers
 
 ```{r}
+# Standardize variables
 
+activity$zaut <- scale(activity$meanaut)
+activity$zcon <- scale(activity$meancon)
+activity$zex <- scale(activity$meanex)
+
+# Remove ego outliers
+
+activity <- 
+  activity %>%
+  filter(zaut >= -3.30 & zaut <= 3.30)
+
+activity <- 
+  activity %>%
+  filter(zcon >= -3.30 & zcon <= 3.30)
+
+activity <- 
+  activity %>%
+  filter(zex >= -3.30 & zex <= 3.30)
+
+activity
+```
+
+
+## Step 7: Detect and remove multivariate outliers
+
+```{r}
+linear.model2 <- lm(AutSup1 ~ meanaut + meancon + meanex, data=activity) # build linear model with focial variables as predictors
+activity$res  <- activity$AutSup1 - predict(linear.model2) # save residuals
+activity$mahal <- MoE_mahala(linear.model2, activity$res)
+
+# 16.26 = p .001
+
+activity <- 
+  activity %>%
+  filter(mahal <= 16.27)
+data_var
 ```
 
 ## Step 8: Run linear model and report results
 
 ```{r}
-
+main.model2 <- lm(meanex ~ meanaut + meancon, data=activity)
+summary(main.model2)
 ```
 
 
