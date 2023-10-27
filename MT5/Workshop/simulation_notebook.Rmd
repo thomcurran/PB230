@@ -3,7 +3,7 @@ title: "Data Simulation"
 output: html_notebook
 ---
 
-In this lab, we'll learn how to simulate data with R using the normal distribution (rnorm). There are 
+In this lab, we'll learn how to simulate data with R using the normal distribution (rnorm). There are three learning outcomes.
 
 1. Learn how to simulate data for t-test (one-sample, repeated, and independent)
 
