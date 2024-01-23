@@ -151,7 +151,7 @@ But this is a good learning opportunity for what to do if the normality assumpti
 
 But this is non-optimal for a number of reasons including changing the scale of the outcome variable and making model interpretation more difficult.
 
-So we have two options, both involve non-parametric tests (i.e., tests that do not assume a normal distribution. 
+So we have two options, both involve non-parametric tests (i.e., tests that do not assume a normal distribution). 
 
 The first is to bootstrap the  estimate and calculate the 95% bootstrap confidence interval. We have been doing this and it is a strategy I recommend.
 
@@ -207,7 +207,7 @@ leveneTest(SOP ~ Country, data = perfectionism)
 
 The p-value being smaller than the significance level of 0.05, we reject the null hypothesis, so we must reject the hypothesis that variances are equal between groups (p-value = 0.001). It seems the group variances do differ significantly.
 
-An alternative procedure to one-way ANOVA, called the Welch one-way test, does not require the homogeneity of variances assumption to be met. Therefore, if the Levene's test in significant (i.e., p > .05), researchers should use Welch. 
+An alternative procedure to one-way ANOVA, called the Welch one-way test, does not require the homogeneity of variances assumption to be met. Therefore, if the Levene's test is significant (i.e., p > .05), researchers should use Welch. 
 
 We can implement the Welch's test using the function oneway.test():
 
@@ -225,7 +225,7 @@ Lets do that now:
 pairwise.t.test(perfectionism$SOP, perfectionism$Country, p.adjust.method = "BH", pool.sd = FALSE)
 ```
 
-As before, this output reveals a similar story. the Canada US contrast is significant, (p = .046) but all other contrasts are not different from zero. 
+As before, this output reveals a similar story. The Canada US contrast is significant, (p = .046) but all other contrasts are not different from zero. 
 
 And that's it! That's how we diagnose assumptions of ANOVA.
 
@@ -257,7 +257,7 @@ We talked about polynomials last year, so you should know what this means. We fo
 
 *4. Independence.* Just like ANOVA, independence is similarly important for regression. It means that the errors in your model are not related to each other (i.e., no clustering or repeated measures). Computation of standard error relies on the assumption of independence, so if you don’t have standard error, say goodbye to confidence intervals and significance tests. As I mentioned above, we will look more into this as we move to multi-level modeling. It is a design issue and cannot be tested using stats.
 
-*4. No influential outliers.* This isn’t technically an assumption of linear regression, but it’s best practice to avoid influential outliers. Why is it problematic to have outliers in your data? Outliers can bias parameter estimates (e.g., mean), and they also affect your sums of squares. Sums of squares are used to estimate the standard error, so if your sums of squares are biased, your standard error likely is too. 
+*4. No influential outliers.* This isn’t technically an assumption of linear regression, but it’s best practice to avoid influential outliers. Why is it problematic to have outliers in your data? Outliers can bias parameter estimates (e.g., means), and they also affect your sums of squares. Sums of squares are used to estimate the standard error, so if your sums of squares are biased, your standard error likely is too. 
 
 It’s really bad to have a biased standard error because it is used to calculate confidence intervals around our parameter estimate. In other words, outliers could lead to biased confidence intervals. Not good and another reason we bootstrap! We need to rid ourselves of those pesky outliers. We looked at this topic in depth last semester when we cleaned the dataset and inspected for missing data and outliers. So make sure you always do a good job of cleaning and screening before you begin analyses!
 
@@ -329,7 +329,7 @@ qqPlot(lm.model$residuals)
 
 How did we do? R automatically flagged those same 2 data points that have large residuals (observations 192 and 190). However, aside from those 2 data points, observations lie well along the 45-degree line in the QQ-plot, and the histogram has a nice bell shape, so we may assume that normality holds here. 
 
-We could test this more formally, as we did for ANOVA. But regression is robust to small deviations in normality and, besides, our sample so large it will invariably turn a significant result. No need here. The residuals look pretty symmetrical.
+We could test this more formally, as we did for ANOVA. But regression is robust to small deviations in normality and, besides, our sample is so large it will invariably turn a significant result. No need here. The residuals look pretty symmetrical.
 
 Awesome! Job done, we are good to carry on with the analysis.
 
@@ -340,6 +340,9 @@ Finally, I found a really cool package this week that tests model assumptions si
 We can check out (almost) everything using just one package using the check_model() function. Lets do that now for out ANOVA and regression models
 
 ```{r}
+install.packages("performance")
+install.packages("see")
+install.packages("patchwork")
 library(performance)
 check_model(anova.model)
 check_model(lm.model)
