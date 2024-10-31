@@ -423,7 +423,7 @@ It seems both task and ego goals positively predict engagement. We have an answe
 
 Standardized z-scores larger than 3.29 (p < .001) and Mahalanobis distances greater than χ2 (3) = 16.27 (p < .001) were used to identify participants as univariate and multivariate outliers (Tabachnick & Fidell, 2007). Three participants were removed on this basis (3 univariate and 0 multivariate outliers). This yielded a final sample of 256 participants. These data were approximately univariate normal (average absolute skew = .21; average absolute kurtosis = .45)."
 
-## Multiple Imputation
+## Further reading: Multiple Imputation
 
 Although mean scale imputation is preferred for our dataset, I want to show you how to do imputation and analysis using Multiple Imputation because there may be times where you will need to use it (i.e., non-MCAR data or data with large amounts of missingness).
 

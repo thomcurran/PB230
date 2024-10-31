@@ -73,7 +73,7 @@ For example, in the assessment of creativity, people are often asked to suggest 
 
 ![*Depiction of a latent variable (η1) in SEM and how it represents correlations between indicators (y1–y3) and their relations with other variables (z1)*](https://i.postimg.cc/DyWXX1jG/SEM-Figure-3-640x539.png)
 
-Above, a covariance matrix is depicted which shows  that number of novel ideas is positively correlated across the three items (variables y1–y3). The more ideas people have for the can, the more ideas they tend to have as well for what to do with the car tire and the brick. 
+Above, a covariance matrix is depicted which shows  that number of novel ideas is positively correlated across the three items (variables y1–y3). The more ideas people have for the car, the more ideas they tend to have as well for what to do with the car tire and the brick. 
 
 Why is this so? The creativity researcher’s assumption is, surprise surprise, because some people are more creative than others! From a psychological point of view, this assumption entails that people’s creativity is the psychological construct underlying their ideas on all three items. 
 
@@ -424,9 +424,7 @@ Write the script to build the CFA model for two latent variables: political demo
 
 ```{r}
 # Build CFA model
-political.cfa <- "
 
-"
 ```
 
 Now write the code to fit the CFA model to the data and save it as a new object called "political.cfa.fit". Then request the summary estimates:
@@ -451,7 +449,6 @@ Write the script to build the SEM model for two latent variables: political demo
 
 ```{r}
 # Build SEM model
-political.sem <- "
 
 "
 ```

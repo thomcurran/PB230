@@ -265,7 +265,7 @@ friend.happy.fit <- lmer(formula = happy ~ 1 + friend.c + (1 + friend.c|school),
 summary(friend.happy.fit)
 
 # bootstrap confidence intervals
-confint(friend.happy.fit, method="boot", nsim=100)
+confint(friend.happy.fit, method="boot", nsim=100, oldNames=FALSE)
 ```
 
 The "1 + friend.c|school" portion of this equation is requesting that both the intercepts "1" and slope of friends "friend.c" are allowed to vary randomly across schools "|school".
@@ -463,7 +463,7 @@ Recall that time in this data was measured using the day variable. We can also g
 # fit model
 time.stress.fit <- lmer(formula = stress ~ 1 + day + (1 + day|id), REML=FALSE, data=stress)
 summary(time.stress.fit)
-confint(time.stress.fit, method="boot", nsim=100)
+confint(time.stress.fit, method="boot", nsim=100, oldNames=FALSE)
 ```
 
 The "1 + day|id" portion of this equation is requesting that both the intercepts "1" and trajectories "day" are allowed to vary randomly across people "|id".
@@ -570,7 +570,7 @@ To illustrate this interaction, we plotted the conditional mean of the trajector
 
 # Activity: Testing for Neurotic Vulnerability
 
-Our second research question with the stress data was interested on whether the within-person relationship between stress and negative affect is moderated by neuroticism. That is, whether neurotics have especially large relationships between time varying stress and time varying negative affect. put differently, what we are interested to know here is:
+Our second research question with the stress data was interested on whether the within-person relationship between stress and negative affect is moderated by neuroticism. That is, whether neurotics have especially large relationships between time varying stress and time varying negative affect. Put differently, what we are interested to know here is:
 
 a) if day-to-day variations in stress (i.e., whether we are higher or lower that our mean on a particular day) correlate with day-to-day variations in negative affect. We should expect that on stressful days when we report higher than our average stress that we would also report higher than our average negative effect. In other words, that these variables have a positive relationship.
 

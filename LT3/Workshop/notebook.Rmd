@@ -454,7 +454,7 @@ The CFA model looks like this:
 
 ## Load data
 
-Luckily, the Holzinger and Swineford dataset is a practice dataset contained in the lavaan package for CFA, so we don;t need to load it from the computer, we can load it from the package. Lets do that now:
+Luckily, the Holzinger and Swineford dataset is a practice dataset contained in the lavaan package for CFA, so we don't need to load it from the computer, we can load it from the package. Lets do that now:
 
 
 ```{r}
@@ -479,6 +479,10 @@ Write the script to build the model for three latent variables: visual, writing,
 Now write the code to fit the CFA model to the data and save it as a new object called "mental.fit". Then request the summary estimates:
 
 ```{r}
+# Fit the CFA model
+
+
+# Summarise the fit
 
 
 ```

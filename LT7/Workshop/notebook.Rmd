@@ -220,7 +220,7 @@ To answer that question we need to look to the regression of stress slopes on ne
 
 ## Adding a Continuous Predictor to the LGC Model
 
-If you cast your mind back to last year when we split off continuous variables, we saw that doing so was a pretty bad idea because we are shrinking the variance in our x variable and thereby reducing the amount of error we could potentially explain in y. For this reason, it is always better to use the full range of a continuous variable. So lets now look to see if our continuous neuroticism variable can explain variability in the latent stress intercept and slope variables from the LGC model. In this way, we can ascertain whether the trajectory slopes of stress differ across the full range of neuroticism.
+If you cast your mind back to last year when we split off continuous variables, we saw that doing so was a pretty bad idea because we are shrinking the variance in our x variable and thereby reducing the amount of variance we could potentially explain in y. For this reason, it is always better to use the full range of a continuous variable. So lets now look to see if our continuous neuroticism variable can explain variability in the latent stress intercept and slope variables from the LGC model. In this way, we can ascertain whether the trajectory slopes of stress differ across the full range of neuroticism.
 
 ![*LGCM of Stress with Continuous Predictor*](https://i.postimg.cc/Nf8SP1xR/lgcm-6.jpg) 
 
