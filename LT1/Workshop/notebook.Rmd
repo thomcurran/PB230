@@ -8,10 +8,22 @@ output: html_notebook
 Install required packages
 
 ```{r eval = FALSE}
-install.packages("see")
-install.packages("performance")
-install.packages("car")
+#install.packages("see")
+#install.packages("performance")
+#install.packages("car")
+#install.packages("patchwork")
 ```
+
+load required packages
+
+```{r eval = FALSE}
+library("see")
+library("performance")
+library("car")
+library("patchwork")
+```
+
+
 
 # Introduction
 
@@ -104,7 +116,7 @@ head(perfectionism)
 
 Remember that normality of residuals can be tested visually via a histogram and a QQ-plot, or formally via a normality test (Shapiro-Wilk test, for instance).
 
-Before checking the normality assumption, we first need to compute the ANOVA. We then save the results in res_aov:
+Before checking the normality assumption, we first need to compute the ANOVA. We then save the results in anova.model:
 
 ```{r}
 anova.model <- aov(SOP ~ Country, data = perfectionism)
@@ -269,7 +281,7 @@ Before we delve into this topic, lets just clarify the research question we are 
 
 RQ: Is there a linear relationship between GDP and happiness?
 
-First, lets load this data into our R environment. Go to the LT2 folder, and then to the workshop folder, and find the "WHR.csv" file. Click on it and then select "import dataset". In the new window that appears, click "update" and then when the dataframe shows, click import.
+First, lets load this data into our R environment. Go to the LT1 folder, and then to the workshop folder, and find the "WHR.csv" file. Click on it and then select "import dataset". In the new window that appears, click "update" and then when the dataframe shows, click import.
 
 ```{r}
 WHR <- read_csv("C:/Users/CURRANT/Dropbox/Work/LSE/PB230/LT1/Workshop/WHR.csv")
@@ -301,7 +313,7 @@ To test for linearity and equality of variances we plot the fitted values (predi
 
 The plot of residuals versus predicted values is useful for checking the assumption of linearity and equality of variances. If the model does NOT meet the linear model assumption, we would see our residuals take on a defined shape or a distinctive pattern. For example, if your plot looks like a parabola, that’s bad. 
 
-Your scatterplot of residuals should look like the night sky–no distinctive patterns. The red line through your scatterplot should also be straight and horizontal, not overly curved, if the linearity assumption is satisfied. 
+Your scatterplot of residuals should look like the night sky: no distinctive patterns. The red line through your scatterplot should also be straight and horizontal, not overly curved, if the linearity assumption is satisfied. 
 
 To assess if the equality of variances assumption is met we look to make sure that the residuals are equally spread around the y = 0 line.
 
@@ -329,21 +341,17 @@ qqPlot(lm.model$residuals)
 
 How did we do? R automatically flagged those same 2 data points that have large residuals (observations 192 and 190). However, aside from those 2 data points, observations lie well along the 45-degree line in the QQ-plot, and the histogram has a nice bell shape, so we may assume that normality holds here. 
 
-We could test this more formally, as we did for ANOVA. But regression is robust to small deviations in normality and, besides, our sample is so large it will invariably turn a significant result. No need here. The residuals look pretty symmetrical.
+We could test this more formally, as we did for ANOVA. But regression is robust to small deviations in normality and, besides, our sample is so large it will invariably return a significant result. No need here. The residuals look pretty symmetrical.
 
 Awesome! Job done, we are good to carry on with the analysis.
 
 # Global Tests of Linear Model Assumptions
 
-Finally, I found a really cool package this week that tests model assumptions simultaneously. It is called performance and it is kickass.
+Finally, I found a really cool package this week that tests model assumptions simultaneously. It is called performance.
 
 We can check out (almost) everything using just one package using the check_model() function. Lets do that now for out ANOVA and regression models
 
 ```{r}
-install.packages("performance")
-install.packages("see")
-install.packages("patchwork")
-library(performance)
 check_model(anova.model)
 check_model(lm.model)
 ```
