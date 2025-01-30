@@ -36,7 +36,7 @@ Path analysis sounds scary at first. But it is just a extension of linear regres
 
 As we saw in the lecture, this makes path analysis a multivariate analysis: one that can include multiple outcomes to test theoretical models. We can also apply rules of parsimony (leaving redundant paths out of the model) and adjudicate the 'fit' of overidentified models. It is indeed an elegant analysis for many reasons.
 
-Before we begin getting to grips with path analysis, there are a few assumtions of path analysis. Some the same as the GLM assumptions, and some different. These are:
+Before we begin getting to grips with path analysis, there are a few assumptions of path analysis. Some the same as the GLM assumptions, and some different. These are:
 
 1. All causal relationships between variables must go in one direction only (you cannot have a pair of variables that cause each other).
 
@@ -46,7 +46,7 @@ Before we begin getting to grips with path analysis, there are a few assumtions 
 
 4. Residuals (i.e., prediction errors) aren’t correlated with predictor variables (independence) or each other (normality), and residuals have constant variance across values of your predictor variables (equality of variance).
 
-5. Measurements are valid and reliable. We can account for invalidity and unreliability in structural equation modeling, but not path analysis.]
+5. Measurements are valid and reliable. We can account for invalidity and unreliability in structural equation modeling, but not path analysis.
 
 6. The path model accounts for all relevant influences on the variables included. All models are wrong, but how wrong is yours?
 
@@ -117,7 +117,7 @@ Path analysis is all about theory testing and the ability to be wrong is central
 
 # Today's data
 
-To practice conducting path analysis, we are going to use data from research on a sample of 213 call center employees. The focus of this research was to better understand how and why employees were burnout out and what were the potential causes or triggers. 
+To practice conducting path analysis, we are going to use data from research on a sample of 213 call center employees. The focus of this research was to better understand how and why employees were burned out and what were the potential causes or triggers. 
 
 This work surveyed employees on several theoretically relevant managerial behaviors and psychological mediators. In the data are variables drawn from several scales of interest: 
 
@@ -251,7 +251,7 @@ As always with any regression-based analysis, it is important to begin by inspec
 
 The central question is: how well does our model's correlation matrix approximate the actual correlation matrix? If there is a close match, the model is good. If there is a discrepancy, then our model is missing information and needs refinement.
 
-As we saw in the lecture, path analysis is part of the set of techniques often termed ‘covariance modelling’. As the name implies the primary focus here is the relationships between variables, and less so the mean-structure of the variables (as in sum of squares). In fact, by default R first creates the correlation matrix of all the variables in the model, and the fit is based only on these values, plus the sample sizes (in early SEM software you typically had to provide the correlation matrix directly, rather than working with the raw data). So the correlations are what R is working with to compute the coefficients and model fit using Wright's tracing rules, as we saw in the lecture. Pretty neat.
+As we saw in the lecture, path analysis is part of the set of techniques often termed 'model-based' or ‘covariance modelling’. As the name implies the primary focus here is the relationships between variables, and less so the mean-structure of the variables (as in sum of squares). In fact, by default R first creates the correlation matrix of all the variables in the model, and the fit is based only on these values, plus the sample sizes (in early SEM software you typically had to provide the correlation matrix directly, rather than working with the raw data). So the correlations are what R is working with to compute the coefficients and model fit using Wright's tracing rules, as we saw in the lecture. Pretty neat.
 
 Let's quickly run the correlation matrix now for the variables:
 
@@ -327,7 +327,7 @@ total := ab+c
 
 Now we have set up the path model, we can fit it using the sem function. Before we do that though, one thing to note about the standard errors for the estimates.
 
-Standard errors in lavaan are by default estimated using maximum likelihood estimation. We saw MLE this last year when we introduced logistic regression as a method for estimating the line of best fit in the absence of residuals. The same logic applies in path analysis (and structural equation modeling more generally) because the input for path modeling is the covariance matrix, not the data. Therefore we have no residuals to estimate error with, we need another method and that method is MLE.
+Standard errors in lavaan are by default estimated using maximum likelihood estimation. We saw MLE last year when we introduced logistic regression as a method for estimating the line of best fit in the absence of residuals. The same logic applies in path analysis (and structural equation modeling more generally) because the input for path modeling is the covariance matrix, not the data. Therefore we have no residuals to estimate error with, we need another method and that method is MLE.
 
 Remember: we are using the correlations to estimate the paths, not the data (this is also why there are no intercepts reported in SEM, because unlike linear regression, the means are not used). With full information (i.e., no degrees of freedom), we can estimate the correlations perfectly. But when we remove information, as we will do later, our estimates will be wrong, how how wrong is the question.
 
@@ -424,7 +424,7 @@ This table outputs two thing that are of most interest:
 
 2. The bootstrap confidence intervals, listed under "ci.lower" and "ci.upper"
 
-Of most importance here, of course, is the bootstrap confidence interval for the indirect effect. We can see that with 5000 simulations, the 95% confidence interval for our indirect effect of .07 runs from .02 to .12. Crucially, this interval does not include a zero indirect effect and therefore we can reject the null hypothesis. A sense of disconnection with others at work does indeed mediate the relationship between manager control and exhaustion!
+Of most importance here, of course, is the bootstrap confidence interval for the indirect effect. We can see that with 100 simulations, the 95% confidence interval for our indirect effect of .07 runs from .02 to .12. Crucially, this interval does not include a zero indirect effect and therefore we can reject the null hypothesis. A sense of disconnection with others at work does indeed mediate the relationship between manager control and exhaustion!
 
 Of noting in this table is that double tilda ("~~") means the residual variances (i.e., error).
 
@@ -511,9 +511,9 @@ summary(over.model, fit.measures=TRUE, standardized=TRUE, ci=TRUE)
 
 In this output only paths a and b are tested in the path model. For this reason the b path and the indirect effect (ab) differs slightly to what was estimated in the just identified model.
 
-the lack of a c path also has other implications, namely that it cannot be used to estimate the correlations. So we must make do without it, meaning the model implied correlation matrix will differ from the actual correlation matrix: there will be discrepancy.
+The lack of a c path also has other implications, namely that it cannot be used to estimate the correlations. So we must make do without it, meaning the model implied correlation matrix will differ from the actual correlation matrix: there will be discrepancy.
 
-And this is why over identified models do not have perfect fit. CFI and TLI are below 1 and RMSEA and SRMR are above 0 The questions is: how far below 1 and above 0 are they? 
+And this is why over identified models do not have perfect fit. CFI and TLI are below 1 and RMSEA and SRMR are above 0. The question is: how far below 1 and above 0 are they? 
 
 Recall from the lecture and the information above that there are some rules for the assessment of adequate fit. Methodologies are notorious for disagreeing on these criteria, but there is general agreement that:
 
@@ -544,7 +544,7 @@ Let's now quickly call the parameter estimates for the test of that indirect eff
 parameterestimates(over.model, boot.ci.type = "perc", standardized = TRUE)
 ```
 
-We can see that with 5000 resamples, the 95% confidence interval for our indirect effect of .07 runs from .04 to .13. Again, this interval does not include a zero indirect effect and therefore we can reject the null hypothesis. A sense of disconnection with others at work does indeed mediate the relationship between manager control and exhaustion, even when we leave out the direct effect.
+We can see that with 100 resamples, the 95% confidence interval for our indirect effect of .07 runs from .04 to .13. Again, this interval does not include a zero indirect effect and therefore we can reject the null hypothesis. A sense of disconnection with others at work does indeed mediate the relationship between manager control and exhaustion, even when we leave out the direct effect.
 
 Lastly, it is always a good idea to call the R2 for each of the outcome variables in the model, to ascertain how much variance in our variables is explained by the model. We can do that with the lavInspect() function, requesting "rsquare". 
 
