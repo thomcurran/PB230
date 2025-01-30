@@ -616,10 +616,10 @@ And then lets fit those models:
 
 ```{r}
 # Fit the just identified model
-thirst.just.model.fit <- 
+
 
 # Fit the over identified model
-thirst.over.model.fit <- 
+
 ```
 
 
@@ -630,7 +630,6 @@ Now we've fit both models. Lets look at the just identified model first. To do t
 
 ```{r}
 # Summary of just identified model
-
 
 # Parameter estimates of just identified model
 
@@ -655,6 +654,7 @@ Lets now summarize and request the parameter estimates for the over identified m
 
 
 # Parameter estimates of over identified model
+
 
 ```
 
