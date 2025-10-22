@@ -1,0 +1,508 @@
+---
+title: "Exploratory and Confirmatory Factor Anaysis"
+output: html_notebook
+---
+
+# Preliminaries
+
+```{r}
+install.packages("corpcor")
+install.packages("GPArotation")
+install.packages("psych")
+install.packages("tidyverse")
+install.packages("lavaan")
+install.packages("semPlot")
+```
+
+
+```{r}
+library(corpcor)
+library(GPArotation)
+library(psych)
+library(tidyverse)
+library(lavaan)
+library(semPlot)
+```
+
+# The Scourge of Measurement Error
+
+Regression and related techniques (e.g. ANOVA) under the umbrella of the general linear model require us to assume that our measured variables are good indices of these underlying constructs, and that they are measured without any error.
+
+When outcomes are straightforward observed variables like height or weight, and where predictors are experimentally manipulated, then these assumptions are reasonable. However in many applied fields these are not reasonable assumptions to make.
+
+For example, to assume that depression or working memory are indexed in a straightforward way by responses to a depression questionnaire or performance on a laboratory task is naive. Self-reported instruments force participants to approximate and recall. Participants may read the questions wrong. Researchers may code responses incorrectly. In fact, there are a multitude of reasons why a persons score on a measured variable may not reflect the true score.
+
+Perfect measurement is rare to impossible – especially in psychology.
+
+# Measurement Theory
+
+Classic measurement theory says there are two portions of variance in measured variables:
+
+1. the ‘true score variance’, quantifying the actual construct of interest, and 
+
+2. the ‘error variance’, measuring the  variation due to imperfect measurement.
+
+Error variance places an upper limit on correlation because it is assumed to be irrelevant to the outcome. As such, measurement error attenuates relationships and biases findings.
+
+Measurement error can be quantified by the proportion of the ‘true score variance’ to the ‘total variance’, where the total variance is 1.
+
+The higher the reliability, the lower the error. We saw this last year when we looked at the reliability of our psychological measures
+
+![Reliability](https://i.postimg.cc/y8PZ2V9D/rel.png)
+
+There is, though, a better way to take into account measurement error than reliability. In classic measurement theory, reliability is considered as a subset of validity.
+
+When measurements have multiple indicators, each indicator will contain its own specific variance, but it will also contain variance common to the other indicators.
+
+It is this common variance that speaks to the ‘true’ construct of interest.
+
+![Validity](https://i.postimg.cc/0Njb37P4/vl.png)
+
+If we strip away the unique variance of a set of items, we are left with their common variance, which is necessarily measured without error.
+
+So by taking the common variance of a set of items we will be much closer to construct we are interested in (i.e., we have rid it of invalidity and unreliability).
+
+This common variance hence reflects the ‘true’ construct score. And because it is the true construct score, it is measured without error!
+
+How, then, to capture the common variance of items? With latent variables!
+
+We have noted that construct measurement has error variance, unique variance, and common variance.
+
+We can represent these sources of variance in a latent variable as such:
+
+![Latent Variable](https://i.postimg.cc/v8gWCpGG/laten.png)
+
+These are sometimes called factors or latent factors. Typically you will see them referred to as latent variables, though. The common variance of the items is captured in the latent (oval) variable. What is left, the residual of each item, captures the error variance.
+
+Two statistical methods are available to us in the analysis of measurement using latent variables.
+
+1. Exploratory Factor Analysis if the factor structure of the items is unknown
+
+2. Confirmatory Factor Analysis if the factor structure of the items is known
+
+Let's begin with Exploratory Factor Analysis
+
+# Exploratory Factor Analysis (EFA)
+
+## What is EFA?
+
+In psychology, we often try to measure things that cannot directly be measured. For example, management researchers might be interested in measuring ‘burnout’, which is when someone who has been working very hard on a project for a prolonged period of time suddenly finds themselves devoid of motivation and inspiration.
+
+You cannot measure burnout directly: it has many facets. However, you can measure different aspects of burnout. You could get some idea of motivation, stress levels, and so on. 
+
+Having done this, it would be helpful to know whether these differences really do reflect a single variable. Put another way, are these different variables driven by the same underlying variable?
+
+Factor analysis (and Principal Components Analysis) is a technique for identifying groups or clusters of variables for a pool of items.
+
+![Clusters of Items Refecting the Different Factors of Burnout](https://i.postimg.cc/50D84nnT/CFA-burn-3.jpg)
+
+EFA is an exploratory technique because it does not assume a factor structure for the items. It starts with the assumption of hidden latent variables which cannot be observed directly but are reflected in the answers the items in our questionnaire.
+
+In this way, EFA finds the most optimal factor structure from the underlying items.
+
+## What is a Factor?
+
+If we take several items on a questionnaire, the correlation between each pair of items can be arranged in what’s known as an R-matrix. An R-matrix is just a correlation matrix: a table of correlation coefficients between variables. 
+
+The diagonal elements of an R-matrix are all 1 because each variable will correlate perfectly with itself. The off-diagonal elements are the correlation coefficients between pairs of items. 
+
+The existence of clusters of large correlation coefficients between subsets of variables suggests that those variables could be measuring aspects of the same underlying dimension. These underlying dimensions are known as factors (or latent variables, same thing). 
+
+By reducing a data set from a items into a smaller set of factors, factor analysis achieves parsimony by explaining the maximum amount of common variance in a correlation matrix using the smallest number of explanatory constructs.
+
+In other words, factors are a small set of clusters of interrelated items that can explain most of the common variance. 
+
+## What is a Factor Loading?
+
+If we visualize factors as classification axes, then each variable can be plotted along with each classification axis. For example, two factors (e.g., “Sociability” and “Consideration”) can be plotted as a 2D graph, while six variables (e.g., “Selfish”) can be put at corresponding positions on the graph, as shown below. Such factor plot can be drawn after two factors have been extracted via techniques described in later section that best summarize the items into two clusters.
+
+![EFA](https://i.postimg.cc/7Z70b7fd/exp.png)
+
+A factor loading means the coordinate of a item along a classification axis for extracted factors. The factor loading can be thought of as the Pearson correlation between a factor and a variable. You know what that is!
+
+## What is communality?
+
+The total variance for a particular item, as we have seen, will have two components: some of it will be shared with other variables or measures (common variance) and some of it will be specific to that measure (unique variance). 
+
+We tend to use the term unique variance to refer to variance that can be reliably attributed to only one item. However, again as we know, there is also variance that is specific to one item but not reliably so. This variance is called error variance and is what is left after common variance and unique variance are subtracted out. 
+
+The proportion of common variance present in an item is known as the communality. As such, an item that has no unique or error variance would have a communality of 1, an item that shares none of its variance with any other variable would have a communality of 0.
+
+In factor analysis we are interested in finding common underlying dimensions within the data and so we are primarily interested only in the common variance. Therefore, when we run a factor analysis it is fundamental that we know how much of the variance present in our data is common variance.
+
+## How to Calculate Communality?
+
+There are various methods of estimating communalities, but the most widely used is to use the squared multiple correlation (SMC) of each variable with all others. So, for the popularity data, imagine you ran a multiple regression using one measure (Selfish) as the outcome and the other five measures as predictors: the resulting multiple R2 would be used as an estimate of the communality for the variable Selfish. This second approach is used in factor analysis.
+
+## Factor analysis vs. Principal Components Analysis (PCA)
+
+Strictly speaking, what we are working with in this unit is PCA not factor analysis. Factor analysis derives a mathematical model from which factors are estimated, whereas PCA merely decomposes the original data into a set of optimally weighted latent variables (much like multiple regression!)
+
+Because PCA is a perfectly good procedure and conceptually less complex than factor analysis, we are going to work with it here.
+
+PCA combines common and specific variance into explained variance. The total item variance is used in the positive diagonal of the observed correlation matrix before factor extraction. It finds components that maximize the amount of the total variance that is explained.  
+ 
+PCA aims to identify a new smaller set of latent variables, called principal components, that explain the total variance.  PCA assumes that this total variance reflects the sum of explained and error variance. Each principle component is a linear function of the original variables.
+
+For example, lets say we have 12 items for our new questionnaire, each are standardized with a sum of squares of 1. In total, our data set contains 12 items with 12 sum of squares.
+
+If we pool all the items into one factor, we explain half of the variance in the dataset (i.e., explained variance = 6 sum of squares, error variance = 6 sum of squares). If we were to split the items across two factors, we explain a further 4 sum of squares (i.e., explained variance = 10 sum of squares, error variance 2 sum of squares). If we further split the items across three factors we explain all the variance in the data set (i.e., explained variance = 12 sum of squares, error variance 0 sum of squares). The three factors can replace the 12 items without losing any information. This is goal of factor analysis
+
+However, it is rarely this simple. There will always be some error variance unless the number of factors extracted equals the number of items. So the question is: when to stop? When do we have a factor structure that most parsimoniously describes the interrelationships between the items?
+
+There are a variety of approaches to determine the number of factors to extract.  These include:
+
+1. The percentage of variance explained, e.g. stop at 75%
+
+2. A priori criterion, i.e., a decision is made to identify a	particular number of factors.
+
+3. Kaiser’s (1960) stopping rule.  Extract only factors wit	an eigenvalue of  1 or more. An eignenvalue is variance explained, the sum of squares for the factor.
+
+4. Inspect a Scree Plot for the critical inflection point (Cattell, 1958).
+
+We are going to use methods 3 and 4 because they are the more universally accepted.
+
+## Factor Rotation 
+
+Once factors have been extracted, it is possible to calculate the factor loading.
+
+Generally, you will find that most variables have high loadings on the most important factor and small loadings on all other factors. This characteristic makes interpretation difficult, and so a technique called factor rotation is used to discriminate between factors. If a factor is a classification axis along which variables can be plotted, then factor rotation effectively rotates these factor axes such that variables are loaded maximally on only one factor. 
+
+![Factor Rotation](https://i.postimg.cc/7hQFfhKt/12-Figure1-1-2.png)
+
+There are two types of rotation that can be done. The first is orthogonal rotation while the other is oblique rotation. The difference with oblique rotation is that the factors are allowed to correlate. We will use orthogonal rotation here, sometimes called varimax rotation.
+
+## Example: Anxiety Questionnaire
+
+The main usage of factor analysis is the psychological and behavioral scientists is to develop questionnaires. If we want to measure something, we need to ensure that the questions asked relate to the construct that we intend to measure.
+
+Below is the screen shot of a questionnaire of statistics anxiety (copied from the Andy Field's book):
+
+![Anxiety Questionnaire](https://i.postimg.cc/90nfCWZC/anxiety-questionnaire.png)
+
+The questionnaire was designed to predict how anxious a given individual would be about learning how to use R. What’s more, they wanted to know whether anxiety about R could be broken down into specific forms of anxiety. In other words, what latent variables contribute to anxiety about R?
+
+With a little help from a few lecturer friends the researcher collected 2571 completed questionnaires (at this point it should become apparent that this example is fictitious). We are going to work with this data today. 
+
+Lets load the data into R
+
+```{r}
+library(readr)
+anxiety <- read_csv("C:/Users/CURRANT/Dropbox/Work/LSE/PB230/LT3/Workshop/anxiety.csv")
+head(anxiety)
+```
+
+You will see that the dataset contains responses to 23 items regarding R anxiety. Great we can get started factor analyzing to see whether we can identify the optimal factor structure from the underlying items.
+
+## Reverse item 
+
+Item 3 is positively worded, so it first needs to be reversed. Let's do that now.
+
+```{r}
+anxiety$Q03 <- car::recode(anxiety$Q03, "1=5; 2=4; 3=3; 4=2; 5=1")
+```
+
+
+## Correlations Between Items
+
+The first thing to do when conducting a factor analysis or PCA is to look at the correlations of the variables. The correlations between variables can be checked using the cor() function to create a correlation matrix of all variables.
+
+There are essentially two potential problems:
+
+*1. Correlations are not high enough.* We can test this problem by visually scanning the correlation matrix and looking for correlations below about .3. If any variables have lots of correlations below this value then consider excluding them.
+
+*2. Correlations are too high.* For this problem, if you have reason to believe that the correlation matrix has multicollinearity then you could look through the correlation matrix for variables that correlate very highly (R > .8) and consider eliminating one of the variables (or more) before proceeding.
+
+Lets run-off the correlations now:
+
+```{r}
+anxiety.cor <-
+  anxiety %>%
+  select(2:24)
+cor.matrix <- cor(anxiety.cor)
+(round(cor.matrix, 2))
+```
+
+We can use this correlation matrix to check the pattern of relationships. First, scan the items for any that have all relationships below .30. Then, look to see if there are any correlations greater than .90. These items will need to be removed because they're correlations are too low for extraction (i.e., not related to any other item) or too high that they cannot be differentiated.
+
+In all, all items here seem to be fairly well correlated with none of the r values especially large. Therefore, we can proceed as is.
+
+## Factor Extraction (PCA)
+
+For our purposes we will use principal components analysis (PCA) to extract interrelated factors from the data. Principal component analysis is carried out using the principal() function in the psych package.
+
+
+```{r}
+pc1 <- principal(anxiety.cor, nfactors=23, rotate="none")
+as.matrix(pc1$loadings)
+```
+
+When we call the loading from this analysis, we have the loading matrix for each of the extracted factors. Because we have requested all possible factors here, the loading are unimportant for now. What is important is the SS loading (which means sum of squares or variance explained) by the extracted factors (listed PC for principal components). The critical value we are looking for here is 1 (Kaiser's stopping rule). As we can see, 4 factors have SS loading above one. This suggests that four factors best explain the interrelationships between items in our data. We can also inspect the scree plot:
+
+
+```{r}
+plot(pc1$values, type="b")
+```
+
+From the scree plot, we could find the point of inflection (around the third point to the left). The evidence from the scree plot and from the sum of squares loadings suggests a four-component solution may be the best.
+
+## Redo PCA
+
+Now that we know how many factors we want to extract, we can rerun the analysis, specifying that number. To do this, we use an identical command to the previous model but we change nfactors = 23 to be nfactors = 4 because we now want only four factors.
+
+```{r}
+pc2 <- principal(anxiety.cor, nfactors=4, rotate="none")
+as.matrix(pc2$loadings)
+```
+
+Now we are getting somewhere. We can see the factor loadings are more informative here. They reflect the correlation between the item and the factor. The SS loadings are as they were before but now we can interpret the proportion and cumulative variance rows, too. Here we see the variance explained by the factors. PC1 explains 32% of the item variance, PC2 explains 8% of the item variance, and so on. The cumulative variance is the overall variance from one factor to the next to the next.
+
+You will see that most items correlate with the first factor. Some items with the second, less with the third and even less with the fourth. This is to be expected given how PCA extracts factors without rotation. We can rotate the four factors into new positions and therefore optimize the loadings. Lets do that now using varimax rotation.
+
+## Rotation
+
+To rotate the factors we can set rotate="varimax" in the principal() function. There are many possible solutions and the varimax rotation optimizes for maximum variance explained. The print.psych() command prints the factor loading matrix associated with the rotated model, but displaying only loadings above .3 (cut = 0.3, because anything below is too low) and sorting items by the size of their loadings (sort = TRUE).
+
+
+```{r}
+pc3 <- principal(anxiety.cor, nfactors=4, rotate="varimax")
+print.psych(pc3, cut = 0.3, sort = TRUE)
+```
+
+h2 is the commonality, u2 is the error for each item. The factors loadings, again, are the correlations between the item and its factor. 
+
+According to the results and the questionnaires above, we could find the questions that load highly on factor 1 are Q6 (“I have little experience of computers”) with the highest loading of .80, Q18 (“R always crashes when I try to use it”), Q13 (“I worry I will cause irreparable damage …”), Q7 (“All computers hate me”), Q14 (“Computers have minds of their own …”), Q10 (“Computers are only for games”), and Q15 (“Computers are out to get me”) with the lowest loading of .46. All these items seem to relate to using computers or R. Therefore, we might label this factor fear of computers.
+
+Similarly, we might label the factor 2 as fear of statistics, factor 3 fear of mathematics, and factor 4 peer evaluation.
+
+## Reliability Analysis
+
+If you’re using factor analysis to validate a questionnaire, like we are here, as we saw last year it is useful to check the reliability of your scale.
+
+Reliability means that a measure (or in this case questionnaire) should consistently reflect the construct that it is measuring. One way to think of this is that, other things being equal, a person should get the same score on a questionnaire if they complete it at two different points in time.
+
+The simplest way to do this is with Cronbach's alpha. Thinking back to last year, Cronbach's alpha is loosely equivalent to splitting data in two in every possible way and computing the correlation coefficient for each split, and then compute the average of these values.
+
+Recall that we have four factors: fear of computers, fear of statistics, fear of mathematics, and peer evaluation. Each factor stands for several questions in the questionnaire. For example, fear of computers includes question 6, 7, 10, …, 18.
+
+
+```{r}
+computerFear<-anxiety.cor[, c(6, 7, 10, 13, 14, 15, 18)]
+statisticsFear <- anxiety.cor[, c(1, 3, 4, 5, 12, 16, 20, 21)]
+mathFear <- anxiety.cor[, c(8, 11, 17)]
+peerEvaluation <- anxiety.cor[, c(2, 9, 19, 22, 23)]
+```
+
+Reliability analysis is done with the alpha() function, which is found in the psych package.
+
+```{r}
+psych::alpha(computerFear)
+psych::alpha(statisticsFear)
+psych::alpha(mathFear)
+psych::alpha(peerEvaluation)
+```
+
+To reiterate, we’re looking for values in the range of .6 to .8 (or thereabouts) bearing in mind what we’ve already noted about effects from the number of items.
+
+Great, we have successfully conducted exploratory factor analysis and have reduced our questionnaire to four factors. Pretty neat.
+
+# Confirmatory Factor Analysis (CFA)
+
+We have just conducted EFA to find the most optimal underlying factor solution for our questionnaire items. That's great. But lets say we collected data again on this questionnaire. We now know that it has a four factor solution. How then do we check the measurement model to ensure that this four factor solution is good in our new dataset?
+
+Well, when we know the theoretical factor structure of a set of items, we can *confirm* its factor structure using something called confirmatory factor analysis.
+
+Confirmatory factor analysis (CFA) is a type of structural equation model, just like path analysis. But in this case we use latent variables, or factors, rather than measured (or averaged) variables. 
+
+## Latent Variables in CFA
+
+CFA, like EFA, uses the concept of a latent variable which is the cause of items we measure. So for instance, the items 8, 11, and 17 for the anxiety questionnaire are caused by an unobserved, latent, Math Fear variable. This is the process that we think is generating the data: items 8, 11, and 17 belong to Math Fear and should correlate more strongly with each other than they do with the rest of the items we have measured.
+
+CFA provides a mechanism to test these hypothesized patterns, which correspond to different models of the underlying process which generates the data.
+
+It is conventional within CFA to extend the graphical models used to describe path models that we looked at last week. In these diagrams, square edged boxes represent observed variables, and rounded or oval boxes represent latent variables, sometimes called factors:
+
+![CFA For Anxiety Data](https://i.postimg.cc/nLsXHPhx/cfa2.png)
+
+You can see here that I have constructed what is called a measurement model for the items in the anxiety questionnaire. This model is based on the factor analysis we just conducted. CFA is simply the way we test whether this model is a good fit to the data, does this factor structure correspond with the correlations between the items?
+
+Now hopefully you are beginning to see the symmetry between path analysis and CFA in terms of the structural equation model. When we say how well the model fit, what we are saying is does the covariance matrix for the model approximate the covariance matrix for the data. Just like we did last week. The principal is exactly the same!
+
+Only this time, we are testing a model with latent variables, which capture the common variances among the items. If the model fits well, that is to say the covariance matrices are more or less the same, then that is good evidence that the items indeed belong in their latent variable clusters. If the model does not fit well - there is a problem with our measurement.
+
+There is an important advantage of modeling variables this way: latent variables are measured without error. They contain the common variance of the items therefore do not contain any unique or error variance. We have solved the problem of imperfect measurement!
+
+## Building a CFA model
+
+To define our CFA model for the anxiety data we are going to use lavaan. As noted last week, to define models in lavaan you must specify the relationships between variables in a text format. A full guide to this lavaan model syntax is available on the lavaan project website.
+
+For CFA models, like path models, the format is fairly simple, and resembles a series of linear models, written over several lines.
+
+In the model below there are four latent variables, computer fear, statistics fear, math fear, and peer evaluation. The latent variable names are followed by =~ which means ‘is manifested by’, and then the observed variables, our items for the latent variable, are listed, separated by the + symbol.
+
+```{r}
+cfa.model <- "
+computerFear =~ 1*Q06 + Q07 + Q10 + Q13 + Q14 + Q15 + Q18
+statisticsFear=~ 1*Q01 + Q03 + Q04 + Q05 + Q12 + Q16 + Q20 + Q21
+mathFear =~ 1*Q08 + Q11 + Q17
+peerEvaluation =~ 1*Q02 + Q09 + Q19 + Q22 + Q23
+"
+```
+
+
+Note that we have saved our model specification in a variable named cfa.model. Just like last week for path analysis.
+
+The special symbols in the lavaan syntax used for latent varianbles in CFA models is =~ where the latent variable is listed before and the items listed after. 
+
+Also note that "*" fixes variables to a particular value. Here we adopt whats called the marker variable identification approach, where we fix the loading of one indicator in each latent to 1 in order to identify the model and give each latent factor a metric. 
+
+This will not change model fit, just some of the loadings in the model. Fixing to 1 makes it so that a one unit change in the latent factor is interpreted as a unit unit change in the scale of the item selected as the marker variable (the variable loading we fix to 1). Thats all I am doing here by setting the first item to 1*.
+
+## Testing the CFA Model
+
+To run the analysis we pass the model specification and the data to the cfa() function. Again, just like last week:
+
+```{r}
+# Fit the model
+cfa.fit <- cfa(cfa.model, data=anxiety.cor)
+summary(cfa.fit, fit.measures=TRUE, standardized=TRUE)
+```
+
+The output has four parts:
+
+Model fit. The extent to which the model implied covariance matrix approximates the observed covariance matrix
+
+Parameter estimates. The values in the first column are the unstandardised weights from the observed variables to the latent factors. The standardized wights are in the std.all column. We will inspect the standardized weights because they are analogous to factor loadings in EFA and they give us an interpretible metric for model diagnostics.
+
+Factor covariances. In CFA the factors are correlated with each other to account for the interrelation of the factors that make up the underlying data. These values are the covariances between the latent factors. The values in the std.all column are the correlation coefficients between the latent variables (standardized covariance)
+
+Error variances. These values are the estimates of each item's error variance (i.e., what is left over after the common variance has been subtracted out).
+
+What can we say from this output? Well, the CFI and TLI are our first areas of concern. They are below the .90 threshold that we discussed last week. The RMSEA and the SRMR look good though. Both are below .10.
+
+When we take a look at the standardized factor loadings for the latent variables, we see a few issues. There is one item here with low loading on its hypothesised factor (Q23 of Peer Evaluation; "If I am good at statistics, people will think I'm a nerd"). It had a standardised loading of 0.27. One rule of thumb is that factor loadings < .40 are weak and factor loadings > .60 are strong (Garson, 2010). This is a very weak loading so we should remove the item and respecify the model.
+
+```{r}
+# Model respecifcation removing Q23
+
+cfa.model2 <- "
+computerFear =~ Q06 + Q07 + Q10 + Q13 + Q14 + Q15 + Q18
+statisticsFear=~ Q01 + Q04 + Q05 + Q12 + Q16 + Q20 + Q21 + Q03
+mathFear =~ Q08 + Q11 + Q17
+peerEvaluation =~ Q02 + Q09 + Q19 + Q22
+"
+
+# Fit the respecified model
+
+cfa.fit2 <- cfa(cfa.model2, data=anxiety.cor)
+summary(cfa.fit2, fit.measures=TRUE, standardized=TRUE)
+```
+
+Now we have CFI = .90, TLI .88, RMSEA = .06, and SRMR = .05. As well, all standardised factor loadings are > .40. That's pretty good! Our anxiety questionnaire has successfully passed the EFA and CFA with four factors that fit the data adequately from the initial pool of 23 item items. Lets visualize that model with semPlot plotting the standardized factor loadings and covariances (correlations):
+
+```{r}
+semPaths(cfa.fit2, "std")
+```
+
+We are done!
+
+# Activity: Holzinger and Swineford Factor Analysis
+
+The classic Holzinger and Swineford (1939) study of mental ability consists of mental ability test scores of seventh- and eighth-grade children from two different schools (Pasteur and Grant-White). 
+
+In the original dataset, there are scores for 26 tests. However, a smaller subset with 9 variables is more widely used in the literature (for example in Joreskog's 1969 paper, which also uses the 145 subjects from the Grant-White school only). These mental abilities are:
+
+x1
+Visual perception
+
+x2
+Cubes
+
+x3
+Lozenges
+
+x4
+Paragraph comprehension
+
+x5
+Sentence completion
+
+x6
+Word meaning
+
+x7
+Speeded addition
+
+x8
+Speeded counting of dots
+
+x9
+Speeded discrimination straight and curved capitals
+
+Holzinger and Swineford thought that these abilities could be condensed into three latent abilities for visual skill, writing skill, and math skill:
+
+
+Visual skill was hypothesized as a combination of x1, x2, and x3
+
+Writing skill was hypothesized as a combination of x4, x5, and x6
+
+Math skill was hypothesized as a combination of x7, x8, and x9
+
+The CFA model looks like this:
+
+![Holzinger and Swineford Model of Mental Ability](https://i.postimg.cc/8zRyZZS1/cfa3.png)
+
+## Load data
+
+Luckily, the Holzinger and Swineford dataset is a practice dataset contained in the lavaan package for CFA, so we don't need to load it from the computer, we can load it from the package. Lets do that now:
+
+
+```{r}
+mental <- lavaan::HolzingerSwineford1939
+head(mental)
+```
+
+You can see we have some demographic information and then the items that we are going to run CFA with to confirm the factor structure hypothesised by Holzinger and Swineford.
+
+Lets do that now.
+
+## Build the CFA model
+
+Write the script to build the model for three latent variables: visual, writing, and math. Dont forget to specify the latent variables with "=~". Save the model object as "mental.model"
+
+```{r}
+
+```
+
+## Fit the CFA Model
+
+Now write the code to fit the CFA model to the data and save it as a new object called "mental.fit". Then request the summary estimates:
+
+```{r}
+# Fit the CFA model
+
+
+# Summarise the fit
+
+
+```
+
+Summarize the key fit indexes for this model. Are they indicative of adequate fit?
+
+Do the items loading well on their respective latent variables?
+
+How are the factors correlated with each other?
+
+## Visulaise the CFA
+
+Finally, write the code to visualize the CFA model with the standardised estimates plotted. Don't forget to use semPaths
+
+```{r}
+
+```
+
+Nice job!
+
+
+--
+This post covers my notes of Exploratory Factor Analysis which draw some help from the book “Discovering Statistics using R (2012)” by Andy Field. Some code and text come from the book. For those parts, credit goes to him.

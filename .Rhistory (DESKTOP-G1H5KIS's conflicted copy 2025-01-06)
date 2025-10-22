@@ -1,0 +1,512 @@
+mutate(meanvig = mean(c(vig1,vig2,vig3,vig4), na.rm = TRUE)) %>%
+mutate(meanent = mean(c(ent1,ent2,ent3,ent4), na.rm = TRUE))
+data_var
+# Task
+data_var <- within(data_var, task1 <- ifelse(is.na(task1), meantask, task1)) # if (ifelse) task1 is missing (is.na) then replace with meantask, else use task1
+data_var <- within(data_var, task2 <- ifelse(is.na(task2), meantask, task2))
+data_var <- within(data_var, task3 <- ifelse(is.na(task3), meantask, task3))
+data_var <- within(data_var, task4 <- ifelse(is.na(task4), meantask, task4))
+data_var <- within(data_var, task5 <- ifelse(is.na(task5), meantask, task5))
+data_var <- within(data_var, task6 <- ifelse(is.na(task6), meantask, task6))
+# Ego
+data_var <- within(data_var, ego1 <- ifelse(is.na(ego1), meantask, ego1))
+data_var <- within(data_var, ego2 <- ifelse(is.na(ego2), meantask, ego2))
+data_var <- within(data_var, ego3 <- ifelse(is.na(ego3), meantask, ego3))
+data_var <- within(data_var, ego4 <- ifelse(is.na(ego4), meantask, ego4))
+data_var <- within(data_var, ego5 <- ifelse(is.na(ego5), meantask, ego5))
+# Confidence
+data_var <- within(data_var, conf1 <- ifelse(is.na(conf1), meantask, conf1))
+data_var <- within(data_var, conf4 <- ifelse(is.na(conf4), meantask, conf4))
+# Dedication
+data_var <- within(data_var, ded1 <- ifelse(is.na(ded1), meantask, ded1))
+data_var <- within(data_var, ded3 <- ifelse(is.na(ded3), meantask, ded3))
+data_var <- within(data_var, ded4 <- ifelse(is.na(ded4), meantask, ded4))
+# Vigor
+data_var <- within(data_var, vig1 <- ifelse(is.na(vig1), meantask, vig1))
+data_var <- within(data_var, vig2 <- ifelse(is.na(vig2), meantask, vig2))
+data_var <- within(data_var, vig3 <- ifelse(is.na(vig3), meantask, vig3))
+data_var <- within(data_var, vig4 <- ifelse(is.na(vig4), meantask, vig4))
+# Enthusiasm
+data_var <- within(data_var, ent1 <- ifelse(is.na(ent1), meantask, ent1))
+data_var <- within(data_var, ent2 <- ifelse(is.na(ent2), meantask, ent2))
+data_var <- within(data_var, ent3 <- ifelse(is.na(ent3), meantask, ent3))
+data_var <- within(data_var, ent4 <- ifelse(is.na(ent4), meantask, ent4))
+data_var
+md.pattern(data_var)
+data_var <-
+data_var %>%
+rowwise()%>%
+mutate(meanego = mean(c(ego1,ego2,ego3,ego4,ego5,ego6))) %>%
+mutate(meantask = mean(c(task1,task2,task3,task4,task5,task6,task7))) %>%
+mutate(meanconf = mean(c(conf1,conf2,conf3,conf4))) %>%
+mutate(meanded = mean(c(ded1,ded2,ded3,ded4))) %>%
+mutate(meanvig = mean(c(vig1,vig2,vig3,vig4))) %>%
+mutate(meanent = mean(c(ent1,ent2,ent3,ent4))) %>%
+mutate(meaneng = mean(c(meanded,meanvig,meanent,meanconf))) # create mean enagaement variable "meaneng"
+data_var
+# Standardize variables
+data_var$zego <- scale(data_var$meanego)
+data_var$ztask <- scale(data_var$meantask)
+data_var$zeng <- scale(data_var$meaneng)
+# Remove ego outliers
+data_var <-
+data_var %>%
+filter(zego >= -3.30 & zego <= 3.30)
+data_var
+# Remove task outliers
+data_var <-
+data_var %>%
+filter(ztask >= -3.30 & ztask <= 3.30)
+data_var
+# Remove engagement outliers
+data_var <-
+data_var %>%
+filter(zeng >= -3.30 & zeng <= 3.30)
+data_var
+linear.model <- lm(task1 ~ meantask + meanego + meaneng, data=data_var) # build linear model with focial variables as predictors
+data_var$res  <- data_var$task1 - predict(linear.model) # save residuals
+data_var$mahal <- MoE_mahala(linear.model, data_var$res)
+data_var # calculate mahalanobis distances from the residuals and save them in the dataset as new variable mahal
+summary(linear.model)
+# Remove multivariate outliers
+data_var <-
+data_var %>%
+filter(mahal <= 16.28)
+data_var
+describe(data_var)
+main.model <- lm(meaneng ~ meantask + meanego, data=data_var)
+summary(main.model)
+data_MI <-
+data %>%
+rowwise()%>%
+mutate(meanego = mean(c(ego1,ego2,ego3,ego4,ego5,ego6), na.rm = FALSE)) %>%
+mutate(meantask = mean(c(task1,task2,task3,task4,task5,task6,task7), na.rm = FALSE)) %>%
+mutate(meanconf = mean(c(conf1,conf2,conf3,conf4), na.rm = FALSE)) %>%
+mutate(meanded = mean(c(ded1,ded2,ded3,ded4), na.rm = FALSE)) %>%
+mutate(meanvig = mean(c(vig1,vig2,vig3,vig4), na.rm = FALSE)) %>%
+mutate(meanent = mean(c(ent1,ent2,ent3,ent4), na.rm = FALSE)) %>%
+mutate(meaneng = mean(c(meanded,meanconf,meanvig,meanent), na.rm = FALSE))
+data_MI
+data_MI <-
+data_MI %>%
+select(meaneng,meantask,meanego)
+data_MI
+md.pattern(data_MI)
+aggr(data_MI, col=c('white','red'), numbers=TRUE, sortVars=TRUE, cex.axis=.7, gap=3, ylab=c("Percentage of missing data","Missing Data Pattern"))
+out <- TestMCARNormality(data_MI, del.lesscases = 1)
+summary(out)
+imp <- mice(data_MI, m=5, maxit=10, method="pmm")
+imp
+complete(imp, action = "long", include = TRUE)
+res.mi.cor <- micombine.cor(mi.res=imp, variables = c(1:3) )
+res.mi.cor
+fit <- with(data=imp,exp=lm(meaneng ~ meantask + meanego)) # fit the linear model with the imputed dataset
+lin.pool <- pool(fit) # pool the estimates across the multiple imputations
+summary(lin.pool) # output
+mi.anova(mi.res=imp, formula="meaneng ~ meantask + meanego")
+library(readr)
+activity <- read_csv("MT4/Workshop/activity.csv")
+View(activity)
+describe(activity)
+vis_miss(data_var)
+vis_miss(activity)
+vis_miss(activity)
+out.MCAR.ws1 <- TestMCARNormality(activity, del.lesscases = 1)
+summary(out.MCAR.ws1)
+vis_miss(activity)
+out.MCAR.ws1 <- TestMCARNormality(activity, del.lesscases = 1)
+summary(out.MCAR.ws1)
+activity$na_count <- apply(is.na(activity), 1, sum)
+activity
+vis_miss(activity)
+out.MCAR.ws1 <- TestMCARNormality(activity, del.lesscases = 1)
+vis_miss(activity)
+#out.MCAR.ws1 <- TestMCARNormality(activity, del.lesscases = 1)
+summary(out.MCAR.ws1)
+activity$na_count <- apply(is.na(activity), 1, sum)
+activity
+activity <-
+activity %>%
+filter(na_count <= "2")
+activity
+activity <-
+activity %>%
+rowwise()%>%
+mutate(meanaut = mean(c(AutSup1,AutSup2,AutSup3,AutSup4,AutSup5), na.rm = TRUE)) %>%
+mutate(meancon = mean(c(CON1,CON2,CON3,CON4), na.rm = TRUE)) %>%
+mutate(meanex = mean(c(EX1,EX2,EX3,EX4,EX5), na.rm = TRUE)) %>%
+activity
+activity <-
+activity %>%
+rowwise()%>%
+mutate(meanaut = mean(c(AutSup1,AutSup2,AutSup3,AutSup4,AutSup5), na.rm = TRUE)) %>%
+mutate(meancon = mean(c(CON1,CON2,CON3,CON4), na.rm = TRUE)) %>%
+mutate(meanex = mean(c(EX1,EX2,EX3,EX4,EX5), na.rm = TRUE))
+activity
+# Task
+activity <- within(activity, AutSup1 <- ifelse(is.na(AutSup1), meanaut, AutSup1))
+activity <- within(activity, AutSup2 <- ifelse(is.na(AutSup2), meanaut, AutSup2))
+activity <- within(activity, AutSup3 <- ifelse(is.na(AutSup3), meanaut, AutSup3))
+activity <- within(activity, AutSup4 <- ifelse(is.na(AutSup4), meanaut, AutSup4))
+activity <- within(activity, AutSup5 <- ifelse(is.na(AutSup5), meanaut, AutSup5))
+# Ego
+activity <- within(activity, CON1 <- ifelse(is.na(CON1), meanaut, CON1))
+activity <- within(activity, CON2 <- ifelse(is.na(CON2), meanaut, CON2))
+activity <- within(activity, CON3 <- ifelse(is.na(CON3), meanaut, CON3))
+activity <- within(activity, CON4 <- ifelse(is.na(CON4), meanaut, CON4))
+# ex
+activity <- within(activity, EX1 <- ifelse(is.na(EX1), meanaut, EX1))
+activity <- within(activity, EX2 <- ifelse(is.na(EX2), meanaut, EX2))
+activity <- within(activity, EX3 <- ifelse(is.na(EX3), meanaut, EX3))
+activity <- within(activity, EX4 <- ifelse(is.na(EX4), meanaut, EX4))
+activity <- within(activity, EX5 <- ifelse(is.na(EX5), meanaut, EX5))
+# Task
+activity <- within(activity, AutSup1 <- ifelse(is.na(AutSup1), meanaut, AutSup1))
+activity <- within(activity, AutSup2 <- ifelse(is.na(AutSup2), meanaut, AutSup2))
+activity <- within(activity, AutSup3 <- ifelse(is.na(AutSup3), meanaut, AutSup3))
+activity <- within(activity, AutSup4 <- ifelse(is.na(AutSup4), meanaut, AutSup4))
+activity <- within(activity, AutSup5 <- ifelse(is.na(AutSup5), meanaut, AutSup5))
+# Ego
+activity <- within(activity, CON1 <- ifelse(is.na(CON1), meanaut, CON1))
+activity <- within(activity, CON2 <- ifelse(is.na(CON2), meanaut, CON2))
+activity <- within(activity, CON3 <- ifelse(is.na(CON3), meanaut, CON3))
+activity <- within(activity, CON4 <- ifelse(is.na(CON4), meanaut, CON4))
+# ex
+activity <- within(activity, EX1 <- ifelse(is.na(EX1), meanaut, EX1))
+activity <- within(activity, EX2 <- ifelse(is.na(EX2), meanaut, EX2))
+activity <- within(activity, EX3 <- ifelse(is.na(EX3), meanaut, EX3))
+activity <- within(activity, EX4 <- ifelse(is.na(EX4), meanaut, EX4))
+activity <- within(activity, EX5 <- ifelse(is.na(EX5), meanaut, EX5))
+vis_miss(activity)
+# Task
+activity <- within(activity, AutSup1 <- ifelse(is.na(AutSup1), meanaut, AutSup1))
+activity <- within(activity, AutSup2 <- ifelse(is.na(AutSup2), meanaut, AutSup2))
+activity <- within(activity, AutSup3 <- ifelse(is.na(AutSup3), meanaut, AutSup3))
+activity <- within(activity, AutSup4 <- ifelse(is.na(AutSup4), meanaut, AutSup4))
+activity <- within(activity, AutSup5 <- ifelse(is.na(AutSup5), meanaut, AutSup5))
+# Ego
+activity <- within(activity, CON1 <- ifelse(is.na(CON1), meanaut, CON1))
+activity <- within(activity, CON2 <- ifelse(is.na(CON2), meanaut, CON2))
+activity <- within(activity, CON3 <- ifelse(is.na(CON3), meanaut, CON3))
+activity <- within(activity, CON4 <- ifelse(is.na(CON4), meanaut, CON4))
+# ex
+activity <- within(activity, EX1 <- ifelse(is.na(EX1), meanaut, EX1))
+activity <- within(activity, EX2 <- ifelse(is.na(EX2), meanaut, EX2))
+activity <- within(activity, EX3 <- ifelse(is.na(EX3), meanaut, EX3))
+activity <- within(activity, EX4 <- ifelse(is.na(EX4), meanaut, EX4))
+activity <- within(activity, EX5 <- ifelse(is.na(EX5), meanaut, EX5))
+activity <-
+activity %>%
+rowwise()%>%
+mutate(meanaut = mean(c(AutSup1,AutSup2,AutSup3,AutSup4,AutSup5), na.rm = TRUE)) %>%
+mutate(meancon = mean(c(CON1,CON2,CON3,CON4), na.rm = TRUE)) %>%
+mutate(meanex = mean(c(EX1,EX2,EX3,EX4,EX5), na.rm = TRUE))
+activity
+vis_miss(activity)
+# Standardize variables
+activity$zaut <- scale(activity$meanaut)
+activity$zcon <- scale(activity$meancon)
+activity$zex <- scale(activity$meanex)
+# Remove ego outliers
+activity <-
+activity %>%
+filter(zaut >= -3.30 & zaut <= 3.30)
+activity <-
+activity %>%
+filter(zcon >= -3.30 & zcon <= 3.30)
+activity <-
+activity %>%
+filter(zex >= -3.30 & zex <= 3.30)
+linear.model2 <- lm(AutSup1 ~ meanaut + meancon + meanex, data=activity) # build linear model with focial variables as predictors
+activity$res  <- activity$AutSup1 - predict(linear.model2) # save residuals
+activity$mahal <- MoE_mahala(linear.model1, activity$res)
+linear.model2 <- lm(AutSup1 ~ meanaut + meancon + meanex, data=activity) # build linear model with focial variables as predictors
+activity$res  <- activity$AutSup1 - predict(linear.model2) # save residuals
+activity$mahal <- MoE_mahala(linear.model2, activity$res)
+linear.model2 <- lm(AutSup1 ~ meanaut + meancon + meanex, data=activity) # build linear model with focial variables as predictors
+activity$res  <- activity$AutSup1 - predict(linear.model2) # save residuals
+activity$mahal <- MoE_mahala(linear.model2, activity$res)
+# 16.26 = p .001
+activity <-
+activity %>%
+filter(mahal <= 16.27)
+data_var
+main.model2 <- lm(meanex ~ meanaut + meancon, data=activity)
+summary(main.model2)
+data_var$na_count <- apply(is.na(data_var), 1, sum)
+data_var
+data_var <-
+data_var %>%
+filter(na_count <= "3")
+data_var
+data_var <-
+data_var %>%
+rowwise()%>%
+mutate(meanego = mean(c(ego1,ego2,ego3,ego4,ego5,ego6), na.rm = TRUE)) %>%
+mutate(meantask = mean(c(task1,task2,task3,task4,task5,task6,task7), na.rm = TRUE)) %>%
+mutate(meanconf = mean(c(conf1,conf2,conf3,conf4), na.rm = TRUE)) %>%
+mutate(meanded = mean(c(ded1,ded2,ded3,ded4), na.rm = TRUE)) %>%
+mutate(meanvig = mean(c(vig1,vig2,vig3,vig4), na.rm = TRUE)) %>%
+mutate(meanent = mean(c(ent1,ent2,ent3,ent4), na.rm = TRUE))
+data_var
+# Task
+data_var <- within(data_var, task1 <- ifelse(is.na(task1), meantask, task1)) # if (ifelse) task1 is missing (is.na) then replace with meantask, else use task1
+data_var <- within(data_var, task2 <- ifelse(is.na(task2), meantask, task2))
+data_var <- within(data_var, task3 <- ifelse(is.na(task3), meantask, task3))
+data_var <- within(data_var, task4 <- ifelse(is.na(task4), meantask, task4))
+data_var <- within(data_var, task5 <- ifelse(is.na(task5), meantask, task5))
+data_var <- within(data_var, task6 <- ifelse(is.na(task6), meantask, task6))
+# Ego
+data_var <- within(data_var, ego1 <- ifelse(is.na(ego1), meantask, ego1))
+data_var <- within(data_var, ego2 <- ifelse(is.na(ego2), meantask, ego2))
+data_var <- within(data_var, ego3 <- ifelse(is.na(ego3), meantask, ego3))
+data_var <- within(data_var, ego4 <- ifelse(is.na(ego4), meantask, ego4))
+data_var <- within(data_var, ego5 <- ifelse(is.na(ego5), meantask, ego5))
+# Confidence
+data_var <- within(data_var, conf1 <- ifelse(is.na(conf1), meantask, conf1))
+data_var <- within(data_var, conf4 <- ifelse(is.na(conf4), meantask, conf4))
+# Dedication
+data_var <- within(data_var, ded1 <- ifelse(is.na(ded1), meantask, ded1))
+data_var <- within(data_var, ded3 <- ifelse(is.na(ded3), meantask, ded3))
+data_var <- within(data_var, ded4 <- ifelse(is.na(ded4), meantask, ded4))
+# Vigor
+data_var <- within(data_var, vig1 <- ifelse(is.na(vig1), meantask, vig1))
+data_var <- within(data_var, vig2 <- ifelse(is.na(vig2), meantask, vig2))
+data_var <- within(data_var, vig3 <- ifelse(is.na(vig3), meantask, vig3))
+data_var <- within(data_var, vig4 <- ifelse(is.na(vig4), meantask, vig4))
+# Enthusiasm
+data_var <- within(data_var, ent1 <- ifelse(is.na(ent1), meantask, ent1))
+data_var <- within(data_var, ent2 <- ifelse(is.na(ent2), meantask, ent2))
+data_var <- within(data_var, ent3 <- ifelse(is.na(ent3), meantask, ent3))
+data_var <- within(data_var, ent4 <- ifelse(is.na(ent4), meantask, ent4))
+data_var
+grp1 <- rnorm(20,mean=17,sd=3)
+grp2 <- rnorm(20,mean=15,sd=3)
+grp3 <- rnorm(20,mean=12, sd=3)
+grp1[grp1 > 20] <- 20
+grp1[grp1 < 0] <- 0
+grp2[grp2 > 20] <- 20
+grp2[grp2 < 0] <- 0
+grp3[grp3 > 20] <- 20
+grp3[grp3 < 0] <- 0
+mean(grp1)
+mean(grp2)
+mean(grp3)
+anova <- data.frame(grp1=grp1, grp2=grp2, grp3=grp3)
+anova <- gather(anova, key=condition, value=words, grp1, grp2, grp3)
+prescription <- rnorm(48, mean = 1.15, sd = 0.11)
+prescription[prescription > 4] <- 4
+prescription[prescription < -4] <- -4
+mean(prescription)
+write.csv(prescription, "C:/Users/CURRANT/Dropbox/Work/LSE/PB230/MT5/Workshop/onesamplet.csv") # Remember to insert the correct file location for your compendium
+day1<-rnorm(20, mean = 20, sd = 5)
+day2<-rnorm(20, mean = 30, sd = 5)
+day1[day1<0]<-0
+day2[day2<0]<-0
+mean(day1)
+mean(day2)
+pairedt <- data.frame(ID=1:20, day1 = day1, day2 = day2)
+pairedt
+write.csv(pairedt, "C:/Users/CURRANT/Dropbox/Work/LSE/PB230/MT5/Workshop/pairedt.csv") # Remember to insert the correct file location for your compendium
+cheater <- rnorm(75, mean = 4.88, sd = 1.38)
+cheating <- rnorm(75, mean = 5.49, sd = 1.25)
+cheater[cheater > 10] <- 10
+cheater[cheater < 0] <- 0
+cheating[cheating > 10] <- 10
+cheating[cheating < 0] <- 0
+mean(cheater)
+mean(cheating)
+library(tidyverse)
+indt <- data.frame(cheater=cheater, cheating=cheating)
+indt <- gather(indt, key=condition, value=heads, cheater, cheating)
+indt
+write.csv(indt, "C:/Users/CURRANT/Dropbox/Work/LSE/PB230/MT5/Workshop/indt.csv") # Remember to insert the correct file location for your compendium
+grp1 <- rnorm(20,mean=17,sd=3)
+grp2 <- rnorm(20,mean=15,sd=3)
+grp3 <- rnorm(20,mean=12, sd=3)
+grp1[grp1 > 20] <- 20
+grp1[grp1 < 0] <- 0
+grp2[grp2 > 20] <- 20
+grp2[grp2 < 0] <- 0
+grp3[grp3 > 20] <- 20
+grp3[grp3 < 0] <- 0
+mean(grp1)
+mean(grp2)
+mean(grp3)
+anova <- data.frame(grp1=grp1, grp2=grp2, grp3=grp3)
+anova <- gather(anova, key=condition, value=words, grp1, grp2, grp3)
+anova
+prescription <- rnorm(48, mean = 1.15, sd = 0.11)
+prescription[prescription > 4] <- 4
+prescription[prescription < -4] <- -4
+mean(prescription)
+write.csv(prescription, "C:/Users/CURRANT/Dropbox/Work/LSE/PB230/MT5/Workshop/onesamplet.csv") # Remember to insert the correct file location for your compendium
+day1<-rnorm(20, mean = 20, sd = 5)
+day2<-rnorm(20, mean = 30, sd = 5)
+day1[day1<0]<-0
+day2[day2<0]<-0
+mean(day1)
+mean(day2)
+pairedt <- data.frame(ID=1:20, day1 = day1, day2 = day2)
+pairedt
+write.csv(pairedt, "C:/Users/CURRANT/Dropbox/Work/LSE/PB230/MT5/Workshop/pairedt.csv") # Remember to insert the correct file location for your compendium
+cheater <- rnorm(75, mean = 4.88, sd = 1.38)
+cheating <- rnorm(75, mean = 5.49, sd = 1.25)
+cheater[cheater > 10] <- 10
+cheater[cheater < 0] <- 0
+cheating[cheating > 10] <- 10
+cheating[cheating < 0] <- 0
+mean(cheater)
+mean(cheating)
+library(tidyverse)
+indt <- data.frame(cheater=cheater, cheating=cheating)
+indt <- gather(indt, key=condition, value=heads, cheater, cheating)
+indt
+write.csv(indt, "C:/Users/CURRANT/Dropbox/Work/LSE/PB230/MT5/Workshop/indt.csv") # Remember to insert the correct file location for your compendium
+grp1 <- rnorm(20,mean=17,sd=3)
+grp2 <- rnorm(20,mean=15,sd=3)
+grp3 <- rnorm(20,mean=12, sd=3)
+grp1[grp1 > 20] <- 20
+grp1[grp1 < 0] <- 0
+grp2[grp2 > 20] <- 20
+grp2[grp2 < 0] <- 0
+grp3[grp3 > 20] <- 20
+grp3[grp3 < 0] <- 0
+mean(grp1)
+mean(grp2)
+mean(grp3)
+anova <- data.frame(grp1=grp1, grp2=grp2, grp3=grp3)
+anova <- gather(anova, key=condition, value=words, grp1, grp2, grp3)
+anova
+write.csv(anova, "C:/Users/CURRANT/Dropbox/Work/LSE/PB230/MT5/Workshop/anova.csv") # Remember to insert the correct file location for your compendium
+ID <- 1:260
+mastery <- rnorm(260,mean =3.99, sd = 0.67)
+performance <- rnorm(260, mean = 2.36, sd= 0.55)
+b0 <- 1.15
+b1 <- .69
+b2 <- .18
+sigma <- 1.4 # this is for the random error in the model
+eps <- rnorm(ID,0,sigma)
+confidence <- b0 + b1*mastery  + b2*performance + eps # this is the linear model equation with the study beta values multiplied by the simulated data to give the criterion variable
+reg <- data.frame(ID=ID, mastery=mastery, performance=performance, confidence=confidence)
+reg
+write.csv(reg, "C:/Users/CURRANT/Dropbox/Work/LSE/PB230/MT5/Workshop/reg.csv") # Remember to insert the correct file location for your compendium
+library(readr)
+activity <- read_csv("MT4/Workshop/activity.csv")
+View(activity)
+library(psych)
+library(naniar)
+library(sjlabelled)
+library(tidyverse)
+library(mice)
+library(VIM)
+library(MissMech)
+library(mice)
+library(MoEClust)
+library(miceadds)
+vis_miss(activity)
+out.MCAR.ws1 <- TestMCARNormality(activity, del.lesscases = 1)
+summary(out.MCAR.ws1)
+activity$na_count <- apply(is.na(activity), 1, sum)
+activity
+activity <-
+activity %>%
+filter(na_count <= "2")
+activity
+out.MCAR.ws1 <- TestMCARNormality(activity, del.lesscases = 1)
+vis_miss(activity)
+out.MCAR.ws1 <- TestMCARNormality(activity, del.lesscases = 1)
+out.MCAR.ws1 <- TestMCARNormality(activity, del.lesscases = 1)
+vis_miss(activity)
+out.MCAR.ws1 <- TestMCARNormality(activity, del.lesscases = 1)
+activity <- read_csv("MT4/Workshop/activity.csv")
+library(readr)
+activity <- read_csv("MT4/Workshop/activity.csv")
+View(activity)
+describe(activity)
+out.MCAR.ws1 <- TestMCARNormality(activity, del.lesscases = 1)
+summary(out.MCAR.ws1)
+library(readr)
+activity <- read_csv("MT4/Workshop/activity.csv")
+View(activity)
+describe(activity)
+vis_miss(activity)
+out.MCAR.ws1 <- TestMCARNormality(activity, del.lesscases = 1)
+summary(out.MCAR.ws1)
+activity$na_count <- apply(is.na(activity), 1, sum)
+activity
+activity <-
+activity %>%
+filter(na_count <= "2")
+activity
+activity <-
+activity %>%
+rowwise()%>%
+mutate(meanaut = mean(c(AutSup1,AutSup2,AutSup3,AutSup4,AutSup5), na.rm = TRUE)) %>%
+mutate(meancon = mean(c(CON1,CON2,CON3,CON4), na.rm = TRUE)) %>%
+mutate(meanex = mean(c(EX1,EX2,EX3,EX4,EX5), na.rm = TRUE))
+activity
+# Task
+activity <- within(activity, AutSup1 <- ifelse(is.na(AutSup1), meanaut, AutSup1))
+activity <- within(activity, AutSup2 <- ifelse(is.na(AutSup2), meanaut, AutSup2))
+activity <- within(activity, AutSup3 <- ifelse(is.na(AutSup3), meanaut, AutSup3))
+activity <- within(activity, AutSup4 <- ifelse(is.na(AutSup4), meanaut, AutSup4))
+activity <- within(activity, AutSup5 <- ifelse(is.na(AutSup5), meanaut, AutSup5))
+# Ego
+activity <- within(activity, CON1 <- ifelse(is.na(CON1), meanaut, CON1))
+activity <- within(activity, CON2 <- ifelse(is.na(CON2), meanaut, CON2))
+activity <- within(activity, CON3 <- ifelse(is.na(CON3), meanaut, CON3))
+activity <- within(activity, CON4 <- ifelse(is.na(CON4), meanaut, CON4))
+# ex
+activity <- within(activity, EX1 <- ifelse(is.na(EX1), meanaut, EX1))
+activity <- within(activity, EX2 <- ifelse(is.na(EX2), meanaut, EX2))
+activity <- within(activity, EX3 <- ifelse(is.na(EX3), meanaut, EX3))
+activity <- within(activity, EX4 <- ifelse(is.na(EX4), meanaut, EX4))
+activity <- within(activity, EX5 <- ifelse(is.na(EX5), meanaut, EX5))
+activity <-
+activity %>%
+rowwise()%>%
+mutate(meanaut = mean(c(AutSup1,AutSup2,AutSup3,AutSup4,AutSup5), na.rm = TRUE)) %>%
+mutate(meancon = mean(c(CON1,CON2,CON3,CON4), na.rm = TRUE)) %>%
+mutate(meanex = mean(c(EX1,EX2,EX3,EX4,EX5), na.rm = TRUE))
+activity
+vis_miss(activity)
+# Standardize variables
+activity$zaut <- scale(activity$meanaut)
+activity$zcon <- scale(activity$meancon)
+activity$zex <- scale(activity$meanex)
+# Remove ego outliers
+activity <-
+activity %>%
+filter(zaut >= -3.30 & zaut <= 3.30)
+activity <-
+activity %>%
+filter(zcon >= -3.30 & zcon <= 3.30)
+activity <-
+activity %>%
+filter(zex >= -3.30 & zex <= 3.30)
+# Standardize variables
+activity$zaut <- scale(activity$meanaut)
+activity$zcon <- scale(activity$meancon)
+activity$zex <- scale(activity$meanex)
+# Remove ego outliers
+activity <-
+activity %>%
+filter(zaut >= -3.30 & zaut <= 3.30)
+activity <-
+activity %>%
+filter(zcon >= -3.30 & zcon <= 3.30)
+activity <-
+activity %>%
+filter(zex >= -3.30 & zex <= 3.30)
+activity
+linear.model2 <- lm(AutSup1 ~ meanaut + meancon + meanex, data=activity) # build linear model with focial variables as predictors
+activity$res  <- activity$AutSup1 - predict(linear.model2) # save residuals
+activity$mahal <- MoE_mahala(linear.model2, activity$res)
+# 16.26 = p .001
+activity <-
+activity %>%
+filter(mahal <= 16.27)
+data_var
+main.model2 <- lm(meanex ~ meanaut + meancon, data=activity)
+summary(main.model2)

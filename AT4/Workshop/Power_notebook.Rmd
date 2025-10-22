@@ -1,0 +1,221 @@
+---
+title: "Power Analysis"
+output: html_notebook
+---
+
+Preliminaries
+
+```{r}
+install.packages("pwr")
+install.packages("pwr2")
+install.packages("MBESS")
+library(pwr)
+library(pwr2)
+library(MBESS)
+```
+
+## Overview
+
+Power analysis is an important aspect of experimental design. It allows us to determine the sample size required to detect an effect of a given size with a given degree of confidence. Conversely, it allows us to determine the probability of detecting an effect of a given size with a given level of confidence, under sample size constraints. If the probability is unacceptably low, we would be wise to alter or abandon the experiment.
+
+The following four quantities have an intimate relationship:
+
+1. sample size
+
+2. effect size
+
+3. significance level = P(Type I error) = probability of finding an effect that is not there
+
+4. power = 1 - P(Type II error) = probability of finding an effect that is there
+
+Given any three, we can determine the fourth.
+
+## Power Analysis in R
+
+The pwr package develped by Stéphane Champely, implements power analysis as outlined by Cohen (1988). Some of the more important functions are listed below:
+
+![Power calculation functions](https://i.ibb.co/vxV4qRp/power.jpg) 
+
+For each of these functions, you enter three of the four quantities (effect size, sample size, significance level, power) and the fourth is calculated.
+
+The significance level defaults to 0.05. Therefore, to calculate the significance level, given an effect size, sample size, and power, use the option "sig.level=NULL".
+
+Specifying an effect size can be a daunting task. ES formulas and Cohen's suggestions (based on social science research) are provided below. Cohen's suggestions should only be seen as very rough guidelines. Your own subject matter experience should be brought to bear.
+
+## t-tests
+
+For t-tests, use the following functions:
+
+pwr.t.test(n = , d = , sig.level = , power = , type = c("two.sample", "one.sample", "paired"))
+
+where n is the sample size, d is the effect size, and type indicates a two-sample t-test, one-sample t-test, or paired t-test. If you have unequal sample sizes, use:
+
+pwr.t2n.test(n1 = , n2= , d = , sig.level =, power = )
+
+where n1 and n2 are the sample sizes.
+
+Cohen suggests that d values of 0.2, 0.5, and 0.8 represent small, medium, and large effect sizes respectively.
+
+You can specify alternative="two.sided", "less", or "greater" to indicate a two-tailed, or one-tailed test. A two tailed test is the default.
+
+### For example
+
+For a two-sample t-test comparing 2 groups, let's calculate the sample size needed in each group to obtain a power of 0.80, when the effect size is small (0.25) and a significance level of 0.05 is employed.
+
+```{r}
+pwr.t.test(d = .25, power = .8, sig.level = .05, type = c("two.sample"))
+```
+
+Whoa, that's a massive sample needed! What if the effect size were larger? Say, a Cohen's d of .80?
+
+```{r}
+pwr.t.test(d = .8, power = .8, sig.level =.05, type = c("two.sample"))
+```
+
+You see, the larger the effect size, the smaller the sample needed to reliability identify the true effect, if it exists.
+
+#### Exercise
+
+Now you have a go. What is the sample size needed for a paired-sample t-test to obtain a power of 0.80, when the effect size is large (0.50) and a significance level of 0.05 is employed. Write the code needed to find the n.
+
+```{r}
+pwr.t.test(d = ??, power = ??, sig.level = ??, type = c("paired"))
+```
+
+## One-way ANOVA
+
+For a one-way analysis of variance use:
+
+pwr.anova.test(k = , n = , f = , sig.level = , power = )
+
+where k is the number of groups, n is the common sample size in each group, and f is the Cohens F. Cohen's F can be calcuated from eta2 (or the PRE) of the overall ANOVA model using this website: https://www.escal.site/. It converts common effect size metrics for ANOVA to Cohen's F. 
+
+Cohen suggests that F values of 0.1, 0.25, and 0.4 represent small, medium, and large effect sizes respectively.
+
+### For example
+
+For a one-way ANOVA comparing 3 groups, let's calculate the sample size needed in each group to obtain a power of 0.80, when the effect size is moderate (0.25) and a significance level of 0.05 is employed.
+
+```{r}
+pwr.anova.test(k=3,f=.25,sig.level=.05,power=.8)
+```
+
+### Exercise
+
+Now you have a go. What is the sample size needed for a 4 group one-way ANVOA to obtain a power of 0.80, when the effect size is large (0.40) and a significance level of 0.05 is employed. Write the code needed to find the n for each group.
+
+```{r}
+
+```
+
+## Two-way ANOVA
+
+For a two-way analysis of variance use pwr2 (cannot do it with pwr):
+
+ss.2way(a = , b = , f.A = , f.B = alpha = , beta = , B=100)
+
+where a is the number of groups in Factor A, b is the number of groups in Factor B, f.A is the Cohens F of Factor A, f.B is the Cohen's F of Factor B, alpha is the significance level (0.05), and beta is the inverse power (i.e., 1-power so for 80% power we have a beta of .20 or 1-80). B=100 is just the number of iteration runs for the calculation.
+
+Cohen's F can be calcuated from eta2 (or the PRE) of each main effect in the ANOVA model using this website: https://www.escal.site/. It converts common effect size metrics for ANOVA to Cohen's F. 
+
+Cohen suggests that F values of 0.1, 0.25, and 0.4 represent small, medium, and large effect sizes respectively.
+
+### For example
+
+For a two-way ANOVA, each factor of 2 groups (i.e., 2 x 2 design), let's calculate the sample size needed in each group to obtain a power of 0.80, when the effect size is moderate (0.25) for each main effect, and a significance level of 0.05 is employed.
+
+```{r}
+ss.2way(a=2, b=2, f.A=0.25, f.B=0.25, alpha=0.05, beta=0.2, B=100)
+```
+
+### Exercise
+
+Now you have a go. What is the sample size needed for a 2 x 3 two-way ANVOA to obtain a power of 0.80, when the effect size is large (0.40) for main effect A and moderate for main effect B (0.25), with a significance level of 0.05 employed. Write the code needed to find the n for each group:
+
+```{r}
+
+```
+
+## Applied replication example
+
+In last weeks lecture, I gave a example of a study that I thought could do with being replicated. The study was:
+
+Bryan, C. J., Adams, G. S., & Monin, B. (2013). When cheating would make you a cheater: implicating the self prevents unethical behavior. Journal of Experimental Psychology: General, 142(4), 1001.
+
+This study tested whether people were less likely to cheat for personal gain when a subtle change in phrasing framed such behavior as diagnostic of an undesirable identity cheater vs cheating). 
+
+Participants were given the opportunity to claim money they were not entitled to at the experimenters’ expense; instructions referred to cheating with either language that was designed to highlight the implications of cheating for the actor’s identity (e.g., “Please don’t be a cheater”) or language that focused on the action (e.g., “Please don’t cheat”). 
+
+Participants in the “cheating” condition claimed significantly more money than did participants in the “cheater” condition, who showed no evidence of having cheated at all.
+
+I am going to run a practice power analysis on experiment 2 from this study, which tested the effect in a private online setting.
+
+### Practice power analysis for Bryan et al
+
+The design was a classic two-group design, with participants randomized into a cheater or cheating group. The authors do not list the randomization split but the original sample was 79 college students. We will assume it was 40/39.
+
+Participants in the “cheating” condition claimed to have obtained significantly more heads for money (M  5.49, SD  1.25) than did those in the “cheater” condition (M  4.88, SD = 1.38), t(77) = 2.06, p = .04, Cohen's d = 0.46. This was a difference in favor of the authors' hypotheses: asking someone not to be a cheater appears to stop them cheating. But note here the high p value. Definitely one to check out.
+
+#### Original study power (post-priori power)
+
+The original effect size for the two-sample t-test that tested the primary prediction was Cohen’s d = .46. The authors do not provide a confidence interval for this effect size but we can estimate it using the ci.smd() function from the MBESS package. It has the form:
+
+ci.smd(ncp=, n.1=, n.2=, conf.level=0.95)
+
+where ncp is the t value from the t-test and n.1 and n.2 are the samples sizes in both groups. You know what conf.level means by now!
+
+Let's do this for the Bryan example:
+
+```{r}
+ci.smd(ncp=2.06, n.1=40, n.2=39, conf.level=0.95)
+```
+
+Oof, we have a really low lower limit there of .02. This effect is already looking shaky!
+
+Anyway, let's first see what sample size would have been needed to detect the original effect.
+
+```{r}
+pwr.t.test(d = .46, power = .8, sig.level = .05, type = c("two.sample"))
+```
+
+As is clear from these analyses the original study was not sufficiently powered at 80% to detect a Cohen’s d = .46. Rearranging those numbers, we can calculate the post-hoc power:
+
+```{r}
+pwr.t2n.test(n1 = 40, n2= 39, d = .46, sig.level =.05) # for uneven samples like this use pwr.t2n.test where n1 and n2 are the sample sizes (all other commands the same)
+```
+
+The original study only had a post-priori power of .52 or 52%. Hmmmmmm. Very good grounds to replicate this.
+
+#### Replication study power (a-priori power)
+
+To achieve high power I will need a large number of participants because the original effect size is only moderate. In this case we will use the original effect size to calculate the required sample size with 80% power:
+
+```{r}
+pwr.t.test(d = .46, power = .8, sig.level = .05, type = c("two.sample"))
+```
+
+Okay, so we will need a sample of n = 150 (i.e., 75 in each group) to replicate the original effect size with 80% power.
+
+## Post-script: Quick run through of post-priori power for two-way ANOVA
+
+The logic of post-priori power for two-way ANOVA is slightly different to the other tests listed here because the function used is different. For post-priori two-way ANOVA power we use pwr.2way() from the pwr2 package:
+
+pwr.2way(a=, b=, alpha=, size.A=, size.B=, f.A=, f.B=)
+
+where a is the number of groups in Factor A, b is the number of groups in Factor B, f.A is the Cohens F of Factor A, f.B is the Cohen's F of Factor B, alpha is the significance level (0.05), size.A is the sample size of each group in Factor A and size.B is the sample size of each group in Factor B. B=100 is just the number of iteration runs for the calculation.
+
+### For example
+
+For a two-way ANOVA, with each factor of 2 groups (i.e., 2 x 2 design) containing 50 participants, let's calculate the post-priori power, when the effect size is moderate (0.25) for main effect A and large (.50) for main effect B, a significance level of 0.05 is employed.
+
+
+```{r}
+pwr.2way(a=2, b=2, alpha=.05, size.A=50, size.B=50, f.A=.25, f.B=.50)
+```
+
+Power for main effect A is 94% for main effect B is 1.00%. Use lowest power.
+
+
+***
+
+--Some of this content comes from: Robert I. Kabacoff, Ph.D

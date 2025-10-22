@@ -1,0 +1,512 @@
+employee <- read_csv("C:/Users/CURRANT/Dropbox/Work/LSE/PB230/LT2/Workshop/employee.csv")
+employee <- read_csv("C:/Users/CURRANT/Dropbox/Work/LSE/PB230/LT2/Workshop/employee.csv")
+library(readr)
+employee <- read_csv("C:/Users/CURRANT/Dropbox/Work/LSE/PB230/LT2/Workshop/employee.csv")
+employee
+## missing data
+data_var <-
+employee %>%
+dplyr::select(3:5)
+library("OpenMx")
+library("lavaan")
+library("semPlot")
+library("tidyverse")
+library("mice")
+library("MoEClust")
+library("performance")
+library("mediation")
+library("Hmisc")
+## missing data
+data_var <-
+employee %>%
+dplyr::select(3:5)
+md.pattern(data_var)
+# Standardize variables
+data_var$zControl <- scale(data_var$Control)
+data_var$zExhaustion <- scale(data_var$Exhaustion)
+data_var$zDisconnection <- scale(data_var$Disconnection)
+# Remove Control outliers
+data_var <-
+data_var %>%
+filter(zControl >= -3.30 & zControl <= 3.30)
+# Remove Exhaustion outliers
+data_var <-
+data_var %>%
+filter(zExhaustion >= -3.30 & zExhaustion <= 3.30)
+# Remove Disconnection outliers
+data_var <-
+data_var %>%
+filter(zDisconnection >= -3.30 & zDisconnection <= 3.30)
+# build linear model
+linear.model <- lm(Exhaustion ~ Control + Disconnection, data=data_var)
+# save residuals
+data_var$res  <- data_var$Exhaustion - predict(linear.model)
+# save mahalabonus distances
+data_var$mahal <- MoE_mahala(linear.model, data_var$res)
+# Remove multivariate outliers
+data_var <-
+data_var %>%
+filter(mahal <= 13.82)
+check_model(linear.model)
+rcorr(as.matrix(data_var[,c("Control","Disconnection", "Exhaustion")], type="pearson"))
+# define the model over multiple lines for clarity
+mediation.model <- "
+y ~ x + m
+m ~ x
+"
+mediation.fit <- sem(mediation.model, data=dat)
+med.model <- "
+# the c and b paths
+Exhaustion ~ c * Control + b * Disconnection
+# the a path
+Disconnection ~ a * Control
+# indirect and total effects
+ab := a*b
+total := ab+c
+"
+just.model <- sem(med.model, data = data_var, se = "bootstrap", bootstrap = 100)
+summary(just.model, fit.measures=TRUE, standardized=TRUE, ci=TRUE)
+parameterestimates(just.model, boot.ci.type = "perc", standardized = TRUE)
+## linear model for a path
+model.a <- lm(Disconnection ~ 1 + Control, data=data_var)
+## linear model for b and c paths
+model.b <- lm(Exhaustion ~ 1 + Control + Disconnection, data = data_var)
+## mediation analysis using linear regression
+mediation <- mediate(model.a, model.b, treat="Control", mediator="Disconnection", boot=TRUE, sims=100, boot.ci.type="perc", conf.level= 0.95)
+summary(mediation)
+# unfortunately semPaths plots very small by default, so we set some extra parameters to increase the size to make it readable
+semPaths(just.model, "par",
+sizeMan = 15, sizeInt = 15, sizeLat = 15,
+edge.label.cex=1.5,
+fade=FALSE)
+med.model2 <- "
+# the b path
+Exhaustion ~ b * Disconnection
+# the a path
+Disconnection ~ a * Control
+# indirect effect
+ab := a*b
+"
+over.model <- sem(med.model2, data = data_var, se = "bootstrap", bootstrap = 100)
+summary(over.model, fit.measures=TRUE, standardized=TRUE, ci=TRUE)
+## covariance matrix for the data
+cov(as.matrix(data_var[,c("Exhaustion","Disconnection", "Control")]))
+## model implied covariance matrix
+fitted(over.model)
+parameterestimates(over.model, boot.ci.type = "perc", standardized = TRUE)
+lavInspect(over.model, what = "rsquare")
+semPaths(over.model, "par",
+sizeMan = 15, sizeInt = 15, sizeLat = 15,
+edge.label.cex=1.5,
+fade=FALSE)
+# Just identified model
+just.thirst.model <- "
+# the b and c paths
+consume ~ b * thirst + c * room_temp
+# the a path
+thirst ~ a * room_temp
+# indirect effect
+ab := a*b
+total := ab+c
+"
+# Over identified model
+over.thirst.model <- "
+# the b path
+consume ~ b * thirst
+# the a path
+thirst ~ a * room_temp
+# indirect effect
+ab := a*b
+"
+# Fit the just identified model
+thirst.just.model.fit <- sem(just.thirst.model, data = thirst, se = "bootstrap", bootstrap = 100)
+library(readr)
+thirst <- read_csv("LT2/Workshop/thirst.csv")
+View(thirst)
+# Fit the just identified model
+thirst.just.model.fit <- sem(just.thirst.model, data = thirst, se = "bootstrap", bootstrap = 100)
+# Fit the over identified model
+thirst.over.model.fit <- sem(over.thirst.model, data = thirst, se = "bootstrap", bootstrap = 100)
+# Summary of just identified model
+summary(thirst.just.model.fit, fit.measures=TRUE, standardized=TRUE, ci=TRUE)
+# Parameter estimates of just identified model
+parameterestimates(thirst.just.model.fit, boot.ci.type = "perc", standardized = TRUE)
+# Summary of over identified model
+summary(thirst.over.model.fit, fit.measures=TRUE, standardized=TRUE, ci=TRUE)
+# Parameter estimates of over identified model
+parameterestimates(thirst.over.model.fit, boot.ci.type = "perc", standardized = TRUE)
+library(corpcor)
+library(GPArotation)
+library(psych)
+library(tidyverse)
+library(lavaan)
+library(semPlot)
+library(readr)
+anxiety <- read_csv("C:/Users/CURRANT/Dropbox/Work/LSE/PB230/LT3/Workshop/anxiety.csv")
+head(anxiety)
+anxiety$Q03 <- car::recode(anxiety$Q03, "1=5; 2=4; 3=3; 4=2; 5=1")
+anxiety.cor <-
+anxiety %>%
+select(2:24)
+cor.matrix <- cor(anxiety.cor)
+(round(cor.matrix, 2))
+pc1 <- principal(anxiety.cor, nfactors=23, rotate="none")
+as.matrix(pc1$loadings)
+plot(pc1$values, type="b")
+pc2 <- principal(anxiety.cor, nfactors=4, rotate="none")
+as.matrix(pc2$loadings)
+pc3 <- principal(anxiety.cor, nfactors=4, rotate="varimax")
+print.psych(pc3, cut = 0.3, sort = TRUE)
+computerFear<-anxiety.cor[, c(6, 7, 10, 13, 14, 15, 18)]
+statisticsFear <- anxiety.cor[, c(1, 3, 4, 5, 12, 16, 20, 21)]
+mathFear <- anxiety.cor[, c(8, 11, 17)]
+peerEvaluation <- anxiety.cor[, c(2, 9, 19, 22, 23)]
+psych::alpha(computerFear)
+psych::alpha(statisticsFear)
+psych::alpha(mathFear)
+psych::alpha(peerEvaluation)
+cfa.model <- "
+computerFear =~ 1*Q06 + Q07 + Q10 + Q13 + Q14 + Q15 + Q18
+statisticsFear=~ 1*Q01 + Q03 + Q04 + Q05 + Q12 + Q16 + Q20 + Q21
+mathFear =~ 1*Q08 + Q11 + Q17
+peerEvaluation =~ 1*Q02 + Q09 + Q19 + Q22 + Q23
+"
+# Fit the model
+cfa.fit <- cfa(cfa.model, data=anxiety.cor)
+summary(cfa.fit, fit.measures=TRUE, standardized=TRUE)
+# Model respecifcation removing Q23
+cfa.model2 <- "
+computerFear =~ Q06 + Q07 + Q10 + Q13 + Q14 + Q15 + Q18
+statisticsFear=~ Q01 + Q04 + Q05 + Q12 + Q16 + Q20 + Q21 + Q03
+mathFear =~ Q08 + Q11 + Q17
+peerEvaluation =~ Q02 + Q09 + Q19 + Q22
+"
+# Fit the respecified model
+cfa.fit2 <- cfa(cfa.model2, data=anxiety.cor)
+summary(cfa.fit2, fit.measures=TRUE, standardized=TRUE)
+semPaths(cfa.fit2, "std")
+mental <- lavaan::HolzingerSwineford1939
+head(mental)
+mental.model <- "
+visual =~ x1 + x2 + x3
+writing =~ x4 + x5 + x6
+maths =~ x7 + x8 + x9
+"
+# Fit the CFA model
+mental.fit <- cfa(mental.model, data=mental)
+# Summarise the fit
+summary(mental.fit, fit.measures=TRUE, standardized=TRUE)
+semPaths(mental.fit, "std")
+parent <- read_csv("C:/Users/CURRANT/Dropbox/Work/LSE/PB230/LT4/Workshop/parent.csv")
+library(readr)
+library(lavaan)
+library(semPlot)
+parent <- read_csv("C:/Users/CURRANT/Dropbox/Work/LSE/PB230/LT4/Workshop/parent.csv")
+head(parent)
+measurement.model <- "
+conditional_regard =~ 1*cr1 + cr2 + cr3 + cr4 + cr5
+contingent_self_worth =~ 1*csw1 + csw2 + csw3 + csw4 + csw5
+perfectionistic_strivings =~ 1*sop + ps
+perfectionistic_concerns =~ 1*spp + com + doa
+"
+measurement.model.fit <- cfa(measurement.model, data=parent)
+summary(measurement.model.fit, fit.measures=TRUE, standardized=TRUE)
+library(tidyverse)
+library(Hmisc)
+parent <- parent %>%
+mutate(con_reg = (cr1 + cr2 + cr3 + cr4 + cr5)/5)
+parent <- parent %>%
+mutate(csw = (csw1 + csw2 + csw3 + csw4 + csw5)/5)
+parent <- parent %>%
+mutate(ps = (sop + ps)/2)
+parent <- parent %>%
+mutate(pc = (spp + com + doa)/3)
+rcorr(as.matrix(parent[,c("con_reg","csw", "ps", "pc")], type="pearson"))
+# save standardised factor loadings in object s1
+sl <- standardizedSolution(measurement.model.fit)
+# extract from s1 standardised estimates (est.std) form only parent conditional regard
+sl <- sl$est.std[sl$lhs == "conditional_regard"]
+# calculate the residual variances
+re <- 1 - sl^2
+# calculate the composite reliability
+sum(sl)^2 / (sum(sl)^2 + sum(re))
+semPaths(measurement.model.fit, "std")
+structural.model <- "
+# measurement portion of model
+conditional_regard =~ 1*cr1 + cr2 + cr3 + cr4 + cr5
+contingent_self_worth =~ 1*csw1 + csw2 + csw3 + csw4 + csw5
+perfectionistic_strivings =~ 1*sop + ps
+perfectionistic_concerns =~ 1*spp + com + doa
+# structural portion of model
+contingent_self_worth ~ a*conditional_regard
+perfectionistic_strivings ~ b1*contingent_self_worth
+perfectionistic_concerns ~ b2*contingent_self_worth
+# the indirect effects
+ab1 := a*b1
+ab2 := a*b2
+"
+structural.model.fit <- sem(structural.model, data=parent, se = "bootstrap", bootstrap = 100)
+summary(structural.model.fit, fit.measures=TRUE, standardized=TRUE)
+structural.model2 <- "
+# measurement portion of model
+conditional_regard =~ 1*cr1 + cr2 + cr3 + cr4 + cr5
+contingent_self_worth =~ 1*csw1 + csw2 + csw3 + csw4 + csw5
+perfectionistic_strivings =~ 1*sop + ps
+perfectionistic_concerns =~ 1*spp + com + doa
+# structural portion of model with direct paths added
+contingent_self_worth ~ a*conditional_regard
+perfectionistic_strivings ~ b1*contingent_self_worth + conditional_regard
+perfectionistic_concerns ~ b2*contingent_self_worth + conditional_regard
+# the indirect effects
+ab1 := a*b1
+ab2 := a*b2
+"
+structural.model.fit2 <- sem(structural.model2, data=parent,se = "bootstrap", bootstrap = 100)
+summary(structural.model.fit2, fit.measures=TRUE, standardized=TRUE)
+structural.model3 <- "
+# measurement portion of model
+conditional_regard =~ 1*cr1 + cr2 + cr3 + cr4 + cr5
+contingent_self_worth =~ 1*csw1 + csw2 + csw3 + csw4 + csw5
+perfectionistic_strivings =~ 1*sop + ps
+perfectionistic_concerns =~ 1*spp + com + doa
+# structural portion of model with only direct path to perfectionistic concerns added
+contingent_self_worth ~ a*conditional_regard
+perfectionistic_strivings ~ b1*contingent_self_worth
+perfectionistic_concerns ~ b2*contingent_self_worth + conditional_regard
+# the indirect effects
+ab1 := a*b1
+ab2 := a*b2
+"
+structural.model.fit3 <- sem(structural.model3, data=parent,se = "bootstrap", bootstrap = 100)
+summary(structural.model.fit3, fit.measures=TRUE, standardized=TRUE)
+parameterestimates(structural.model.fit3, boot.ci.type = "perc", standardized = TRUE)
+lavInspect(structural.model.fit3, what = "rsquare")
+semPaths(structural.model.fit3, "std")
+pol <- lavaan::PoliticalDemocracy
+head(pol)
+# Build CFA model
+political.cfa <- "
+industrialisation =~ 1*y5 + y6 + y7 + y8
+political_democracy =~ 1*x1 + x2 + x3
+"
+# Fit CFA model
+political.cfa.fit <- cfa(political.cfa, data=pol)
+#Summarise CFA model
+summary(political.cfa.fit, fit.measures=TRUE, standardized=TRUE)
+# Build SEM model
+political.sem <- "
+political_democracy =~ 1*y5 + y6 + y7 + y8
+industrialisation =~ 1*x1 + x2 + x3
+political_democracy ~ industrialisation
+"
+# Parameter SEM model
+political.sem.fit <- sem(political.sem, data=pol,se = "bootstrap", bootstrap = 100)
+# Summary of SEM model
+summary(political.sem.fit, fit.measures=TRUE, standardized=TRUE)
+# Fit CFA model
+political.cfa.fit <- cfa(political.cfa, data=pol)
+#Summarise CFA model
+summary(political.cfa.fit, fit.measures=TRUE, standardized=TRUE)
+# Parameter SEM model
+political.sem.fit <- sem(political.sem, data=pol,se = "bootstrap", bootstrap = 100)
+# Summary of SEM model
+summary(political.sem.fit, fit.measures=TRUE, standardized=TRUE)
+# Parameter estimates of SEM model
+parameterestimates(political.sem.fit, boot.ci.type = "perc", standardized = TRUE)
+# R2 of SEM model
+lavInspect(political.sem.fit, what = "rsquare")
+semPaths(political.sem.fit, "std")
+install.packages("pwr")
+install.packages("pwr2")
+install.packages("MBESS")
+library(pwr)
+library(pwr2)
+library(MBESS)
+pwr.t.test(d = .25, power = .8, sig.level = .05, type = c("two.sample"))
+pwr.t.test(d = .8, power = .8, sig.level =.05, type = c("two.sample"))
+pwr.anova.test(k=3,f=.25,sig.level=.05,power=.8)
+ss.2way(a=2, b=2, f.A=0.25, f.B=0.25, alpha=0.05, beta=0.2, B=100)
+pwr.2way(a=2, b=2, alpha=.05, size.A=50, size.B=50, f.A=.25, f.B=.50)
+library(psych)
+library(naniar)
+library(sjlabelled)
+library(tidyverse)
+library(mice)
+library(VIM)
+library(MissMech)
+library(mice)
+library(MoEClust)
+library(miceadds)
+data <- read_csv("C:/Users/CURRANT/Dropbox/Work/LSE/PB230/MT4/Workshop/data.csv")
+describe(data)
+data <-
+data %>%
+replace_with_na(replace = list(ded3 = 6:55, task4 = 6:33)) # replace any value between 6:55 and 6:33 with na
+describe(data)
+data_var <-
+data %>%
+select(6:34) # select out only the items
+md.pattern(data_var) # run the missing data pattern function
+aggr(data_var, col=c('white','red'), numbers=TRUE, sortVars=TRUE, cex.axis=.7, gap=3, ylab=c("Percentage of missing data","Missing Data Pattern"))
+vis_miss(data_var)
+out.MCAR.ws <- TestMCARNormality(data_var, del.lesscases = 1)
+summary(out.MCAR.ws)
+data_var$na_count <- apply(is.na(data_var), 1, sum)
+data_var
+data_var <-
+data_var %>%
+filter(na_count <= "3")
+data_var
+data_var <-
+data_var %>%
+rowwise()%>%
+mutate(meanego = mean(c(ego1,ego2,ego3,ego4,ego5,ego6), na.rm = TRUE)) %>%
+mutate(meantask = mean(c(task1,task2,task3,task4,task5,task6,task7), na.rm = TRUE)) %>%
+mutate(meanconf = mean(c(conf1,conf2,conf3,conf4), na.rm = TRUE)) %>%
+mutate(meanded = mean(c(ded1,ded2,ded3,ded4), na.rm = TRUE)) %>%
+mutate(meanvig = mean(c(vig1,vig2,vig3,vig4), na.rm = TRUE)) %>%
+mutate(meanent = mean(c(ent1,ent2,ent3,ent4), na.rm = TRUE))
+data_var
+# Task
+data_var <- within(data_var, task1 <- ifelse(is.na(task1), meantask, task1)) # if (ifelse) task1 is missing (is.na) then replace with meantask, else use task1
+data_var <- within(data_var, task2 <- ifelse(is.na(task2), meantask, task2))
+data_var <- within(data_var, task3 <- ifelse(is.na(task3), meantask, task3))
+data_var <- within(data_var, task4 <- ifelse(is.na(task4), meantask, task4))
+data_var <- within(data_var, task5 <- ifelse(is.na(task5), meantask, task5))
+data_var <- within(data_var, task6 <- ifelse(is.na(task6), meantask, task6))
+# Ego
+data_var <- within(data_var, ego1 <- ifelse(is.na(ego1), meantask, ego1))
+data_var <- within(data_var, ego2 <- ifelse(is.na(ego2), meantask, ego2))
+data_var <- within(data_var, ego3 <- ifelse(is.na(ego3), meantask, ego3))
+data_var <- within(data_var, ego4 <- ifelse(is.na(ego4), meantask, ego4))
+data_var <- within(data_var, ego5 <- ifelse(is.na(ego5), meantask, ego5))
+# Confidence
+data_var <- within(data_var, conf1 <- ifelse(is.na(conf1), meantask, conf1))
+data_var <- within(data_var, conf4 <- ifelse(is.na(conf4), meantask, conf4))
+# Dedication
+data_var <- within(data_var, ded1 <- ifelse(is.na(ded1), meantask, ded1))
+data_var <- within(data_var, ded3 <- ifelse(is.na(ded3), meantask, ded3))
+data_var <- within(data_var, ded4 <- ifelse(is.na(ded4), meantask, ded4))
+# Vigor
+data_var <- within(data_var, vig1 <- ifelse(is.na(vig1), meantask, vig1))
+data_var <- within(data_var, vig2 <- ifelse(is.na(vig2), meantask, vig2))
+data_var <- within(data_var, vig3 <- ifelse(is.na(vig3), meantask, vig3))
+data_var <- within(data_var, vig4 <- ifelse(is.na(vig4), meantask, vig4))
+# Enthusiasm
+data_var <- within(data_var, ent1 <- ifelse(is.na(ent1), meantask, ent1))
+data_var <- within(data_var, ent2 <- ifelse(is.na(ent2), meantask, ent2))
+data_var <- within(data_var, ent3 <- ifelse(is.na(ent3), meantask, ent3))
+data_var <- within(data_var, ent4 <- ifelse(is.na(ent4), meantask, ent4))
+data_var
+md.pattern(data_var)
+data_var <-
+data_var %>%
+rowwise()%>%
+mutate(meanego = mean(c(ego1,ego2,ego3,ego4,ego5,ego6))) %>%
+mutate(meantask = mean(c(task1,task2,task3,task4,task5,task6,task7))) %>%
+mutate(meanconf = mean(c(conf1,conf2,conf3,conf4))) %>%
+mutate(meanded = mean(c(ded1,ded2,ded3,ded4))) %>%
+mutate(meanvig = mean(c(vig1,vig2,vig3,vig4))) %>%
+mutate(meanent = mean(c(ent1,ent2,ent3,ent4))) %>%
+mutate(meaneng = mean(c(meanded,meanvig,meanent,meanconf))) # create mean enagaement variable "meaneng"
+data_var
+# Standardize variables
+data_var$zego <- scale(data_var$meanego)
+data_var$ztask <- scale(data_var$meantask)
+data_var$zeng <- scale(data_var$meaneng)
+# Remove ego outliers
+data_var <-
+data_var %>%
+filter(zego >= -3.30 & zego <= 3.30)
+data_var
+# Remove task outliers
+data_var <-
+data_var %>%
+filter(ztask >= -3.30 & ztask <= 3.30)
+data_var
+# Remove engagement outliers
+data_var <-
+data_var %>%
+filter(zeng >= -3.30 & zeng <= 3.30)
+data_var
+linear.model <- lm(task1 ~ meantask + meanego + meaneng, data=data_var) # build linear model with focial variables as predictors
+data_var$res  <- data_var$task1 - predict(linear.model) # save residuals
+data_var$mahal <- MoE_mahala(linear.model, data_var$res)
+data_var # calculate mahalanobis distances from the residuals and save them in the dataset as new variable mahal
+summary(linear.model)
+# Remove multivariate outliers
+data_var <-
+data_var %>%
+filter(mahal <= 16.28)
+data_var
+describe(data_var)
+main.model <- lm(meaneng ~ meantask + meanego, data=data_var)
+summary(main.model)
+data_MI <-
+data %>%
+rowwise()%>%
+mutate(meanego = mean(c(ego1,ego2,ego3,ego4,ego5,ego6), na.rm = FALSE)) %>%
+mutate(meantask = mean(c(task1,task2,task3,task4,task5,task6,task7), na.rm = FALSE)) %>%
+mutate(meanconf = mean(c(conf1,conf2,conf3,conf4), na.rm = FALSE)) %>%
+mutate(meanded = mean(c(ded1,ded2,ded3,ded4), na.rm = FALSE)) %>%
+mutate(meanvig = mean(c(vig1,vig2,vig3,vig4), na.rm = FALSE)) %>%
+mutate(meanent = mean(c(ent1,ent2,ent3,ent4), na.rm = FALSE)) %>%
+mutate(meaneng = mean(c(meanded,meanconf,meanvig,meanent), na.rm = FALSE))
+data_MI
+data_MI <-
+data_MI %>%
+select(meaneng,meantask,meanego)
+data_MI
+md.pattern(data_MI)
+aggr(data_MI, col=c('white','red'), numbers=TRUE, sortVars=TRUE, cex.axis=.7, gap=3, ylab=c("Percentage of missing data","Missing Data Pattern"))
+out <- TestMCARNormality(data_MI, del.lesscases = 1)
+summary(out)
+imp <- mice(data_MI, m=5, maxit=10, method="pmm")
+imp
+complete(imp, action = "long", include = TRUE)
+res.mi.cor <- micombine.cor(mi.res=imp, variables = c(1:3) )
+res.mi.cor
+fit <- with(data=imp,exp=lm(meaneng ~ meantask + meanego)) # fit the linear model with the imputed dataset
+lin.pool <- pool(fit) # pool the estimates across the multiple imputations
+summary(lin.pool) # output
+mi.anova(mi.res=imp, formula="meaneng ~ meantask + meanego")
+library(performance)
+check_model(anova.model)
+library(readr)
+perfectionism <- read_csv("C:/Users/CURRANT/Dropbox/Work/LSE/PB230/LT1/Workshop/perfectionism.csv")
+head(perfectionism)
+anova.model <- aov(SOP ~ Country, data = perfectionism)
+# histogram
+hist(anova.model$residuals)
+# QQ-plot
+library(car)
+qqPlot(anova.model$residuals)
+shapiro.test(anova.model$residuals)
+kruskal.test(SOP ~ Country, data = perfectionism)
+pairwise.wilcox.test(perfectionism$SOP, perfectionism$Country, p.adjust.method = "BH")
+# Boxplot
+boxplot(SOP ~ Country, data = perfectionism)
+# Levene's test
+library(car)
+leveneTest(SOP ~ Country, data = perfectionism)
+oneway.test(SOP ~ Country, data = perfectionism)
+pairwise.t.test(perfectionism$SOP, perfectionism$Country, p.adjust.method = "BH", pool.sd = FALSE)
+WHR <- read_csv("C:/Users/CURRANT/Dropbox/Work/LSE/PB230/LT1/Workshop/WHR.csv")
+head(WHR)
+library(tidyverse)
+WHR <- # into existing dataframe
+WHR %>% # from existing daraframe
+filter(GDP >= "1") # Filter GDP at a value of 1 and above (i.e., rid the dataframe of any non-numeric cases)
+head(WHR)
+lm.model<-lm(Happiness~GDP, data=WHR)
+summary(lm.model)
+plot(lm.model,which=1)
+# histogram
+hist(lm.model$residuals)
+# QQ-plot
+library(car)
+qqPlot(lm.model$residuals)
+check_model(anova.model)
+check_model(lm.model)
+check_model(anova.model)
+check_model(lm.model)
