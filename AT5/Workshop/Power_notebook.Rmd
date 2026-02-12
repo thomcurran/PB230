@@ -79,7 +79,7 @@ You see, the larger the effect size, the smaller the sample needed to reliabilit
 Now you have a go. What is the sample size needed for a paired-sample t-test to obtain a power of 0.80, when the effect size is large (0.50) and a significance level of 0.05 is employed. Write the code needed to find the n.
 
 ```{r}
-pwr.t.test(d = ??, power = ??, sig.level = ??, type = c("paired"))
+pwr.t.test(d = .50, power = .80, sig.level = .05, type = c("paired"))
 ```
 
 ## One-way ANOVA
@@ -105,7 +105,7 @@ pwr.anova.test(k=3,f=.25,sig.level=.05,power=.8)
 Now you have a go. What is the sample size needed for a 4 group one-way ANVOA to obtain a power of 0.80, when the effect size is large (0.40) and a significance level of 0.05 is employed. Write the code needed to find the n for each group.
 
 ```{r}
-
+pwr.anova.test(k=4,f=.40,sig.level=.05,power=.8)
 ```
 
 ## Two-way ANOVA
@@ -133,7 +133,7 @@ ss.2way(a=2, b=2, f.A=0.25, f.B=0.25, alpha=0.05, beta=0.2, B=100)
 Now you have a go. What is the sample size needed for a 2 x 3 two-way ANVOA to obtain a power of 0.80, when the effect size is large (0.40) for main effect A and moderate for main effect B (0.25), with a significance level of 0.05 employed. Write the code needed to find the n for each group:
 
 ```{r}
-
+ss.2way(a=2, b=3, f.A=0.40, f.B=0.25, alpha=0.05, beta=0.2, B=100)
 ```
 
 ## Applied replication example
@@ -194,7 +194,7 @@ To achieve high power I will need a large number of participants because the ori
 pwr.t.test(d = .46, power = .8, sig.level = .05, type = c("two.sample"))
 ```
 
-Okay, so we will need a sample of n = 150 (i.e., 75 in each group) to replicate the original effect size with 80% power.
+Okay, so we will need a sample of n = 152 (i.e., 76 in each group) to replicate the original effect size with 80% power.
 
 ## Post-script: Quick run through of post-priori power for two-way ANOVA
 
