@@ -1,0 +1,128 @@
+---
+title: "Example Confirmatory Data Analysis Script"
+output: html_notebook
+---
+
+## Replication study and hypotheses
+
+This is a data analysis plan for the replication of:
+
+Bryan, C. J., Adams, G. S., & Monin, B. (2013). When cheating would make you a cheater: implicating the self prevents unethical behavior. Journal of Experimental Psychology: General, 142(4), 1001.
+
+The original test of the primary hypothesis is an independent t-test that compares the mean head count of reported coin flips across two randomized conditions: cheater and cheating. Power analyses revealed that 76 participants were needed in each condition to achieve 80% power with an effect size of Cohen's d = 0.46. Here I will document the analysis plan for this replication. A successful replication will find evidence of support for the alternate hypothesis, which is:
+
+H1: The mean heads reported in the cheating condition will be larger than the mean heads reported in the cheater condition.  
+
+The null hypothesis being tested in the independent t-test is:
+
+H0: There will be no difference in mean heads reported between the cheating and cheater conditions.
+
+## Load data
+
+```{r}
+library(readr)
+data <- read_csv("indt.csv")
+```
+
+## Preliminary analysis
+
+### Data Screening and cleaning
+
+First the data will be screened for erroneous and missing values. The outcome in this study, mean heads, is bounded between 0 and 10 and so any responses beyond this range will be replaced with a missing value.
+
+```{r}
+library(tidyverse)
+library(psych)
+library(naniar)
+data <-
+  data %>%
+  replace_with_na_at(.vars = "heads", condition = ~ .x > 10 | .x < 0) # any heads value above 10 or below 0 becomes NA
+describe(data)
+```
+
+As this is an experimental study, any missing values will be removed listwise from the sample.
+
+```{r}
+data <- drop_na(data)
+data
+```
+
+### Summary statistics and distributions
+
+Second, I will inspect the means and standard deviations of each condition in the study.
+
+```{r}
+describeBy(data,data$condition)
+```
+
+Then I will create a plot for the distributions of each condition.
+
+```{r}
+library(ggplot2)
+
+## Find mean for each condition
+
+means <- data %>% group_by(condition) %>% summarise(heads.mean = mean(heads))
+
+## Plot distributions
+
+plot1 <-
+  ggplot(data, aes(x=heads)) + geom_histogram(binwidth=.5, colour="black", fill="white") + 
+    facet_grid(condition ~ .) +
+    geom_vline(data=means, aes(xintercept=heads.mean),
+               linetype="dashed", linewidth=1, colour="red") + theme_classic()
+
+## Save plot
+
+ggsave("plot_1.png", plot = plot1)
+plot1
+```
+
+And finally create an APA table with the mean and sd for each condition.
+
+```{r}
+library(apaTables)
+apa.1way.table(iv=condition,dv=heads,data=data,filename="table_1.doc",table.number = 1)
+```
+
+
+## Confirmatory analysis
+
+The next step is to conduct the independent samples t-test for the primary confirmatory hypothesis testing as listed in the data analysis plan. I will conduct a normal theory t-test and a bootstrapped t-test.
+
+```{r}
+library(MKinfer)
+t.test(data$heads ~ data$condition, var.equal=TRUE)
+set.seed(2026) # so the bootstrap results are the same each time
+boot.t.test(data$heads ~ data$condition, var.equal=TRUE, R = 5000)
+```
+
+Now I will calculate the effect size for the difference between the conditions.
+
+```{r}
+library(rstatix)
+cohens_d(data, heads ~ condition,  var.equal = TRUE)
+```
+
+## Tables and figures for reporting 
+
+To report the results from the independent t-test I will visualize the means and 95% confidence intervals for each condition using a bar chart with error bars.
+
+```{r}
+library(rcompanion)
+sum <- groupwiseMean(heads ~ condition, data=data,conf   = 0.95,digits = 3)
+plot2 <-
+  ggplot(sum, aes(x = condition, y = Mean)) +
+  geom_bar(stat ="identity",
+           fill = "gray", width = .40, alpha=.5
+          ) +
+  geom_errorbar(aes(ymin  = Trad.lower,
+                    ymax  = Trad.upper),
+                width = 0.15) +
+  xlab("Condition") +
+  ylab("Mean Number of Heads")+
+  theme_classic()
+
+ggsave("plot_2.png", plot = plot2)
+plot2
+```
