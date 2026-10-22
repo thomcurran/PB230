@@ -417,6 +417,71 @@ It seems both task and ego goals positively predict engagement. We have an answe
 
 Standardized z-scores larger than 3.29 (p < .001) and Mahalanobis distances greater than χ2 (3) = 16.27 (p < .001) were used to identify participants as univariate and multivariate outliers (Tabachnick & Fidell, 2013). Three participants were removed on this basis (2 univariate and 1 multivariate outlier). This yielded a final sample of 256 participants. These data were approximately univariate normal (average absolute skew = .23; average absolute kurtosis = .45)."
 
+## Activity
+
+For this activity, I want you to screen clean and run a multiple regression for the "activity.csv" dataset. In this dataset are 14 variables from 272 participants. It is real data from a study looking at relationships between manager autonomy support (5 items; AutSup), manager control (4 items; CON), and exhaustion (5 items; EX) among call center workers.
+
+The research question was:
+
+Is employee exhaustion predicted by manager autonomy support and manager control?
+
+This is just a multiple regression with exhaustion as the outcome and manager autonomy support and manager control as the predictor variables.
+
+Before we get to the model, though, we need to screen and clean this dataset for errors, missing data, and outliers. Using the knowledge from this week's lecture and the programming above, I would like you to check the data, examine the missingness, impute values, and detect and delete outliers before running the linear model.
+
+## Step 1: Load data
+
+```{r}
+activity <- read_csv("activity.csv")
+```
+
+
+## Step 2: Check data for errors
+
+```{r}
+
+```
+
+
+## Step 3: Check amount and pattern of missing data and remove any cases with > 10% missing
+
+```{r}
+
+```
+
+
+## Step 4: Impute values using scale mean
+
+```{r}
+
+```
+
+
+## Step 5: Create variables using mean scores
+
+```{r}
+
+```
+
+
+## Step 6: Detect and remove univariate outliers
+
+```{r}
+
+```
+
+## Step 7: Detect and remove multivariate outliers
+
+```{r}
+
+```
+
+## Step 8: Run linear model and report results
+
+```{r}
+
+```
+
 ## Further reading: Multiple Imputation
 
 Although mean scale imputation is preferred for our dataset, I want to show you how to do imputation and analysis using Multiple Imputation because there may be times where you will need to use it (i.e., non-MCAR data or data with large amounts of missingness).
@@ -568,72 +633,5 @@ mi.anova(mi.res=imp, formula="meaneng ~ meantask + meanego")
 In this multiple regression model we have a pooled multiple R2 of .47, F values, and eta2 associated with each predictor of engagement.
 
 And that's how it's done! We will mainly be using mean scale imputation because this satisfies most of the assumptions commonly met in correlational research (i.e., MCAR and low relative missingness). But I also wanted to give you an overview of what to do if your data are not MCAR or the amount of missingness is large.
-
-## Activity
-
-For this activity, I want you to screen clean and run a multiple regression for the "activity.csv" dataset. In this dataset are 14 variables from 272 participants. It is real data from a study looking at relationships between manager autonomy support (5 items; AutSup), manager control (4 items; CON), and exhaustion (5 items; EX) among call center workers.
-
-The research question was:
-
-Is employee exhaustion predicted by manager autonomy support and manager control?
-
-This is just a multiple regression with exhaustion as the outcome and manager autonomy support and manager control as the predictor variables.
-
-Before we get to the model, though, we need to screen and clean this dataset for errors, missing data, and outliers. Using the knowledge from this week's lecture and the programming above, I would like you to check the data, examine the missingness, impute values, and detect and delete outliers before running the linear model.
-
-## Step 1: Load data
-
-```{r}
-activity <- read_csv("activity.csv")
-```
-
-
-## Step 2: Check data for errors
-
-```{r}
-
-```
-
-
-## Step 3: Check amount and pattern of missing data and remove any cases with > 10% missing
-
-```{r}
-
-```
-
-
-## Step 4: Impute values using scale mean
-
-```{r}
-
-```
-
-
-## Step 5: Create variables using mean scores
-
-```{r}
-
-```
-
-
-## Step 6: Detect and remove univariate outliers
-
-```{r}
-
-```
-
-## Step 7: Detect and remove multivariate outliers
-
-```{r}
-
-```
-
-## Step 8: Run linear model and report results
-
-```{r}
-
-```
-
-
 
 --Some of this content comes from: Heymans and Eekhout (2019)
